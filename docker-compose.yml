@@ -1,0 +1,40 @@
+services:
+  users-db:
+    image: postgres:16-alpine
+    container_name: users-db
+    environment:
+      POSTGRES_USER: chat
+      POSTGRES_PASSWORD: chat-secret
+      POSTGRES_DB: users_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - users-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chat -d users_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  auth:
+    build:
+      context: ./chat-system
+      dockerfile: services/auth/Dockerfile
+    container_name: auth
+    environment:
+      DB_TYPE: postgres
+      DB_HOST: users-db
+      DB_PORT: "5432"
+      DB_USERNAME: chat
+      DB_PASSWORD: chat-secret
+      DB_NAME: users_db
+      DB_SYNC: "true"
+      PORT: "3001"
+    ports:
+      - "3001:3001"
+    depends_on:
+      users-db:
+        condition: service_healthy
+
+volumes:
+  users-db-data:

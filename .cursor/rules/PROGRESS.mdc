@@ -1,0 +1,78 @@
+# Progress — Distributed Chat Application (in memory of Ventsislav)
+
+## Architecture decisions log
+
+| Decision | Choice | Notes |
+|----------|--------|--------|
+| Outbox / inbox storage | **Option A — In existing DB** | Outbox table and inbox (processed IDs) live in existing databases (e.g. outbox in Messages DB, inbox/processed_ids in Messages DB). No separate store for these tables. |
+| Message history | HTTP GET, not WebSocket | Client fetches history via `GET /messages/:channelId`; API Gateway → Messaging Service → Messages DB. |
+| Presence registration | Channel Service → Presence Service (HTTP) | Presence Service is sole owner of Presence Redis; Channel Service calls register/unregister/heartbeat. |
+| Offline notifications | Notification Service resolves email via Auth Service | Messaging Service sends only `{ recipientId, issuer, messagePreview }`; Notification Service calls Auth Service for email. |
+| Resilience (main) | Circuit breaker + retry with backoff/jitter | Circuit breaker on Messaging → Presence (fallback: assume offline). Retry + jitter on Messaging→Presence, Notification→Auth, Channel→Presence. |
+| Resilience (bonus later) | Outbox + inbox | After project finish: outbox for at-least-once publish; inbox for idempotent consumption in worker. |
+| Pub/sub (MVP) | Single global topic | One Redis Pub/Sub topic; payload includes `recipientIds`; Channel Services filter locally. Bonus: per-user/per-conversation topics later. |
+| Persistent storage | Named Docker volumes | Users DB, Messages DB, Notification DB use named volumes; Presence Redis and Pub/Sub Redis are ephemeral. |
+
+---
+
+## Phases and tasks
+
+### Phase 1 — Foundation and infra
+
+- [ ] Choose tech stack (backend, DBs, front-end) and document in project
+- [ ] Repository structure (monorepo or multi-repo) and Docker Compose layout
+- [ ] Docker Compose: all services + Redis + DBs + named volumes for Users, Messages, Notification DBs
+- [ ] Single `docker compose up` runs full stack; data persists across stop/start
+
+### Phase 2 — Auth and gateway
+
+- [ ] Auth Service: register, login, JWT issuance; Users DB (id, username, email, passwordHash)
+- [ ] API Gateway: single entry point; route `/auth/*` to Auth Service; validate JWT on protected routes; proxy `/ws` to Load Balancer
+- [ ] Client: login/register flow; store JWT; use for subsequent requests
+
+### Phase 3 — WebSocket and presence
+
+- [ ] Load Balancer (e.g. Nginx): distribute WebSocket connections to Channel Services (no sticky sessions)
+- [ ] Channel Service: WebSocket server; validate JWT on upgrade (`?token=...`); associate connection with userId
+- [ ] Presence Service: register, unregister, heartbeat (batched); sole owner of Presence Redis; TTL 30s
+- [ ] Channel Service: on connect → POST /presence/register; on disconnect → POST /presence/unregister; heartbeat every 15s (batched)
+
+### Phase 4 — Messaging (send and persist)
+
+- [ ] Messaging Service: receive "send message" from Channel Service
+- [ ] Push to Message Queue (with retry); call Presence Service (retry + circuit breaker; fallback: assume offline)
+- [ ] If online: publish to Redis Pub/Sub (`recipientIds`, message, issuer, sentAt, channelId)
+- [ ] If offline: push to Notification Queue (`recipientId`, issuer, messagePreview)
+- [ ] Messaging Processor Worker: consume Message Queue → write to Messages DB
+- [ ] Channel Services: subscribe to Pub/Sub; deliver to local connections for `recipientIds`
+
+### Phase 5 — Notifications and history
+
+- [ ] Notification Service: consume Notification Queue; call Auth Service for email; send email; write to Notification DB
+- [ ] Messaging Service: GET /messages/:channelId → query Messages DB; API Gateway routes history requests here
+- [ ] Client: fetch history via HTTP when opening a conversation; real-time via WebSocket
+
+### Phase 6 — Resilience (main)
+
+- [ ] Retry with exponential backoff + jitter on: Messaging→Presence, Notification→Auth, Channel→Presence
+- [ ] Circuit breaker on Messaging→Presence; fallback: assume offline, push to Notification Queue
+
+### Phase 7 — Polish and bonus (later)
+
+- [ ] Friends/contacts (if in scope): Users DB + GET /users/friends; Gateway route
+- [ ] Conversation creation: implicit on first message; return conversationId for history and subsequent messages
+- [ ] **(Bonus)** Outbox pattern: Messaging Service writes to outbox table in Messages DB; Outbox Publisher polls → Message Queue + Pub/Sub
+- [ ] **(Bonus)** Inbox pattern: Messaging Processor Worker tracks processed message IDs; idempotent consumption
+
+---
+
+## Current focus
+
+- Phase 1: Foundation and infra (tech stack, Docker Compose, volumes).
+
+---
+
+## References
+
+- Architecture and data flows: project architecture XML (data_flows + resilience_patterns).
+- Mentorship workflow: [mentorship.mdc](mentorship.mdc).
