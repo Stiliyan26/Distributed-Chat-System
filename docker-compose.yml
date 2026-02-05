@@ -20,7 +20,7 @@ services:
     build:
       context: ./chat-system
       dockerfile: services/auth/Dockerfile
-    container_name: auth
+    container_name: auth-service
     environment:
       DB_TYPE: postgres
       DB_HOST: users-db
@@ -28,10 +28,11 @@ services:
       DB_USERNAME: chat
       DB_PASSWORD: chat-secret
       DB_NAME: users_db
-      DB_SYNC: "true"
+      DB_SYNC: "true"   # set to "false" in real production and use migrations
+      NODE_ENV: production
       PORT: "3001"
     ports:
-      - "3001:3001"
+      - "3002:3001"
     depends_on:
       users-db:
         condition: service_healthy
