@@ -2,8 +2,8 @@ import { Global, Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
-import { DATABASE_CONFIG_KEY } from "../config/env.validation";
 import { User } from "../entities/user.entity";
+import { DATABASE_CONFIG_KEY } from "../config/env.validation";
 
 @Global()
 @Module({
