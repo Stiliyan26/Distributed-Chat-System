@@ -9,7 +9,7 @@ import {
 } from "class-validator";
 import { ValidationMessages } from "./error-messages";
 
-export class CreateUserDto {
+export class CreateUserRequestDto {
   @MinLength(5)
   @MaxLength(15)
   @Matches(/^[a-zA-Z0-9_]+$/, {

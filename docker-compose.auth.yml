@@ -1,3 +1,13 @@
+# ============================================
+# AUTH DOMAIN - Self-Contained
+# ============================================
+# Includes: Auth Service + Users Database
+#
+# Start: docker-compose -f docker-compose.auth.yml up -d
+# Stop:  docker-compose -f docker-compose.auth.yml down
+
+name: chat-system-auth
+
 services:
   users-db:
     image: postgres:16-alpine
@@ -15,8 +25,10 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - chat-network
 
-  auth:
+  auth-service:
     build:
       context: ./chat-system
       dockerfile: services/auth/Dockerfile
@@ -28,7 +40,7 @@ services:
       DB_USERNAME: chat
       DB_PASSWORD: chat-secret
       DB_NAME: users_db
-      DB_SYNC: "true"   # set to "false" in real production and use migrations
+      DB_SYNC: "true"
       NODE_ENV: production
       PORT: "3001"
     ports:
@@ -36,6 +48,13 @@ services:
     depends_on:
       users-db:
         condition: service_healthy
+    networks:
+      - chat-network
 
 volumes:
   users-db-data:
+
+networks:
+  chat-network:
+    name: chat-network
+    driver: bridge

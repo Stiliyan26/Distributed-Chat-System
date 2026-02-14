@@ -1,0 +1,30 @@
+{
+  // TypeScript/JavaScript automatic import updates
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  
+  // NO file extensions in imports (TypeScript standard)
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.preferences.importModuleSpecifierEnding": "minimal",
+  "javascript.preferences.importModuleSpecifierEnding": "minimal",
+  
+  // Enable auto-imports
+  "typescript.suggest.autoImports": true,
+  "javascript.suggest.autoImports": true,
+  
+  // Nx-specific settings
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/tmp": true
+  },
+  
+  // Better auto-import organization
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  
+  // Format on save (optional, but recommended)
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  }
+}

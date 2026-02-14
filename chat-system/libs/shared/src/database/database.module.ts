@@ -2,8 +2,7 @@ import { Global, Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
-import { User } from "../entities/user.entity";
-import { DATABASE_CONFIG_KEY } from "../config/env.validation";
+import { DATABASE_CONFIG_KEY } from "../../../../libs/shared/src/database/database.config";
 
 @Global()
 @Module({
@@ -22,11 +21,10 @@ import { DATABASE_CONFIG_KEY } from "../config/env.validation";
           synchronize: dbConfig.synchronize,
           autoLoadEntities: true,
           logging: true,
-          entities: [User],
         };
       },
       inject: [ConfigService],
     }),
   ],
 })
-export class DatabaseModule { }
+export class SharedDatabaseModule { }

@@ -1,0 +1,138 @@
+# ============================================
+# MESSAGING DOMAIN - Self-Contained
+# ============================================
+# Includes:
+#   - Messages Database
+#   - Messaging Service (API)
+#   - Messaging Worker (Kafka Consumer)
+#   - Kafka + Zookeeper (Message Broker)
+#   - Kafka UI (Management Interface)
+#
+# Start: docker-compose -f docker-compose.messaging.yml up -d
+# Stop:  docker-compose -f docker-compose.messaging.yml down
+# 
+# Access:
+#   - API: http://localhost:3003
+#   - Kafka UI: http://localhost:8080
+
+name: chat-system-messaging
+
+services:
+  # ============================================
+  # INFRASTRUCTURE
+  # ============================================
+  messages-db:
+    image: postgres:16-alpine
+    container_name: messages-db
+    environment:
+      POSTGRES_USER: chat
+      POSTGRES_PASSWORD: chat-secret
+      POSTGRES_DB: messages_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - messages-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chat -d messages_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - chat-network
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - chat-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - chat-network
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    depends_on:
+      - kafka
+    networks:
+      - chat-network
+
+  # ============================================
+  # MESSAGING SERVICES
+  # ============================================
+  messaging-service:
+    build:
+      context: ./chat-system
+      dockerfile: services/messaging/Dockerfile
+    container_name: messaging-service
+    command: node --inspect=0.0.0.0:9229 api/main.js
+    environment:
+      PORT: 3000
+      KAFKA_BROKER: kafka:29092
+    ports:
+      - "3003:3000"
+      - "9229:9229"
+    depends_on:
+      - kafka
+      - messages-db
+    networks:
+      - chat-network
+
+  messaging-worker:
+    build:
+      context: ./chat-system
+      dockerfile: services/messaging/Dockerfile
+    container_name: messaging-worker
+    command: node --inspect=0.0.0.0:9229 worker/main.js
+    environment:
+      KAFKA_BROKER: kafka:29092
+      DB_HOST: messages-db
+      DB_PORT: "5432"
+      DB_USERNAME: chat
+      DB_PASSWORD: chat-secret
+      DB_NAME: messages_db
+      DB_TYPE: postgres
+      DB_SYNC: "true"
+    ports:
+      - "9230:9229"
+    depends_on:
+      kafka:
+        condition: service_started
+      messages-db:
+        condition: service_healthy
+    networks:
+      - chat-network
+
+volumes:
+  messages-db-data:
+
+networks:
+  chat-network:
+    name: chat-network
+    driver: bridge

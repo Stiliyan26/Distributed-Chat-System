@@ -9,5 +9,5 @@
     "target": "es2021",
     "moduleResolution": "node"
   },
-  "include": ["src/**/*.ts", "src/config/env.validation.ts"]
+  "include": ["src/**/*.ts"]
 }

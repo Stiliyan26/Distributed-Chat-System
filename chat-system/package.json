@@ -2,7 +2,17 @@
   "name": "@chat-system/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "docker:auth:up": "docker-compose -f ../docker-compose.auth.yml up -d",
+    "docker:auth:down": "docker-compose -f ../docker-compose.auth.yml down",
+    "docker:auth:logs": "docker-compose -f ../docker-compose.auth.yml logs -f",
+    "docker:messaging:up": "docker-compose -f ../docker-compose.messaging.yml up -d",
+    "docker:messaging:down": "docker-compose -f ../docker-compose.messaging.yml down",
+    "docker:messaging:logs": "docker-compose -f ../docker-compose.messaging.yml logs -f",
+    "docker:all:up": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml up -d",
+    "docker:all:down": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml down",
+    "docker:all:logs": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml logs -f"
+  },
   "private": true,
   "devDependencies": {
     "@nestjs/schematics": "^11.0.0",
@@ -38,6 +48,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
     "cookie-parser": "^1.4.7",
+    "kafkajs": "^2.2.4",
     "pg": "^8.13.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0",

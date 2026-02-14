@@ -9,6 +9,7 @@ FROM node:20-alpine
 WORKDIR /app
 COPY --from=build /app/dist/services/auth .
 RUN npm ci --omit=dev
+RUN npm install zod
 ENV NODE_ENV=production
 EXPOSE 3001
 CMD ["node", "main.js"]

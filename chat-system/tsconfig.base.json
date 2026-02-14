@@ -16,7 +16,8 @@
     "baseUrl": ".",
     "paths": {
       "@nestjs/config": ["node_modules/@nestjs/config"],
-      "@nestjs/typeorm": ["node_modules/@nestjs/typeorm"]
+      "@nestjs/typeorm": ["node_modules/@nestjs/typeorm"],
+      "@libs/*": ["libs/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]
