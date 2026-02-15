@@ -1,26 +1,6 @@
-# ============================================
-# MESSAGING DOMAIN - Self-Contained
-# ============================================
-# Includes:
-#   - Messages Database
-#   - Messaging Service (API)
-#   - Messaging Worker (Kafka Consumer)
-#   - Kafka + Zookeeper (Message Broker)
-#   - Kafka UI (Management Interface)
-#
-# Start: docker-compose -f docker-compose.messaging.yml up -d
-# Stop:  docker-compose -f docker-compose.messaging.yml down
-# 
-# Access:
-#   - API: http://localhost:3003
-#   - Kafka UI: http://localhost:8080
-
-name: chat-system-messaging
+name: messaging
 
 services:
-  # ============================================
-  # INFRASTRUCTURE
-  # ============================================
   messages-db:
     image: postgres:16-alpine
     container_name: messages-db
@@ -83,9 +63,6 @@ services:
     networks:
       - chat-network
 
-  # ============================================
-  # MESSAGING SERVICES
-  # ============================================
   messaging-service:
     build:
       context: ./chat-system
@@ -95,6 +72,14 @@ services:
     environment:
       PORT: 3000
       KAFKA_BROKER: kafka:29092
+      KAFKA_TOPIC: messages
+      DB_HOST: messages-db
+      DB_PORT: "5432"
+      DB_USERNAME: chat
+      DB_PASSWORD: chat-secret
+      DB_NAME: messages_db
+      DB_TYPE: postgres
+      DB_SYNC: "true"
     ports:
       - "3003:3000"
       - "9229:9229"
@@ -112,6 +97,8 @@ services:
     command: node --inspect=0.0.0.0:9229 worker/main.js
     environment:
       KAFKA_BROKER: kafka:29092
+      KAFKA_TOPIC: messages
+      KAFKA_CONSUMER_GROUP: "messaging-workers"
       DB_HOST: messages-db
       DB_PORT: "5432"
       DB_USERNAME: chat

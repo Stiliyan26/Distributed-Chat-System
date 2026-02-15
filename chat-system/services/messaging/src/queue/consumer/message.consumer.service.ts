@@ -36,7 +36,7 @@ export class MessageConsumerService implements OnModuleInit, OnModuleDestroy {
 
   private async subscribeToTopic() {
     await this.consumer.subscribe({
-      topic: KAFKA_CONFIG.topic,
+      topics: [KAFKA_CONFIG.topic],
       fromBeginning: false
     });
   }

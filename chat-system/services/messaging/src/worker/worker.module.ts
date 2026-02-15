@@ -5,9 +5,9 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import databaseConfig from '@libs/shared/src/database/database.config';
 import { SharedDatabaseModule } from '@libs/shared/src/database/database.module';
 
-import { MessageEntity } from "../entities/message.entity";
 import { MessageConsumerService } from "../queue/consumer/message.consumer.service";
 import { MessagePersistenceService } from "../services/message.persistence.service";
+import { MessageEntity } from "../entities/message.entity";
 
 @Module({
   imports: [

@@ -43,6 +43,7 @@
       "name": "Debug messaging with Nx",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["nx", "serve", "messaging"],
+      "cwd": "${workspaceFolder}",
       "env": {
         "NODE_OPTIONS": "--inspect=9231"
       },
@@ -51,7 +52,7 @@
       "skipFiles": ["<node_internals>/**"],
       "sourceMaps": true,
       "outFiles": [
-        "${workspaceFolder}/services/messaging/dist/**/*.(m|c|)js",
+        "${workspaceFolder}/dist/services/messaging/**/*.(m|c|)js",
         "!**/node_modules/**"
       ]
     },
@@ -108,6 +109,28 @@
         "${workspaceFolder}/services/channel/dist/**/*.(m|c|)js",
         "!**/node_modules/**"
       ]
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Docker: Attach messaging-service",
+      "port": 9229,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/services/messaging/src",
+      "remoteRoot": "/app/api",
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Docker: Attach messaging-worker",
+      "port": 9230,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/services/messaging/src",
+      "remoteRoot": "/app/worker",
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**"]
     }
   ]
 }
