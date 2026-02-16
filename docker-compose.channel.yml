@@ -1,50 +1,51 @@
-name: chat-system-auth
+name: chat-system-channel
 
 services:
-  users-db:
+  channels-db:
     image: postgres:16-alpine
-    container_name: users-db
+    container_name: channels-db
     environment:
       POSTGRES_USER: chat
       POSTGRES_PASSWORD: chat-secret
-      POSTGRES_DB: users_db
+      POSTGRES_DB: channels_db
     ports:
-      - "5433:5432"
+      - "5435:5432"
     volumes:
-      - users-db-data:/var/lib/postgresql/data
+      - channels-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U chat -d users_db"]
+      test: [ "CMD-SHELL", "pg_isready -U chat -d channels_db" ]
       interval: 5s
       timeout: 5s
       retries: 5
     networks:
       - chat-network
 
-  auth-service:
+  channel-service:
     build:
       context: ./chat-system
-      dockerfile: services/auth/Dockerfile
-    container_name: auth-service
+      dockerfile: services/channel/Dockerfile
+    container_name: channel-service
     environment:
       DB_TYPE: postgres
-      DB_HOST: users-db
+      DB_HOST: channels-db
       DB_PORT: "5432"
       DB_USERNAME: chat
       DB_PASSWORD: chat-secret
-      DB_NAME: users_db
+      DB_NAME: channels_db
       DB_SYNC: "true"
       NODE_ENV: production
-      PORT: "3001"
+      PORT: "3000"
     ports:
-      - "3002:3001"
+      - "3020:3000"
     depends_on:
-      users-db:
+      channels-db:
         condition: service_healthy
     networks:
       - chat-network
 
 volumes:
-  users-db-data:
+  channels-db-data:
+
 
 networks:
   chat-network:

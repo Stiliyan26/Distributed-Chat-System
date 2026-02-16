@@ -66,7 +66,7 @@ services:
   messaging-service:
     build:
       context: ./chat-system
-      dockerfile: services/messaging/Dockerfile
+      dockerfile: services/messaging/Dockerfile.api
     # container_name: messaging-service
     command: node --inspect=0.0.0.0:9229 api/main.js
     environment:
@@ -94,7 +94,7 @@ services:
   messaging-worker:
     build:
       context: ./chat-system
-      dockerfile: services/messaging/Dockerfile
+      dockerfile: services/messaging/Dockerfile.worker
     # container_name: messaging-worker
     command: node --inspect=0.0.0.0:9229 worker/main.js
     environment:

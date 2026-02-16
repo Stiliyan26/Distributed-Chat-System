@@ -1,0 +1,18 @@
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY . .
+RUN npx nx run channel:build
+
+FROM node:20-alpine
+WORKDIR /app
+COPY --from=build /app/dist/services/channel ./api
+WORKDIR /app/api
+RUN npm ci --omit=dev
+RUN npm install zod
+
+WORKDIR /app
+ENV NODE_ENV=production
+
+CMD ["node", "api/main.js"]
