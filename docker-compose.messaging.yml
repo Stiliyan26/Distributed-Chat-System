@@ -13,7 +13,7 @@ services:
     volumes:
       - messages-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U chat -d messages_db"]
+      test: [ "CMD-SHELL", "pg_isready -U chat -d messages_db" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -67,7 +67,7 @@ services:
     build:
       context: ./chat-system
       dockerfile: services/messaging/Dockerfile
-    container_name: messaging-service
+    # container_name: messaging-service
     command: node --inspect=0.0.0.0:9229 api/main.js
     environment:
       PORT: 3000
@@ -81,11 +81,13 @@ services:
       DB_TYPE: postgres
       DB_SYNC: "true"
     ports:
-      - "3003:3000"
-      - "9229:9229"
+      - "3003-3010:3000"
+      - "9229-9239:9229"
     depends_on:
-      - kafka
-      - messages-db
+      kafka:
+        condition: service_started
+      messages-db:
+        condition: service_healthy
     networks:
       - chat-network
 
@@ -93,7 +95,7 @@ services:
     build:
       context: ./chat-system
       dockerfile: services/messaging/Dockerfile
-    container_name: messaging-worker
+    # container_name: messaging-worker
     command: node --inspect=0.0.0.0:9229 worker/main.js
     environment:
       KAFKA_BROKER: kafka:29092
@@ -107,7 +109,7 @@ services:
       DB_TYPE: postgres
       DB_SYNC: "true"
     ports:
-      - "9230:9229"
+      - "9240-9250:9229"
     depends_on:
       kafka:
         condition: service_started
@@ -118,6 +120,7 @@ services:
 
 volumes:
   messages-db-data:
+
 
 networks:
   chat-network:
