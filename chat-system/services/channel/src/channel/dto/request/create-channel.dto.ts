@@ -1,4 +1,4 @@
-import { ArrayMinSize, IsArray, IsNotEmpty, IsString, IsUUID, isUUID } from "class-validator";
+import { ArrayMinSize, IsArray, IsNotEmpty, IsString, IsUUID } from "class-validator";
 
 export class CreateChannelDto {
     @IsNotEmpty()
@@ -11,6 +11,6 @@ export class CreateChannelDto {
     members: string[];
 
     @IsNotEmpty()
-    @IsString()
-    creatorName: string;
+    @IsUUID()
+    creatorId: string;
 }

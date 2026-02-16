@@ -11,8 +11,8 @@ export class ChannelEntity {
     @Column('simple-array')
     members: string[];
 
-    @Column()
-    creatorName: string;
+    @Column({ type: 'uuid' })
+    creatorId: string;
 
     @CreateDateColumn()
     createdAt: Date;
