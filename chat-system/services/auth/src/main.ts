@@ -1,10 +1,13 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+
 import cookieParser from 'cookie-parser';
 
+import { AuthModule } from './auth.module';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
+
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AuthModule);
   const globalPrefix = 'api';
 
   app.setGlobalPrefix(globalPrefix);
@@ -18,6 +21,8 @@ async function bootstrap() {
     transform: true, // strips properties not in DTO
     forbidNonWhitelisted: true, // throws error on extra props
   }));
+
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   app.use(cookieParser())
 

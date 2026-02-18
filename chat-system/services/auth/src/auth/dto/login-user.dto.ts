@@ -7,14 +7,8 @@ import {
 } from "class-validator";
 import { ValidationMessages } from "./error-messages";
 
-export class CreateUserRequestDto {
-  @MinLength(5)
-  @MaxLength(15)
-  @Matches(/^[a-zA-Z0-9_]+$/, {
-    message: ValidationMessages.USERNAME_INVALID_CHARS,
-  })
-  readonly username: string;
-
+export class LoginUserRequestDto {
+    
   @IsEmail()
   @Transform(({ value }) => value?.toLowerCase().trim())
   readonly email: string;

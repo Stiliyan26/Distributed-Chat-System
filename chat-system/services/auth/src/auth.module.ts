@@ -2,9 +2,11 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { SharedDatabaseModule } from '@libs/shared/src/database/database.module';
 import databaseConfig from '@libs/shared/src/database/database.config';
+import { SharedDatabaseModule } from '@libs/shared/src/database/database.module';
 
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
 import { UserEntity } from './entities/user.entity';
 
 @Module({
@@ -16,7 +18,7 @@ import { UserEntity } from './entities/user.entity';
     SharedDatabaseModule,
     TypeOrmModule.forFeature([UserEntity]),
   ],
-  controllers: [],
-  providers: [],
+  controllers: [AuthController],
+  providers: [AuthService],
 })
-export class AppModule { }
+export class AuthModule { }
