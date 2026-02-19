@@ -3,11 +3,11 @@ import { NestFactory } from '@nestjs/core';
 
 import cookieParser from 'cookie-parser';
 
-import { AuthModule } from './auth.module';
+import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AuthModule);
+  const app = await NestFactory.create(AppModule);
   const globalPrefix = 'api';
 
   app.setGlobalPrefix(globalPrefix);

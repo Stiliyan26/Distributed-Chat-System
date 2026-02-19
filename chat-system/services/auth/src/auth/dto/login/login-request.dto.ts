@@ -5,10 +5,10 @@ import {
   MaxLength,
   MinLength
 } from "class-validator";
-import { ValidationMessages } from "./error-messages";
+import { ValidationMessages } from "../../constants/error-messages";
 
-export class LoginUserRequestDto {
-    
+export class LoginRequestDto {
+
   @IsEmail()
   @Transform(({ value }) => value?.toLowerCase().trim())
   readonly email: string;

@@ -1,11 +1,13 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 
 import { UserEntity } from '../entities/user.entity';
-import { LoginUserRequestDto } from './dto/login-user.dto';
-import { RegisterUserRequestDto } from './dto/register-user.dto';
+import { LoginRequestDto } from './dto/login/login-request.dto';
+import { LoginResponseDto } from './dto/login/login-response.dto';
+import { RegisterRequestDto } from './dto/register/register-request-user.dto';
+import { RegisterResponseDto } from './dto/register/register-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -15,21 +17,38 @@ export class AuthService {
         private readonly userRepo: Repository<UserEntity>
     ) { }
 
-    async register(registerDto: RegisterUserRequestDto) {
-        const { password, ...userData } = registerDto;
+    async register(registerDto: RegisterRequestDto): Promise<RegisterResponseDto> {
+        const { password, repeatPassword, ...userData } = registerDto;
 
-        const salt = await bcrypt.genSalt();
-        const hashedPassword = await bcrypt.hash(password, salt);
+        if (password !== repeatPassword) {
+            throw new BadRequestException(`Passwords don't match.`);
+        }
+
+        const userExists: boolean = await this.userRepo.exists({
+            where: { email: userData.email }
+        });
+
+        if (userExists) {
+            throw new ConflictException('User with this email already exists');
+        }
+
+        const hashedPassword = await this.hashPassword(password);
 
         const userEntity = this.userRepo.create({
             ...userData,
             password: hashedPassword
         });
 
-        return this.userRepo.save(userEntity);
+        const savedUser = await this.userRepo.save(userEntity);
+
+        return {
+            id: savedUser.id,
+            username: savedUser.username,
+            email: savedUser.email
+        }
     }
 
-    async login(loginDto: LoginUserRequestDto) {
+    async login(loginDto: LoginRequestDto): Promise<LoginResponseDto> {
         const existingUser = await this.userRepo.findOneBy({ email: loginDto.email });
 
         if (!existingUser) {
@@ -45,6 +64,16 @@ export class AuthService {
             throw new UnauthorizedException('Invalid credentials');
         }
 
-        return existingUser;
+        return {
+            id: existingUser.id,
+            username: existingUser.username,
+            email: existingUser.email
+        };
+    }
+
+    private async hashPassword(password: string) {
+        const salt = await bcrypt.genSalt();
+
+        return await bcrypt.hash(password, salt);
     }
 }   
