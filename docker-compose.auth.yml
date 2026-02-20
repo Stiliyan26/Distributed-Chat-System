@@ -13,7 +13,7 @@ services:
     volumes:
       - users-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U chat -d users_db"]
+      test: [ "CMD-SHELL", "pg_isready -U chat -d users_db" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -33,7 +33,8 @@ services:
       DB_PASSWORD: chat-secret
       DB_NAME: users_db
       DB_SYNC: "true"
-      NODE_ENV: production
+      NODE_ENV: production,
+      JWT_SECRET: LSNt4suQD8N8RKq6YMGKs3ExWXsgBxrpH4XzPhZNEin
       PORT: "3001"
     ports:
       - "3002:3001"
@@ -45,6 +46,7 @@ services:
 
 volumes:
   users-db-data:
+
 
 networks:
   chat-network:
