@@ -1,5 +1,5 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Res } from '@nestjs/common';
-import { Response } from 'express';
+import { Body, Controller, HttpCode, HttpStatus, Post, Res, Req } from '@nestjs/common';
+import { Request, Response } from 'express';
 
 import { AuthService } from './auth.service';
 import { LoginRequestDto } from './dto/login/login-request.dto';
@@ -28,5 +28,14 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response
   ): Promise<LoginResponseDto> {
     return this.authService.login(loginDto, res);
+  }
+
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    return this.authService.refresh(req.cookies['refresh_token'], res);
   }
 }

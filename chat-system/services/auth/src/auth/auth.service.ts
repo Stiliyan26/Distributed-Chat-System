@@ -78,6 +78,24 @@ export class AuthService {
         };
     }
 
+    async refresh(refreshToken: string, res: Response) {
+        try {
+            const payload = this.jwtService.verify(refreshToken, {
+                secret: process.env.JWT_REFRESH_SECRET
+            });
+
+            const user = await this.userRepo.findOneBy({ id: payload.sub });
+
+            if (!user) {
+                throw new UnauthorizedException();
+            }
+
+            this.setAuthCookie(res, user);
+        } catch {
+            throw new UnauthorizedException('Invalid refresh token')
+        }
+    }
+
     private async hashPassword(password: string) {
         const salt = await bcrypt.genSalt();
 
@@ -109,14 +127,16 @@ export class AuthService {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 15 * 60 * 1000 // 15 minutes
+            maxAge: 15 * 60 * 1000, // 15 minutes
+            path: '/'
         });
 
         res.cookie('refresh_token', refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+            path: '/api/auth/refresh'
         });
     }
 }   
