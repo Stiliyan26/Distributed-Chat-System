@@ -1,15 +1,15 @@
 import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { Repository } from 'typeorm';
 import { Response } from 'express';
+import { Repository } from 'typeorm';
 
+import { JwtService } from '@nestjs/jwt';
 import { UserEntity } from '../entities/user.entity';
 import { LoginRequestDto } from './dto/login/login-request.dto';
 import { LoginResponseDto } from './dto/login/login-response.dto';
 import { RegisterRequestDto } from './dto/register/register-request-user.dto';
 import { RegisterResponseDto } from './dto/register/register-response.dto';
-import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -44,7 +44,7 @@ export class AuthService {
 
         const savedUser = await this.userRepo.save(userEntity);
 
-        this.setupJwtTokenInCookie(res, savedUser);
+        this.setAuthCookie(res, savedUser);
 
         return {
             id: savedUser.id,
@@ -69,7 +69,7 @@ export class AuthService {
             throw new UnauthorizedException('Invalid credentials');
         }
 
-        this.setupJwtTokenInCookie(res, existingUser);
+        this.setAuthCookie(res, existingUser);
 
         return {
             id: existingUser.id,
@@ -84,18 +84,39 @@ export class AuthService {
         return await bcrypt.hash(password, salt);
     }
 
-     private setupJwtTokenInCookie(res: Response, user: UserEntity) {
-        const token = this.jwtService.sign({
+    private signAccessToken(user: UserEntity) {
+        return this.jwtService.sign({
             sub: user.id,
             username: user.username,
             email: user.email
-        });
+        },
+            { secret: process.env.JWT_SECRET, expiresIn: '15m' }
+        );
+    }
 
-        res.cookie('access_token', token, {
+    private signRefreshToken(user: UserEntity): string {
+        return this.jwtService.sign(
+            { sub: user.id },
+            { secret: process.env.JWT_REFRESH_SECRET, expiresIn: '30d' }
+        )
+    }
+
+    private setAuthCookie(res: Response, user: UserEntity): void {
+        const accessToken = this.signAccessToken(user);
+        const refreshToken = this.signRefreshToken(user);
+
+        res.cookie('access_token', accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 7 * 24 * 60 * 60 * 1000
+            maxAge: 15 * 60 * 1000 // 15 minutes
+        });
+
+        res.cookie('refresh_token', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
         });
     }
 }   
