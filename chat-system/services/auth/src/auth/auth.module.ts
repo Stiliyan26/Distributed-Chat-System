@@ -9,10 +9,7 @@ import { AuthService } from "./auth.service";
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserEntity]),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '7d' }
-    })
+    JwtModule.register({})
   ],
   controllers: [AuthController],
   providers: [AuthService],

@@ -107,15 +107,19 @@ export class AuthService {
             sub: user.id,
             username: user.username,
             email: user.email
-        },
-            { secret: process.env.JWT_SECRET, expiresIn: '15m' }
-        );
+        }, {
+            secret: process.env.JWT_SECRET,
+            expiresIn: '15m'
+        });
     }
 
     private signRefreshToken(user: UserEntity): string {
         return this.jwtService.sign(
             { sub: user.id },
-            { secret: process.env.JWT_REFRESH_SECRET, expiresIn: '30d' }
+            {
+                secret: process.env.JWT_REFRESH_SECRET,
+                expiresIn: '30d'
+            }
         )
     }
 
