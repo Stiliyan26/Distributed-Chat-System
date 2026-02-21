@@ -8,3 +8,7 @@ export enum CookiePath {
     REFRESH = '/api/auth/refresh',
 }
 
+export enum AuthTokenExpiry {
+    ACCESS_TOKEN = '15m',
+    REFRESH_TOKEN = '30d',
+}

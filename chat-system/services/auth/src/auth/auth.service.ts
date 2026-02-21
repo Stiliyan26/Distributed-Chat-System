@@ -4,8 +4,9 @@ import * as bcrypt from 'bcrypt';
 import { Response } from 'express';
 import { Repository } from 'typeorm';
 
+import { AuthCookie, AuthTokenExpiry, CookiePath } from '@libs/shared/src';
 import { JwtService } from '@nestjs/jwt';
-import { AuthCookie, AuthError, AuthTokenExpiry, CookiePath } from '../constants';
+import { AuthError } from '../constants';
 import { UserEntity } from '../user/entities/user.entity';
 import { LoginRequestDto } from './dto/request/login-request.dto';
 import { RegisterRequestDto } from './dto/request/register-request-user.dto';
