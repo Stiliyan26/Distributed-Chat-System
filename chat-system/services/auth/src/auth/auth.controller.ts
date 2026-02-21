@@ -1,7 +1,7 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 
-import { AuthRoutes } from '../constants';
+import { AuthRoutes } from '@libs/shared/src';
 
 import { AuthService } from './auth.service';
 import { LoginRequestDto } from './dto/request/login-request.dto';

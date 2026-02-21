@@ -2,7 +2,7 @@ import { Controller, Get, Query } from "@nestjs/common";
 import { UserListResponseDto } from "./dto/user-list.response.dto";
 import { UsersService } from "./users.service";
 
-import { UserRoutes } from '../constants';
+import { UserRoutes } from '@libs/shared/src';
 
 @Controller(UserRoutes.PREFIX)
 export class UsersController {

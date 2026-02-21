@@ -5,7 +5,7 @@ import { MessageProducerService } from "../queue/producer/message.producer.servi
 import { MessageReadService } from "../services/message.read.service";
 
 
-import { MessageRoutes } from "../constants";
+import { MessageRoutes } from "@libs/shared/src";
 
 @Controller(MessageRoutes.PREFIX)
 export class MessageController {
