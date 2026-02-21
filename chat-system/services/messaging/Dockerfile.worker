@@ -7,12 +7,9 @@ RUN npx nx run messaging:build-worker
 
 FROM node:20-alpine
 WORKDIR /app
+COPY --from=build /app/package.json /app/package-lock.json ./
 COPY --from=build /app/dist/services/messaging-worker ./worker
-WORKDIR /app/worker
 RUN npm ci --omit=dev
-RUN npm install zod
 
-WORKDIR /app
 ENV NODE_ENV=production
-
 CMD ["node", "worker/main.js"]

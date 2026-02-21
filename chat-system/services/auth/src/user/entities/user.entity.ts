@@ -1,9 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { generateId } from "@libs/shared/src/utils/id.util";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity('users')
 export class UserEntity {
-    @PrimaryGeneratedColumn('uuid')
-    id: string
+    
+    @PrimaryColumn('uuid')
+    id: string = generateId();
 
     @Column({ unique: true })
     username: string;

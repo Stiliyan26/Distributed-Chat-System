@@ -1,5 +1,6 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { initializeTransactionalContext } from 'typeorm-transactional';
 
 import cookieParser from 'cookie-parser';
 
@@ -7,6 +8,8 @@ import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 
 async function bootstrap() {
+  initializeTransactionalContext();
+
   const app = await NestFactory.create(AppModule);
   const globalPrefix = 'api';
 
