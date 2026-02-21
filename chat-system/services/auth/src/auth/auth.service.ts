@@ -5,6 +5,7 @@ import { Response } from 'express';
 import { Repository } from 'typeorm';
 
 import { JwtService } from '@nestjs/jwt';
+import { AuthCookie, AuthError, AuthTokenExpiry, CookiePath } from '../constants';
 import { UserEntity } from '../user/entities/user.entity';
 import { LoginRequestDto } from './dto/request/login-request.dto';
 import { RegisterRequestDto } from './dto/request/register-request-user.dto';
@@ -24,7 +25,7 @@ export class AuthService {
         const { password, repeatPassword, ...userData } = registerDto;
 
         if (password !== repeatPassword) {
-            throw new BadRequestException(`Passwords don't match.`);
+            throw new BadRequestException(AuthError.PASSWORDS_MISMATCH);
         }
 
         const userExists: boolean = await this.userRepo.exists({
@@ -32,7 +33,7 @@ export class AuthService {
         });
 
         if (userExists) {
-            throw new ConflictException('User with this email already exists');
+            throw new ConflictException(AuthError.USER_EXISTS);
         }
 
         const hashedPassword = await this.hashPassword(password);
@@ -57,7 +58,7 @@ export class AuthService {
         const existingUser = await this.userRepo.findOneBy({ email: loginDto.email });
 
         if (!existingUser) {
-            throw new UnauthorizedException('User not found.')
+            throw new UnauthorizedException(AuthError.USER_NOT_FOUND)
         }
 
         const isPasswordMatching = await bcrypt.compare(
@@ -66,7 +67,7 @@ export class AuthService {
         )
 
         if (!isPasswordMatching) {
-            throw new UnauthorizedException('Invalid credentials');
+            throw new UnauthorizedException(AuthError.INVALID_CREDENTIALS);
         }
 
         this.setAuthCookie(res, existingUser);
@@ -92,7 +93,7 @@ export class AuthService {
 
             this.setAuthCookie(res, user);
         } catch {
-            throw new UnauthorizedException('Invalid refresh token')
+            throw new UnauthorizedException(AuthError.INVALID_REFRESH_TOKEN)
         }
     }
 
@@ -109,7 +110,7 @@ export class AuthService {
             email: user.email
         }, {
             secret: process.env.JWT_SECRET,
-            expiresIn: '15m'
+            expiresIn: AuthTokenExpiry.ACCESS_TOKEN
         });
     }
 
@@ -118,7 +119,7 @@ export class AuthService {
             { sub: user.id },
             {
                 secret: process.env.JWT_REFRESH_SECRET,
-                expiresIn: '30d'
+                expiresIn: AuthTokenExpiry.REFRESH_TOKEN
             }
         )
     }
@@ -127,20 +128,20 @@ export class AuthService {
         const accessToken = this.signAccessToken(user);
         const refreshToken = this.signRefreshToken(user);
 
-        res.cookie('access_token', accessToken, {
+        res.cookie(AuthCookie.ACCESS_TOKEN, accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            sameSite: AuthCookie.SAME_SITE_STRICT,
             maxAge: 15 * 60 * 1000, // 15 minutes
             path: '/'
         });
 
-        res.cookie('refresh_token', refreshToken, {
+        res.cookie(AuthCookie.REFRESH_TOKEN, refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            sameSite: AuthCookie.SAME_SITE_STRICT,
             maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-            path: '/api/auth/refresh'
+            path: CookiePath.REFRESH
         });
     }
 }   

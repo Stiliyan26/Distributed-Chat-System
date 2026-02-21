@@ -1,6 +1,7 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { Consumer, EachMessagePayload, Kafka } from "kafkajs";
 import { KAFKA_CONFIG } from "../../config/kafka.config";
+import { KafkaLog } from "../../constants";
 import { MessagePersistenceService } from "../../services/message.persistence.service";
 
 @Injectable()
@@ -20,18 +21,18 @@ export class MessageConsumerService implements OnModuleInit, OnModuleDestroy {
       groupId: KAFKA_CONFIG.consumerGroup
     });
 
-    console.log('Kafka consumer connecting...');
+    console.log(KafkaLog.CONNECTING);
     await this.consumer.connect();
-    console.log('Kafka consumer connected');
+    console.log(KafkaLog.CONNECTED);
 
     this.subscribeToTopic();
     this.onMessage();
   }
 
   async onModuleDestroy() {
-    console.log('Kafka consumer disconnecting...');
+    console.log(KafkaLog.DISCONNECTING);
     await this.consumer.disconnect();
-    console.log('Kafka consumer disconnected');
+    console.log(KafkaLog.DISCONNECTED);
   }
 
   private async subscribeToTopic() {

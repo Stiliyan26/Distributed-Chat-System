@@ -1,9 +1,11 @@
 import { generateId } from "@libs/shared/src/utils/id.util";
 import { Column, Entity, PrimaryColumn } from "typeorm";
 
-@Entity('users')
+import { UserTable } from "../../constants";
+
+@Entity(UserTable.USERS)
 export class UserEntity {
-    
+
     @PrimaryColumn('uuid')
     id: string = generateId();
 

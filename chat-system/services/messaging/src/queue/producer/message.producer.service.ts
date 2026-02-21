@@ -1,6 +1,7 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { Kafka, Producer } from 'kafkajs';
 import { KAFKA_CONFIG } from "../../config/kafka.config";
+import { KafkaLog } from "../../constants";
 import { MessageDto } from "../../dto/request/message.dto";
 
 @Injectable()
@@ -16,15 +17,15 @@ export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
 
     this.producer = this.kafka.producer();
 
-    console.log('Kafka producer connecting...');
+    console.log(KafkaLog.CONNECTING);
     await this.producer.connect();
-    console.log('Kafka producer connected');
+    console.log(KafkaLog.CONNECTED);
   }
 
   async onModuleDestroy() {
-    console.log('Kafka producer disconnecting...');
+    console.log(KafkaLog.DISCONNECTING);
     await this.producer.disconnect();
-    console.log('Kafka producer disconnected');
+    console.log(KafkaLog.DISCONNECTED);
   }
 
   async publish(message: MessageDto) {

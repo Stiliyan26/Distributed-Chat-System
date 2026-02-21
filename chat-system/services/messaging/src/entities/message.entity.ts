@@ -1,7 +1,10 @@
+import { DbConstants } from "@libs/shared/src";
 import { generateId } from "@libs/shared/src/utils/id.util";
 import { Column, Entity, Index, PrimaryColumn } from "typeorm";
 
-@Entity('messages')
+import { MessageTable } from "../constants";
+
+@Entity(MessageTable.MESSAGES)
 @Index(['channelId'])
 export class MessageEntity {
 
@@ -20,6 +23,6 @@ export class MessageEntity {
   @Column('text')
   content: string;
 
-  @Column({ type: 'timestamp with time zone' })
+  @Column({ type: DbConstants.TIMESTAMP_WITH_TIMEZONE })
   sentAt: Date;
 }

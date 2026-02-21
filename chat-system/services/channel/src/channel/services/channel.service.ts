@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 
+import { ChannelError, ChannelRole } from '../constants';
 import { CreateChannelRequestDto } from '../dto/request/create-channel.request.dto';
 import { ChannelMembersResponseDto } from '../dto/response/channel-members.response';
 import { CreateChannelResponseDto } from '../dto/response/create-channel.response.dto';
@@ -44,7 +45,7 @@ export class ChannelService {
     });
 
     if (!members.length) {
-      throw new NotFoundException('Channel not found');
+      throw new NotFoundException(ChannelError.NOT_FOUND);
     }
 
     return {
@@ -88,8 +89,8 @@ export class ChannelService {
   private async createChannelMembers(channelId: string, memberIds: string[], creatorId: string): Promise<void> {
     const channelMembers = memberIds.map((memberId) => {
       const role = creatorId === memberId
-        ? 'admin'
-        : 'member';
+        ? ChannelRole.ADMIN
+        : ChannelRole.MEMBER;
 
       return {
         channelId,

@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 
 import { initializeTransactionalContext } from 'typeorm-transactional';
 
+import { CommonConstants } from '@libs/shared/src';
 import { ChannelModule } from './channel/channel.module';
 
 async function bootstrap() {
@@ -20,10 +21,10 @@ async function bootstrap() {
       },
     })
   )
-  const globalPrefix = 'api';
+  const globalPrefix = CommonConstants.GLOBAL_PREFIX;
   app.setGlobalPrefix(globalPrefix);
 
-  const port = process.env.PORT || 3000;
+  const port = process.env.PORT || CommonConstants.DEFAULT_PORT;
   await app.listen(port);
 
   Logger.log(

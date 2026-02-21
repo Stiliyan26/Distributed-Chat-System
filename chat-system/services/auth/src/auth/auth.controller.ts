@@ -1,18 +1,20 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 
+import { AuthRoutes } from '../constants';
+
 import { AuthService } from './auth.service';
 import { LoginRequestDto } from './dto/request/login-request.dto';
 import { RegisterRequestDto } from './dto/request/register-request-user.dto';
 import { LoginResponseDto } from './dto/response/login-response.dto';
 import { RegisterResponseDto } from './dto/response/register-response.dto';
 
-@Controller('auth')
+@Controller(AuthRoutes.PREFIX)
 export class AuthController {
 
   constructor(private readonly authService: AuthService) { }
 
-  @Post('/register')
+  @Post(AuthRoutes.REGISTER)
   @HttpCode(HttpStatus.CREATED)
   async register(
     @Body() registerDto: RegisterRequestDto,
@@ -21,7 +23,7 @@ export class AuthController {
     return this.authService.register(registerDto, res);
   }
 
-  @Post('/login')
+  @Post(AuthRoutes.LOGIN)
   @HttpCode(HttpStatus.OK)
   async login(
     @Body() loginDto: LoginRequestDto,
@@ -30,7 +32,7 @@ export class AuthController {
     return this.authService.login(loginDto, res);
   }
 
-  @Post('refresh')
+  @Post(AuthRoutes.REFRESH)
   @HttpCode(HttpStatus.OK)
   async refresh(
     @Req() req: Request,

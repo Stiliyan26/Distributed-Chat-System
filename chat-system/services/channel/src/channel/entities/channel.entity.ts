@@ -1,9 +1,11 @@
 import { generateId } from "@libs/shared/src/utils/id.util";
 import { Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from "typeorm";
 
-@Entity('channels')
+import { ChannelTable } from "../constants";
+
+@Entity(ChannelTable.CHANNELS)
 export class ChannelEntity {
-    
+
     @PrimaryColumn('uuid')
     id: string = generateId();
 

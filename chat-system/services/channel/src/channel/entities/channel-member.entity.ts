@@ -1,7 +1,9 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { ChannelEntity } from "./channel.entity";
 
-@Entity('channel_members')
+import { ChannelRole, ChannelTable } from "../constants";
+
+@Entity(ChannelTable.CHANNEL_MEMBERS)
 @Index(['memberId', 'channelId'])
 export class ChannelMemberEntity {
 
@@ -11,7 +13,7 @@ export class ChannelMemberEntity {
     @PrimaryColumn('uuid')
     memberId: string
 
-    @Column({ default: 'member' })
+    @Column({ default: ChannelRole.MEMBER })
     role: string;
 
     @CreateDateColumn()
