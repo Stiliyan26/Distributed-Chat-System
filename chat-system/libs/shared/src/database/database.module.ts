@@ -1,8 +1,11 @@
 import { Global, Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { DataSource } from "typeorm";
+import { addTransactionalDataSource } from "typeorm-transactional";
 
 import { DATABASE_CONFIG_KEY } from "../../../../libs/shared/src/database/database.config";
+
 
 @Global()
 @Module({
@@ -24,6 +27,9 @@ import { DATABASE_CONFIG_KEY } from "../../../../libs/shared/src/database/databa
         };
       },
       inject: [ConfigService],
+      dataSourceFactory: async (options) => {
+        return addTransactionalDataSource(new DataSource(options))
+      }
     }),
   ],
 })

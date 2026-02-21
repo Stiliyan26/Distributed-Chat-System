@@ -5,11 +5,11 @@ import { Response } from 'express';
 import { Repository } from 'typeorm';
 
 import { JwtService } from '@nestjs/jwt';
-import { UserEntity } from '../entities/user.entity';
-import { LoginRequestDto } from './dto/login/login-request.dto';
-import { LoginResponseDto } from './dto/login/login-response.dto';
-import { RegisterRequestDto } from './dto/register/register-request-user.dto';
-import { RegisterResponseDto } from './dto/register/register-response.dto';
+import { UserEntity } from '../user/entities/user.entity';
+import { LoginRequestDto } from './dto/request/login-request.dto';
+import { RegisterRequestDto } from './dto/request/register-request-user.dto';
+import { LoginResponseDto } from './dto/response/login-response.dto';
+import { RegisterResponseDto } from './dto/response/register-response.dto';
 
 @Injectable()
 export class AuthService {

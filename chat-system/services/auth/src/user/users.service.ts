@@ -2,8 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { MoreThan, Repository } from "typeorm";
 
-import { UserEntity } from "../entities/user.entity";
 import { UserListResponseDto } from "./dto/user-list.response.dto";
+import { UserEntity } from "./entities/user.entity";
 
 @Injectable()
 export class UsersService {

@@ -1,15 +1,20 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+
+import { initializeTransactionalContext } from 'typeorm-transactional';
+
 import { ChannelModule } from './channel/channel.module';
 
 async function bootstrap() {
+  initializeTransactionalContext()
+
   const app = await NestFactory.create(ChannelModule);
 
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
-      transform: true, 
+      transform: true,
       transformOptions: {
         enableImplicitConversion: true,
       },

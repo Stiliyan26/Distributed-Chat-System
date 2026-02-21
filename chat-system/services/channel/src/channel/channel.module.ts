@@ -8,6 +8,7 @@ import { ChannelService } from './services/channel.service';
 
 import databaseConfig from '@libs/shared/src/database/database.config';
 import { SharedDatabaseModule } from '@libs/shared/src/database/database.module';
+import { ChannelMemberEntity } from './entities/channel-member.entity';
 
 
 @Module({
@@ -17,7 +18,10 @@ import { SharedDatabaseModule } from '@libs/shared/src/database/database.module'
       load: [databaseConfig]
     }),
     SharedDatabaseModule,
-    TypeOrmModule.forFeature([ChannelEntity])
+    TypeOrmModule.forFeature([
+      ChannelEntity,
+      ChannelMemberEntity
+    ])
   ],
   controllers: [ChannelController],
   providers: [ChannelService],

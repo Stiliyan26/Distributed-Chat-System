@@ -1,6 +1,6 @@
 import { ArrayMinSize, IsArray, IsNotEmpty, IsString, IsUUID } from "class-validator";
 
-export class CreateChannelDto {
+export class CreateChannelRequestDto {
     @IsNotEmpty()
     @IsString()
     channelName: string;
@@ -8,7 +8,7 @@ export class CreateChannelDto {
     @IsArray()
     @ArrayMinSize(1)
     @IsUUID(4, { each: true })
-    members: string[];
+    memberIds: string[];
 
     @IsNotEmpty()
     @IsUUID()
