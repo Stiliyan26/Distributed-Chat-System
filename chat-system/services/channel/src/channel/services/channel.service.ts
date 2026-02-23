@@ -22,8 +22,11 @@ export class ChannelService {
   ) { }
 
   @Transactional()
-  async create(createChannelDto: CreateChannelRequestDto): Promise<CreateChannelResponseDto> {
-    const { channelName, memberIds, creatorId } = createChannelDto;
+  async create(
+    createChannelDto: CreateChannelRequestDto,
+    creatorId: string
+  ): Promise<CreateChannelResponseDto> {
+    const { channelName, memberIds } = createChannelDto;
 
     const savedChannel = await this.createChannel(channelName, creatorId);
 

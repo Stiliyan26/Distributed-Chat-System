@@ -7,10 +7,6 @@ export class MessageDto {
 
   @IsNotEmpty()
   @IsString()
-  senderId: string;
-
-  @IsNotEmpty()
-  @IsString()
   senderUsername: string;
 
   @IsNotEmpty()

@@ -8,6 +8,8 @@ import { ChannelService } from './services/channel.service';
 
 import databaseConfig from '@libs/shared/src/database/database.config';
 import { SharedDatabaseModule } from '@libs/shared/src/database/database.module';
+import { UserHeaderGuard } from '@libs/shared/src/guards/user-header.guard';
+import { APP_GUARD } from '@nestjs/core';
 import { ChannelMemberEntity } from './entities/channel-member.entity';
 
 
@@ -24,6 +26,12 @@ import { ChannelMemberEntity } from './entities/channel-member.entity';
     ])
   ],
   controllers: [ChannelController],
-  providers: [ChannelService],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: UserHeaderGuard
+    },
+    ChannelService
+  ],
 })
 export class ChannelModule { }

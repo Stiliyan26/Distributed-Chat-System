@@ -1,29 +1,35 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, ParseUUIDPipe, Post, Query } from "@nestjs/common";
 
-import { MessageDto } from "../dto/request/message.dto";
-import { MessageProducerService } from "../queue/producer/message.producer.service";
-import { MessageReadService } from "../services/message.read.service";
-
-
 import { MessageRoutes } from "@libs/shared/src";
+import { CurrentUserId } from '@libs/shared/src/decorators/current-user.decorator';
+
+import { MessageDto } from "../dto/request/message.dto";
+import { MessageResponseDto } from "../dto/response/message.response.dto";
+import { MessageProducerService } from "../queue/producer/message.producer.service";
+import { MessageFetchService } from "../services/message.fetch.service";
 
 @Controller(MessageRoutes.PREFIX)
 export class MessageController {
 
   constructor(
     private readonly messageProducerService: MessageProducerService,
-    private readonly messageReadService: MessageReadService
+    private readonly messageFetchService: MessageFetchService
   ) { }
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async get(@Query('channelId', ParseUUIDPipe) channelId: string) {
-    return this.messageReadService.getAllMessagesByChannel(channelId);
+  async getAllMessagesByChannel(
+    @Query('channelId', ParseUUIDPipe) channelId: string
+  ): Promise<MessageResponseDto[]> {
+    return this.messageFetchService.getAllMessagesByChannel(channelId);
   }
 
   @Post()
   @HttpCode(HttpStatus.ACCEPTED)
-  async create(@Body() messageDto: MessageDto) {
-    return this.messageProducerService.publish(messageDto);
+  async createMessage(
+    @Body() messageDto: MessageDto,
+    @CurrentUserId() senderId: string
+  ): Promise<void> {
+    return this.messageProducerService.publish(messageDto, senderId);
   }
 }

@@ -1,7 +1,9 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { Kafka, Producer } from 'kafkajs';
+
 import { KAFKA_CONFIG } from "../../config/kafka.config";
 import { KafkaLog } from "../../constants";
+import { KafkaMessagePayload } from "../../dto/kafka/kafka-message.payload";
 import { MessageDto } from "../../dto/request/message.dto";
 
 @Injectable()
@@ -28,13 +30,21 @@ export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
     console.log(KafkaLog.DISCONNECTED);
   }
 
-  async publish(message: MessageDto) {
+  async publish(messageDto: MessageDto, senderId: string): Promise<void> {
+    const payload: KafkaMessagePayload = {
+      channelId: messageDto.channelId,
+      senderId,
+      senderUsername: messageDto.senderUsername,
+      content: messageDto.content,
+      sentAt: messageDto.sentAt,
+    };
+
     await this.producer.send({
       topic: KAFKA_CONFIG.topic,
       messages: [
         {
-          key: message.channelId,
-          value: JSON.stringify(message),
+          key: payload.channelId,
+          value: JSON.stringify(payload),
         }
       ]
     });

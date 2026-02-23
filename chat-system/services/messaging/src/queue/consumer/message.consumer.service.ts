@@ -1,7 +1,9 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { Consumer, EachMessagePayload, Kafka } from "kafkajs";
+
 import { KAFKA_CONFIG } from "../../config/kafka.config";
 import { KafkaLog } from "../../constants";
+import { KafkaMessagePayload } from "../../dto/kafka/kafka-message.payload";
 import { MessagePersistenceService } from "../../services/message.persistence.service";
 
 @Injectable()
@@ -50,17 +52,17 @@ export class MessageConsumerService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  private async handleMessage({ topic, partition, message }: EachMessagePayload) {
+  private async handleMessage({ partition, message }: EachMessagePayload) {
     const value = message.value?.toString();
 
     if (!value) {
       return;
     }
 
-    const parsedMessage = JSON.parse(value);
+    const payload: KafkaMessagePayload = JSON.parse(value);
 
-    console.log(`Processing message ${parsedMessage} from channel ${parsedMessage.channelId} partition ${partition}]`);
+    console.log(`Processing message from channel ${payload.channelId} partition ${partition}`);
 
-    await this.messagePersistenceService.save(parsedMessage);
+    await this.messagePersistenceService.save(payload);
   }
 }
