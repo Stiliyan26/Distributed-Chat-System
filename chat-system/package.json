@@ -12,13 +12,17 @@
     "docker:channel:up": "docker-compose -f ../docker-compose.channel.yml up -d",
     "docker:channel:down": "docker-compose -f ../docker-compose.channel.yml down",
     "docker:channel:logs": "docker-compose -f ../docker-compose.channel.yml logs -f",
-    "docker:all:up": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml up -d",
-    "docker:all:up:build": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml up -d --build",
-    "docker:all:down": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml down",
-    "docker:all:logs": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml logs -f",
+    "docker:all:up": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml up -d",
+    "docker:all:up:build": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml up -d --build",
+    "docker:all:down": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml down",
+    "docker:all:logs": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml logs -f",
     "docker:auth:up:build": "docker-compose -f ../docker-compose.auth.yml up -d --build",
     "docker:channel:up:build": "docker-compose -f ../docker-compose.channel.yml up -d --build",
-    "docker:messaging:up:build": "docker-compose -f ../docker-compose.messaging.yml up -d --build"
+    "docker:messaging:up:build": "docker-compose -f ../docker-compose.messaging.yml up -d --build",
+    "docker:api-gateway:up": "docker-compose -f ../docker-compose.api-gateway.yml up -d",
+    "docker:api-gateway:up:build": "docker-compose -f ../docker-compose.api-gateway.yml up -d --build",
+    "docker:api-gateway:down": "docker-compose -f ../docker-compose.api-gateway.yml down",
+    "docker:api-gateway:logs": "docker-compose -f ../docker-compose.api-gateway.yml logs -f"
   },
   "private": true,
   "devDependencies": {

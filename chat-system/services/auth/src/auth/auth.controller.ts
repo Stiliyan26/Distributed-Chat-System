@@ -1,7 +1,7 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 
-import { AuthRoutes } from '@libs/shared/src';
+import { AuthCookie, AuthRoutes } from '@libs/shared/src';
 
 import { AuthService } from './auth.service';
 import { LoginRequestDto } from './dto/request/login-request.dto';
@@ -38,6 +38,6 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response
   ): Promise<void> {
-    return this.authService.refresh(req.cookies['refresh_token'], res);
+    return this.authService.refresh(req.cookies[AuthCookie.REFRESH_TOKEN], res);
   }
 }

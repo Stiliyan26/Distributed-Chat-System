@@ -33,7 +33,7 @@ services:
       DB_PASSWORD: chat-secret
       DB_NAME: users_db
       DB_SYNC: "true"
-      NODE_ENV: production,
+      NODE_ENV: production
       JWT_SECRET: LSNt4suQD8N8RKq6YMGKs3ExWXsgBxrpH4XzPhZNEin
       JWT_REFRESH_SECRET: w1XZdLT1kaRv8g5ASHYPYJmYRIegXmdep70Wh40bNws
       PORT: "3001"

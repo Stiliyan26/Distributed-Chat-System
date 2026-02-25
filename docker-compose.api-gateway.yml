@@ -1,0 +1,24 @@
+name: chat-system-api-gateway
+
+services:
+  api-gateway:
+    build:
+      context: ./chat-system
+      dockerfile: services/api-gateway/Dockerfile
+    container_name: api-gateway
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      JWT_SECRET: LSNt4suQD8N8RKq6YMGKs3ExWXsgBxrpH4XzPhZNEin
+      AUTH_SERVICE_URL: http://auth-service:3001
+      CHANNEL_SERVICE_URL: http://channel-service:3000
+      MESSAGING_SERVICE_URL: http://messaging-service:3000
+    ports:
+      - "3000:3000"
+    networks:
+      - chat-network
+
+networks:
+  chat-network:
+    name: chat-network
+    driver: bridge

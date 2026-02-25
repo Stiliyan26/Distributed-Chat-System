@@ -81,21 +81,28 @@ export class AuthService {
     }
 
     async refresh(refreshToken: string, res: Response) {
+        if (!refreshToken) {
+            throw new UnauthorizedException(AuthError.REFRESH_TOKEN_IS_ABSENT);
+        }
+
+        let payload: { sub: string };
+
         try {
-            const payload = this.jwtService.verify(refreshToken, {
+            payload = this.jwtService.verify(refreshToken, {
                 secret: process.env.JWT_REFRESH_SECRET
             });
-
-            const user = await this.userRepo.findOneBy({ id: payload.sub });
-
-            if (!user) {
-                throw new UnauthorizedException();
-            }
-
-            this.setAuthCookie(res, user);
         } catch {
-            throw new UnauthorizedException(AuthError.INVALID_REFRESH_TOKEN)
+            throw new UnauthorizedException(AuthError.INVALID_REFRESH_TOKEN);
         }
+        console.log("id: ", payload);
+        const user = await this.userRepo.findOneBy({ id: payload.sub });
+        console.log(user);
+
+        if (!user) {
+            throw new UnauthorizedException(AuthError.USER_NOT_FOUND);
+        }
+
+        this.setAuthCookie(res, user);
     }
 
     private async hashPassword(password: string) {

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { MoreThan, Repository } from "typeorm";
+import { ILike, Repository } from "typeorm";
 
 import { UserListResponseDto } from "./dto/user-list.response.dto";
 import { UserEntity } from "./entities/user.entity";
@@ -15,7 +15,7 @@ export class UsersService {
 
     async getPaginatedUsersByUsername(username: string | null): Promise<UserListResponseDto> {
         const whereCondition = username
-            ? { username: MoreThan(username) }
+            ? { username: ILike(`${username}%`) }
             : {}
 
         const users = await this.userRepo.find({

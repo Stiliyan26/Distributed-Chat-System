@@ -1,28 +1,28 @@
 import { All, Controller, Next, Req, Res, UseGuards } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { NextFunction, Request, Response } from 'express';
 
 import proxy from "express-http-proxy";
 
-import { MessageRoutes } from '@libs/shared/src';
-import { ConfigService } from "@nestjs/config";
+import { UserRoutes } from '@libs/shared/src';
 import { AuthGuard } from "../common/auth.guard";
 
 @UseGuards(AuthGuard)
-@Controller(MessageRoutes.PREFIX)
-export class MessagingProxyController {
+@Controller(UserRoutes.PREFIX)
+export class UsersProxyController {
 
-    private readonly messagingServiceUrl: string;
+    private readonly authServiceUrl: string;
 
     constructor(private readonly configService: ConfigService) {
-        this.messagingServiceUrl = this.configService.get<string>('services.messaging.url');
+        this.authServiceUrl = configService.get<string>('services.auth.url');
     }
 
     @All()
-    proxyMessagingRoot(
+    proxyUsersRoot(
         @Req() req: Request,
         @Res() res: Response,
         @Next() next: NextFunction
     ) {
-        return proxy(this.messagingServiceUrl)(req, res, next);
+        return proxy(this.authServiceUrl)(req, res, next);
     }
 }

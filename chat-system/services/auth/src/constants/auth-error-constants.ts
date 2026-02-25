@@ -4,5 +4,6 @@ export enum AuthError {
     USER_NOT_FOUND = 'User not found.',
     INVALID_CREDENTIALS = 'Invalid credentials',
     INVALID_REFRESH_TOKEN = 'Invalid refresh token',
+    REFRESH_TOKEN_IS_ABSENT = 'Refresh token is absent'
 }
 
