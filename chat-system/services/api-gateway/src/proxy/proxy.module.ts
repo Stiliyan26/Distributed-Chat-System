@@ -3,10 +3,10 @@ import { ConfigModule } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 
 import { AuthGuard } from "../common/auth.guard";
-import { AuthProxyController } from "./auth-proxy.controller";
-import { ChannelProxyController } from "./channel-proxy.controller";
-import { MessagingProxyController } from "./messaging-proxy.controller";
-import { UsersProxyController } from "./users-proxy.controller";
+import { AuthProxyController } from "./controllers/auth-proxy.controller";
+import { ChannelProxyController } from "./controllers/channel-proxy.controller";
+import { MessagingProxyController } from "./controllers/messaging-proxy.controller";
+import { UsersProxyController } from "./controllers/users-proxy.controller";
 
 @Module({
     imports: [ConfigModule, JwtModule],

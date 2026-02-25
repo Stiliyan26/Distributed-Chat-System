@@ -5,7 +5,7 @@ import proxy from "express-http-proxy";
 
 import { MessageRoutes } from '@libs/shared/src';
 import { ConfigService } from "@nestjs/config";
-import { AuthGuard } from "../common/auth.guard";
+import { AuthGuard } from "../../common/auth.guard";
 
 @UseGuards(AuthGuard)
 @Controller(MessageRoutes.PREFIX)

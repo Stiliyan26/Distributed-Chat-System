@@ -12,7 +12,7 @@ export class AuthProxyController {
     private readonly authServiceUrl: string;
 
     constructor(private readonly configService: ConfigService) {
-        this.authServiceUrl = configService.get<string>('services.auth.url');
+        this.authServiceUrl = this.configService.get<string>('services.auth.url');
     }
 
     @All('*')

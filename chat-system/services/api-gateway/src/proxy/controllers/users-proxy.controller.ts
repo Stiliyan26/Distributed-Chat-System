@@ -5,7 +5,7 @@ import { NextFunction, Request, Response } from 'express';
 import proxy from "express-http-proxy";
 
 import { UserRoutes } from '@libs/shared/src';
-import { AuthGuard } from "../common/auth.guard";
+import { AuthGuard } from "../../common/auth.guard";
 
 @UseGuards(AuthGuard)
 @Controller(UserRoutes.PREFIX)
@@ -14,7 +14,7 @@ export class UsersProxyController {
     private readonly authServiceUrl: string;
 
     constructor(private readonly configService: ConfigService) {
-        this.authServiceUrl = configService.get<string>('services.auth.url');
+        this.authServiceUrl = this.configService.get<string>('services.auth.url');
     }
 
     @All()
