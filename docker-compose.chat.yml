@@ -1,0 +1,19 @@
+name: chat-system-chat
+
+services:
+  chat-service:
+    build:
+      context: ./chat-system
+      dockerfile: services/chat/Dockerfile
+    container_name: chat-service
+    environment:
+      MESSAGING_SERVICE_URL: http://messaging-service:3000
+    ports:
+      - "3080:3000"
+    networks:
+      - chat-network
+
+networks:
+  chat-network:
+    name: chat-network
+    driver: bridge

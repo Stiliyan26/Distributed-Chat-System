@@ -67,8 +67,7 @@ services:
     build:
       context: ./chat-system
       dockerfile: services/messaging/Dockerfile.api
-    # container_name: messaging-service
-    command: node --inspect=0.0.0.0:9229 api/main.js
+    container_name: messaging-service
     environment:
       PORT: 3000
       KAFKA_BROKER: kafka:29092
@@ -81,8 +80,7 @@ services:
       DB_TYPE: postgres
       DB_SYNC: "true"
     ports:
-      - "3003-3010:3000"
-      - "9229-9239:9229"
+      - "3003:3000"
     depends_on:
       kafka:
         condition: service_started
@@ -95,8 +93,7 @@ services:
     build:
       context: ./chat-system
       dockerfile: services/messaging/Dockerfile.worker
-    # container_name: messaging-worker
-    command: node --inspect=0.0.0.0:9229 worker/main.js
+    container_name: messaging-worker
     environment:
       KAFKA_BROKER: kafka:29092
       KAFKA_TOPIC: messages
@@ -108,8 +105,6 @@ services:
       DB_NAME: messages_db
       DB_TYPE: postgres
       DB_SYNC: "true"
-    ports:
-      - "9240-9250:9229"
     depends_on:
       kafka:
         condition: service_started

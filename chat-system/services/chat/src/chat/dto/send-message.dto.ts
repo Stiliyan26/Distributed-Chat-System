@@ -1,19 +1,19 @@
-import { IsDate, IsNotEmpty, IsString } from "class-validator";
+import { IsDate, IsNotEmpty, IsString, IsUUID } from "class-validator";
 
-export class MessageDto {
+export class SendMessageDto {
+    @IsUUID()
     @IsNotEmpty()
-    @IsString()
     channelId: string;
 
     @IsNotEmpty()
     @IsString()
     senderUsername: string;
 
-    @IsNotEmpty()
     @IsString()
+    @IsNotEmpty()
     content: string;
 
     @IsNotEmpty()
     @IsDate()
-    sentAt: Date;
+    sentAt: string;
 }
