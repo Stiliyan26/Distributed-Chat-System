@@ -4,6 +4,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import axios from "axios";
 import { Server, Socket } from 'socket.io';
 
+import { AuthHeader } from '@libs/shared/src';
 import { ChatEvents } from "./constants/chat.events";
 import { SendMessageDto } from "./dto/send-message.dto";
 
@@ -40,14 +41,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         @MessageBody() sendMessageDto: SendMessageDto,
         @ConnectedSocket() socket: Socket
     ) {
-        const userId = socket.handshake.headers['x-user-id'] as string;
+        const userId = socket.handshake.headers[AuthHeader.USER_ID] as string;
 
         const messagingServiceUrl = process.env.MESSAGING_SERVICE_URL;
 
         await axios.post(
             `${messagingServiceUrl}/api/messages`,
             sendMessageDto,
-            { headers: { 'x-user-id': userId } }
+            { headers: { [AuthHeader.USER_ID]: userId } }
         )
     }
 }

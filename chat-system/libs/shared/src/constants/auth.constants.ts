@@ -1,7 +1,7 @@
 export enum AuthCookie {
     ACCESS_TOKEN = 'access_token',
     REFRESH_TOKEN = 'refresh_token',
-    SAME_SITE_STRICT = 'strict', 
+    SAME_SITE_STRICT = 'strict',
 }
 
 export enum CookiePath {
@@ -11,4 +11,8 @@ export enum CookiePath {
 export enum AuthTokenExpiry {
     ACCESS_TOKEN = '15m',
     REFRESH_TOKEN = '30d',
+}
+
+export enum AuthHeader {
+    USER_ID = 'x-user-id'
 }

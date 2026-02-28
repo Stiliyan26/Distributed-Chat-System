@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 
-import { AuthCookie } from '@libs/shared/src';
+import { AuthCookie, AuthHeader } from '@libs/shared/src';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -27,7 +27,7 @@ export class AuthGuard implements CanActivate {
                 secret: this.configService.get<string>('jwtSecret')
             });
 
-            request.headers['x-user-id'] = payload.sub;
+            request.headers[AuthHeader.USER_ID] = payload.sub;
 
             return true;
         } catch {

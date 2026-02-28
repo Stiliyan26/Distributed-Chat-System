@@ -10,6 +10,9 @@ export default () => ({
         },
         messaging: {
             url: process.env.MESSAGING_SERVICE_URL || 'http://localhost:3003',
+        },
+        chat: {
+            url: process.env.CHAT_SERVICE_URL || 'http://localhost:3000'
         }
     }
 });
