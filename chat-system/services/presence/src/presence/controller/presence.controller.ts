@@ -13,25 +13,25 @@ export class PresenceController {
     constructor(private readonly presenceService: PresenceService) { }
 
     @Post(PresenceRoutes.STATUS)
-    async getUsersStatus(@Body() getStatusDto: GetUserStatusRequestDto) {
+    getUsersStatus(@Body() getStatusDto: GetUserStatusRequestDto) {
         return this.presenceService.getUsersStatus(getStatusDto.userIds);
     }
 
     @Post(PresenceRoutes.ONLINE)
     @HttpCode(HttpStatus.CREATED)
     async markOnline(@Body() markOnlineDto: MarkOnlineRequestDto) {
-
+        return this.presenceService.markOnline(markOnlineDto);
     }
 
     @Post(PresenceRoutes.OFFLINE)
     @HttpCode(HttpStatus.NO_CONTENT)
     async markOffline(@Body() offlineDto: OfflineRequestDto) {
-
+        return this.presenceService.markOffline(offlineDto);
     }
 
     @Post(PresenceRoutes.HEARTBEAT)
     @HttpCode(HttpStatus.OK)
     async refreshHeartbeat(@Body() heartbeatDto: HeartbeatDto) {
-
+        return this.presenceService.refreshHeartbeat(heartbeatDto);
     }
 }   
