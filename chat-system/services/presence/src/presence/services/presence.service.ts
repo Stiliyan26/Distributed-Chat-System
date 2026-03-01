@@ -18,7 +18,10 @@ export class PresenceService implements OnModuleInit {
     ) { }
 
     onModuleInit() {
-        const scriptPath = join(__dirname, '../../assets/redis/markOffline.lua');
+        const isProd = process.env.NODE_ENV === 'production';
+        const scriptPath = isProd
+            ? join(__dirname, './assets/redis/markOffline.lua')
+            : join(__dirname, '../../assets/redis/markOffline.lua');
 
         this.markOfflineScript = readFileSync(scriptPath, 'utf-8');
     }

@@ -1,0 +1,42 @@
+name: chat-system-presence
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: chat_redis
+    ports:
+      - "6379:6379"
+    restart: always
+    networks:
+      - chat-network
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: chat-redis-insight
+    ports:
+      - "8001:5540"
+    depends_on:
+      - redis
+    networks:
+      - chat-network
+
+  presence-service:
+    build:
+      context: ./chat-system
+      dockerfile: services/presence/Dockerfile
+    container_name: chat-presence
+    environment:
+      - NODE_ENV=production
+      - PORT=3004
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "3004:3004"
+    depends_on:
+      - redis
+    networks:
+      - chat-network
+
+networks:
+  chat-network:
+    name: chat-network
+    driver: bridge
