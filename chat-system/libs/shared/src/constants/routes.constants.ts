@@ -19,3 +19,11 @@ export enum ChannelRoutes {
 export enum MessageRoutes {
     PREFIX = 'messages',
 }
+
+export enum PresenceRoutes {
+    PREFIX = 'presence',
+    ONLINE = 'online',
+    OFFLINE = 'offline',
+    HEARTBEAT = 'heartbeat',
+    STATUS = 'status'
+}

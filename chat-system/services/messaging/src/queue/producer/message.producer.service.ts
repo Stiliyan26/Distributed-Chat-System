@@ -4,7 +4,7 @@ import { Kafka, Producer } from 'kafkajs';
 import { KAFKA_CONFIG } from "../../config/kafka.config";
 import { KafkaLog } from "../../constants";
 import { KafkaMessagePayload } from "../../dto/kafka/kafka-message.payload";
-import { MessageDto } from "../../dto/request/message.dto";
+import { MessageRequestDto } from "../../dto/request/message.request.dto";
 
 @Injectable()
 export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
@@ -30,7 +30,7 @@ export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
     console.log(KafkaLog.DISCONNECTED);
   }
 
-  async publish(messageDto: MessageDto, senderId: string): Promise<void> {
+  async publish(messageDto: MessageRequestDto, senderId: string): Promise<void> {
     const payload: KafkaMessagePayload = {
       channelId: messageDto.channelId,
       senderId,

@@ -1,6 +1,6 @@
 import { IsDate, IsNotEmpty, IsString } from "class-validator";
 
-export class MessageDto {
+export class MessageRequestDto {
     @IsNotEmpty()
     @IsString()
     channelId: string;

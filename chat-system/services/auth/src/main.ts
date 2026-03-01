@@ -20,11 +20,12 @@ async function bootstrap() {
     credentials: true // Allows cookies to be sent
   });
 
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    transform: true, // strips properties not in DTO
-    forbidNonWhitelisted: true, // throws error on extra props
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true, // strips properties not in DTO
+      forbidNonWhitelisted: true, // throws error on extra props
+    }));
 
   app.useGlobalFilters(new GlobalExceptionFilter());
 

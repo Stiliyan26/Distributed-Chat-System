@@ -20,7 +20,8 @@ async function bootstrap() {
         enableImplicitConversion: true,
       },
     })
-  )
+  );
+
   const globalPrefix = CommonConstants.GLOBAL_PREFIX;
   app.setGlobalPrefix(globalPrefix);
 

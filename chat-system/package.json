@@ -69,6 +69,7 @@
     "cookie-parser": "^1.4.7",
     "express-http-proxy": "^2.1.2",
     "http-proxy-middleware": "^3.0.5",
+    "ioredis": "^5.10.0",
     "kafkajs": "^2.2.4",
     "pg": "^8.13.0",
     "reflect-metadata": "^0.1.13",

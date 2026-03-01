@@ -15,15 +15,6 @@ export class ChannelController {
 
   constructor(private readonly channelService: ChannelService) { }
 
-  @Post(ChannelRoutes.CREATE)
-  @HttpCode(HttpStatus.CREATED)
-  createChannel(
-    @Body() createChannelDto: CreateChannelRequestDto,
-    @CurrentUserId() userId: string
-  ): Promise<CreateChannelResponseDto> {
-    return this.channelService.create(createChannelDto, userId);
-  }
-
   @Get(ChannelRoutes.MEMBERS)
   @HttpCode(HttpStatus.OK)
   getAllMembersByChannelId(
@@ -38,5 +29,14 @@ export class ChannelController {
     @CurrentUserId() userId: string
   ): Promise<UserChannelsResponseDto> {
     return this.channelService.getAllChannelsByUserId(userId);
+  }
+
+  @Post(ChannelRoutes.CREATE)
+  @HttpCode(HttpStatus.CREATED)
+  createChannel(
+    @Body() createChannelDto: CreateChannelRequestDto,
+    @CurrentUserId() userId: string
+  ): Promise<CreateChannelResponseDto> {
+    return this.channelService.create(createChannelDto, userId);
   }
 }
