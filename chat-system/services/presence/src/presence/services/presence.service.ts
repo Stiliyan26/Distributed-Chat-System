@@ -61,6 +61,7 @@ export class PresenceService implements OnModuleInit {
         await this.redisService.pipeline()
             .set(userOnlineKey, '1', 'EX', 35)
             .sadd(userConnectionsKey, socketId)
+            .expire(userConnectionsKey, 35)
             .set(heartbeatKey, '1', 'EX', 35)
             .exec();
     }
@@ -85,6 +86,7 @@ export class PresenceService implements OnModuleInit {
         await this.redisService.pipeline()
             .set(this.getUserOnlineKey(userId), '1', 'EX', 35)
             .set(this.getHeartbeatKey(socketId), '1', 'EX', 35)
+            .expire(this.getUserConnectionsKey(userId), 35)
             .exec();
     }
 
