@@ -1,11 +1,7 @@
 import { IsNotEmpty, IsString } from "class-validator";
 
-export class OfflineRequestDto {
+export class SocketDto {
     @IsNotEmpty()
     @IsString()
     socketId: string;
-
-    @IsNotEmpty()
-    @IsString()
-    userId: string;
 }

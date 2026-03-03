@@ -4,9 +4,6 @@ import { join } from "path";
 
 import { readFileSync } from "fs";
 import { REDIS_CLIENT } from "../../constants/redis.constants";
-import { HeartbeatDto } from "../dto/heartbeat.request.dto";
-import { MarkOnlineRequestDto } from "../dto/mark-online.request.dto";
-import { OfflineRequestDto } from "../dto/offline.request.dto";
 
 @Injectable()
 export class PresenceService implements OnModuleInit {
@@ -51,9 +48,7 @@ export class PresenceService implements OnModuleInit {
         return { online, offline };
     }
 
-    async markOnline(markOnlineDto: MarkOnlineRequestDto) {
-        const { socketId, userId } = markOnlineDto;
-
+    async markOnline(socketId: string, userId: string) {
         const userOnlineKey = this.getUserOnlineKey(userId);
         const userConnectionsKey = this.getUserConnectionsKey(userId);
         const heartbeatKey = this.getHeartbeatKey(socketId);
@@ -66,9 +61,7 @@ export class PresenceService implements OnModuleInit {
             .exec();
     }
 
-    async markOffline(offlineDto: OfflineRequestDto) {
-        const { socketId, userId } = offlineDto;
-
+    async markOffline(socketId: string, userId: string) {
         return this.redisService.eval(
             this.markOfflineScript, // The script string
             2, // Number of keys
@@ -80,9 +73,7 @@ export class PresenceService implements OnModuleInit {
         );
     }
 
-    async refreshHeartbeat(heartbeatDto: HeartbeatDto) {
-        const { socketId, userId } = heartbeatDto;
-
+    async refreshHeartbeat(socketId: string, userId: string) {
         await this.redisService.pipeline()
             .set(this.getUserOnlineKey(userId), '1', 'EX', 35)
             .set(this.getHeartbeatKey(socketId), '1', 'EX', 35)

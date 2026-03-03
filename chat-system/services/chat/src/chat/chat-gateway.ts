@@ -4,7 +4,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import axios from "axios";
 import { Server, Socket } from 'socket.io';
 
-import { AuthHeader, CommonConstants, MessageRoutes } from '@libs/shared/src';
+import { AuthHeader, CommonConstants, MessageRoutes, PresenceRoutes } from '@libs/shared/src';
 import { ChatEvents } from "./constants/chat.events";
 import { SendMessageDto } from "./dto/send-message.dto";
 
@@ -14,26 +14,27 @@ import { SendMessageDto } from "./dto/send-message.dto";
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
+    private readonly sendMessageUrl = `${process.env.MESSAGING_SERVICE_URL}/${CommonConstants.GLOBAL_PREFIX}/${MessageRoutes.PREFIX}`;
+
+    private readonly presenceCommon = `${process.env.PRESENCE_SERVICE_URL}/${CommonConstants.GLOBAL_PREFIX}`;
+    private readonly presenceOnlineUrl = `${this.presenceCommon}/${PresenceRoutes.ONLINE}`;
+    private readonly presenceOfflineUrl = `${this.presenceCommon}/${PresenceRoutes.OFFLINE}`;
+
     @WebSocketServer()
     server: Server
 
     private readonly logger = new Logger(ChatGateway.name);
 
-    handleConnection(socket: Socket) {
+    async handleConnection(socket: Socket) {
+        this.updatePresenceStatus(this.presenceOnlineUrl, socket);
+
         this.logger.log(`Client connected: ${socket.id}`);
     }
 
-    handleDisconnect(socket: Socket) {
-        this.logger.log(`Client disconnected: ${socket.id}`);
-    }
+    async handleDisconnect(socket: Socket) {
+        this.updatePresenceStatus(this.presenceOfflineUrl, socket);
 
-    @SubscribeMessage(ChatEvents.JOIN_CHANNEL)
-    handleJoinChannel(
-        @MessageBody() channelId: string,
-        @ConnectedSocket() socket: Socket
-    ) {
-        socket.join(channelId);
-        this.logger.log(`Socket ${socket.id} joined channel ${channelId}`);
+        this.logger.log(`Client disconnected: ${socket.id}`);
     }
 
     @SubscribeMessage(ChatEvents.SEND_MESSAGE)
@@ -43,11 +44,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     ) {
         const userId = socket.handshake.headers[AuthHeader.USER_ID] as string;
 
-        const messagingServiceUrl = `${process.env.MESSAGING_SERVICE_URL}/${CommonConstants.GLOBAL_PREFIX}/${MessageRoutes.PREFIX}`;
+        await axios.post(
+            this.sendMessageUrl,
+            sendMessageDto,
+            { headers: { [AuthHeader.USER_ID]: userId } }
+        );
+    }
+
+    private async updatePresenceStatus(endpointUrl: string, socket: Socket) {
+        const userId = socket.handshake.headers[AuthHeader.USER_ID] as string;
 
         await axios.post(
-            messagingServiceUrl,
-            sendMessageDto,
+            this.sendMessageUrl,
+            { socketId: socket.id },
             { headers: { [AuthHeader.USER_ID]: userId } }
         )
     }

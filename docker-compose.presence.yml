@@ -3,7 +3,7 @@ name: chat-system-presence
 services:
   redis:
     image: redis:7-alpine
-    container_name: chat_redis
+    container_name: presence-redis
     ports:
       - "6379:6379"
     restart: always
@@ -12,7 +12,7 @@ services:
 
   redis-insight:
     image: redis/redisinsight:latest
-    container_name: chat-redis-insight
+    container_name: presence-redis-insight
     ports:
       - "8001:5540"
     depends_on:
@@ -24,7 +24,7 @@ services:
     build:
       context: ./chat-system
       dockerfile: services/presence/Dockerfile
-    container_name: chat-presence
+    container_name: presence-service
     environment:
       - NODE_ENV=production
       - PORT=3004
