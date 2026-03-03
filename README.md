@@ -1,7 +1,5 @@
 <img width="180" height="112" alt="image" src="https://github.com/user-attachments/assets/b3040c8d-daf1-48df-94f4-76017fbaefbf" /># Distributed Chat System
 
-> *Dedicated to the memory of my father, Ventsislav.*
-
 A production-grade real-time distributed chat system built with microservices architecture. 7 services, event-driven message pipeline, dynamic Pub/Sub fan-out, multi-device presence tracking with crash recovery, and polyglot persistence — all containerized with Docker.
 
 ## Tech Stack
