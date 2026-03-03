@@ -1,4 +1,4 @@
-<img width="180" height="112" alt="image" src="https://github.com/user-attachments/assets/b3040c8d-daf1-48df-94f4-76017fbaefbf" /># Distributed Chat System
+# Distributed Chat System
 
 A production-grade real-time distributed chat system built with microservices architecture. 7 services, event-driven message pipeline, dynamic Pub/Sub fan-out, multi-device presence tracking with crash recovery, and polyglot persistence — all containerized with Docker.
 
@@ -6,21 +6,20 @@ A production-grade real-time distributed chat system built with microservices ar
 
 **Runtime:** Node.js · NestJS · TypeScript  
 **Monorepo:** Nx  
-**Databases:** PostgreSQL (Auth, Channel) · PostgreSQL (Messages)  
-**Cache / Presence:** Redis  
+**Databases:** PostgreSQL (Auth, Channel, Messages, Notification)
+**Cache:** Redis (Presence, Pub/Sub)
 **Message Broker:** Apache Kafka  
-**Real-time:** Socket.IO (WebSocket)  
-**Pub/Sub:** Redis Pub/Sub  
+**Real-time:** Socket.IO (WebSocket)   
 **Infrastructure:** Docker · Docker Compose
 
 ---
 
 ## Architecture Overview
 
-<img width="180" height="112" alt="image" src="https://github.com/user-attachments/assets/7e3305f1-288e-497e-a9ef-d61ab7e71d4d" />
-<img width="180" height="112" alt="image" src="https://github.com/user-attachments/assets/7ea0fab6-f641-401c-8ebb-4c542002775b" />
-<img width="180" height="112" alt="image" src="https://github.com/user-attachments/assets/a0917d81-be9f-47ef-a592-99735f22bca1" />
-<img width="180" height="112" alt="image" src="https://github.com/user-attachments/assets/1d4b2077-6533-4600-b6b5-e87a31f4ec04" />
+<img width="100%" height="100%" alt="image" src="./architecture-diagrams/send-message-flow.webp" />
+<img width="100%" height="100%" alt="image" src="./architecture-diagrams/presence-flow.webp" />
+<img width="100%" height="100%" alt="image" src="./architecture-diagrams/create-channel-flow.webp" />
+<img width="100%" height="100%" alt="image" src="./architecture-diagrams/auth-flow.webp" />
 
 ---
 
@@ -33,8 +32,8 @@ A production-grade real-time distributed chat system built with microservices ar
 | Channel Service | 3002 | PostgreSQL | Channel CRUD, member management, provides member lists to other services |
 | Chat Service | 3003 | Redis Pub/Sub | WebSocket connections (Socket.IO), dynamic topic subscription, in-memory connection maps |
 | Messaging Service | 3004 | PostgreSQL + Kafka | Two entry points: messaging-api (HTTP) + messaging-worker (Kafka consumer) |
-| Presence Service | 3005 | Redis | Online/offline tracking, TTL heartbeats, multi-device connection counters |
-| Notification Service | 3006 | — | Receives constructed payloads, publishes to Redis Pub/Sub + sends email for offline users |
+| Presence Service | 3004 | Redis | Online/offline tracking, atomic Lua-based multi-device connection tracking, TTL heartbeats |
+| Delivery Service | 3006 | — | Receives constructed payloads, publishes to Redis Pub/Sub + sends email for offline users |
 
 ---
 
@@ -98,16 +97,18 @@ Message published to "channel:investments"
 
 **Solution:**
 
-- **Connection counters per user per channel:** `HINCRBY channel:investments:user_connections "stiliyan" 1` on join, `-1` on leave. User removed from online set only when counter reaches zero. Phone disconnects but laptop is still there → user stays online.
-- **TTL-based heartbeats:** Each connection has a Redis key with 30-second TTL. Chat Service refreshes every 10 seconds. If Chat Service crashes → no heartbeats → TTL expires → stale presence auto-cleans within 30 seconds.
+- **Per-user connection SET:** `SADD user:{userId}:connections {socketId}` on connect, `SREM` on disconnect. User is only marked offline when the connections SET empties — phone disconnects but laptop is still there → user stays online. All set operations are handled by an atomic **Lua script** to eliminate race conditions.
+- **TTL-based heartbeats:** Each socket has a Redis key `heartbeat:{socketId}` with 35-second TTL, refreshed every 20 seconds. If a Chat Service crashes → no heartbeats → TTL expires → stale presence auto-cleans within 35 seconds. The connections SET also carries a TTL, ensuring full cleanup even in catastrophic crashes with zero `markOffline` calls.
 
 ```
 Redis Presence Model:
-  user:{userId}:online           → STRING "true" TTL 30s
-  channel:{channelId}:online     → SET of userIds  
-  channel:{channelId}:user_connections → HASH { userId: connectionCount }
-  heartbeat:{connectionId}       → STRING "1" TTL 30s
+  user:{userId}:online        → STRING "1"  TTL 35s  (exists = online)
+  user:{userId}:connections  → SET { socketId1, socketId2 }  TTL 35s
+  heartbeat:{socketId}       → STRING "1"  TTL 35s  (per-socket liveness probe)
 ```
+
+> See [docs/chat_architecture_v2.md](./docs/chat_architecture_v2.md) for full Redis schema and Lua script logic.
+> See [docs/big_player_presence_arch.md](./docs/big_player_presence_arch.md) for why Lua was chosen over Pipelines.
 
 ### 6. Messaging Service as Orchestrator — Constructed Payloads
 
@@ -189,12 +190,12 @@ Uses `before` timestamp instead of offset-based pagination. Why: when new messag
      → messaging-api validates, generates messageId, publishes to Kafka
      → returns 202 Accepted
 4. Chat Service sends { event: "message_sent", messageId } back to Peter (optimistic UI)
-5. Messaging Service consumes from Kafka:
+5. Messaging Worker consumes from Kafka:
      a. INSERT message into PostgreSQL (idempotent: ON CONFLICT DO NOTHING)
+5b. Messaging Service (async, non-blocking after 202):
      b. GET /channels/:channelId/members → [stiliyan, peter, bogdan]
      c. GET /presence/users/status?userIds=... → { online: [stiliyan, peter], offline: [bogdan] }
-     d. PUBLISH to Redis Pub/Sub "channel:investments" → Chat Service instances deliver via WebSocket
-     e. POST to Notification Service → email sent to bogdan with constructed payload
+     d. POST /delivery → Delivery Service publishes to Redis Pub/Sub + emails bogdan
 ```
 
 **Durability guarantee:** Message is safe from the moment Kafka acknowledges the publish. If Messaging Service crashes before DB write → Kafka redelivers (offset not committed). If it crashes after DB write but before offset commit → Kafka redelivers → idempotent insert ignores duplicate.
@@ -222,6 +223,6 @@ services/
   channel/              ← NestJS + PostgreSQL
   chat/                 ← NestJS + Socket.IO + Redis Pub/Sub
   messaging/            ← Two entry points (main.ts + worker.ts) + PostgreSQL + Kafka
-  presence/             ← NestJS + Redis
-  notification/         ← NestJS + Redis Pub/Sub + Email
+  presence/             ← NestJS + Redis + Lua scripts
+  delivery/             ← NestJS + Redis Pub/Sub + Email
 ```
