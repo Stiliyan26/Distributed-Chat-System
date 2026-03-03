@@ -1,4 +1,4 @@
-# Distributed Chat System
+<img width="180" height="112" alt="image" src="https://github.com/user-attachments/assets/b3040c8d-daf1-48df-94f4-76017fbaefbf" /># Distributed Chat System
 
 > *Dedicated to the memory of my father, Ventsislav.*
 
@@ -19,33 +19,10 @@ A production-grade real-time distributed chat system built with microservices ar
 
 ## Architecture Overview
 
-```
-┌──────────┐         ┌──────────────┐
-│  Client  │◄──REST──►│ API Gateway  │──── JWT validation ────►  Auth / Channel / Messaging API
-│ (Browser)│         │   (3000)     │
-└────┬─────┘         └──────────────┘
-     │
-     │  WebSocket (Socket.IO)
-     │  Direct connection — bypasses API Gateway
-     ▼
-┌──────────────┐        ┌─────────────────┐
-│ Chat Service │◄──────►│  Redis Pub/Sub  │
-│   (3003)     │ subscribe/receive   │  (Fan-out)        │
-│ Socket.IO    │        └─────────────────┘
-│ + JWT auth   │                ▲
-└──────┬───────┘                │ publish
-       │                 ┌──────┴──────────────┐
-       │                 │ Messaging Service    │──► Presence Service ──► Redis
-       │                 │  (Kafka consumer)    │──► Channel Service  ──► PostgreSQL
-       │                 └────────▲─────────────┘──► Notification Svc ──► Email
-       │                          │
-       ▼                   ┌──────┴──────┐
-┌──────────────┐           │    Kafka    │
-│ Messaging API│──publish──►│  (messages  │
-│   (3004)     │           │   topic)    │
-│  202 Accepted│           └─────────────┘
-└──────────────┘
-```
+<img width="180" height="112" alt="image" src="https://github.com/user-attachments/assets/7e3305f1-288e-497e-a9ef-d61ab7e71d4d" />
+<img width="180" height="112" alt="image" src="https://github.com/user-attachments/assets/7ea0fab6-f641-401c-8ebb-4c542002775b" />
+<img width="180" height="112" alt="image" src="https://github.com/user-attachments/assets/a0917d81-be9f-47ef-a592-99735f22bca1" />
+<img width="180" height="112" alt="image" src="https://github.com/user-attachments/assets/1d4b2077-6533-4600-b6b5-e87a31f4ec04" />
 
 ---
 
