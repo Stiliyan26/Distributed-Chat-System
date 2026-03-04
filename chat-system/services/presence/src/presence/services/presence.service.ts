@@ -4,6 +4,7 @@ import { join } from "path";
 
 import { readFileSync } from "fs";
 import { REDIS_CLIENT } from "../../constants/redis.constants";
+import { GetUserStatusResponseDto } from "../dto/get-user-status.response.dto";
 
 @Injectable()
 export class PresenceService implements OnModuleInit {
@@ -23,7 +24,7 @@ export class PresenceService implements OnModuleInit {
         this.markOfflineScript = readFileSync(scriptPath, 'utf-8');
     }
 
-    async getUsersStatus(userIds: string[]) {
+    async getUsersStatus(userIds: string[]): Promise<GetUserStatusResponseDto> {
         if (userIds.length === 0) {
             return { online: [], offline: [] };
         }
