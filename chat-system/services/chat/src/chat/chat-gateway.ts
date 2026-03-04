@@ -17,8 +17,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly sendMessageUrl = `${process.env.MESSAGING_SERVICE_URL}/${CommonConstants.GLOBAL_PREFIX}/${MessageRoutes.PREFIX}`;
 
     private readonly presenceCommon = `${process.env.PRESENCE_SERVICE_URL}/${CommonConstants.GLOBAL_PREFIX}`;
+
     private readonly presenceOnlineUrl = `${this.presenceCommon}/${PresenceRoutes.ONLINE}`;
     private readonly presenceOfflineUrl = `${this.presenceCommon}/${PresenceRoutes.OFFLINE}`;
+    private readonly presenceHeartbeatUrl = `${this.presenceCommon}/${PresenceRoutes.HEARTBEAT}`;
+
+    private readonly heartbeatInterval = 20_000;
 
     @WebSocketServer()
     server: Server
@@ -28,10 +32,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     async handleConnection(socket: Socket) {
         this.updatePresenceStatus(this.presenceOnlineUrl, socket);
 
+        socket.data.heartbeatId = setInterval(() => {
+            this.updatePresenceStatus(this.presenceHeartbeatUrl, socket);
+        }, this.heartbeatInterval);
+
         this.logger.log(`Client connected: ${socket.id}`);
     }
 
     async handleDisconnect(socket: Socket) {
+        clearInterval(socket.data.heartbeatId);
+
         this.updatePresenceStatus(this.presenceOfflineUrl, socket);
 
         this.logger.log(`Client disconnected: ${socket.id}`);
@@ -55,7 +65,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const userId = socket.handshake.headers[AuthHeader.USER_ID] as string;
 
         await axios.post(
-            this.sendMessageUrl,
+            endpointUrl,
             { socketId: socket.id },
             { headers: { [AuthHeader.USER_ID]: userId } }
         )

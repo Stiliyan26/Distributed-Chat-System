@@ -13,6 +13,7 @@ export class PresenceController {
     constructor(private readonly presenceService: PresenceService) { }
 
     @Post(PresenceRoutes.STATUS)
+    @HttpCode(HttpStatus.OK)
     getUsersStatus(@Body() getStatusDto: GetUserStatusRequestDto) {
         return this.presenceService.getUsersStatus(getStatusDto.userIds);
     }

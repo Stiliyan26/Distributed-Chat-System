@@ -8,7 +8,7 @@ import { ChannelMembersResponseDto } from '../dto/response/channel-members.respo
 import { CreateChannelResponseDto } from '../dto/response/create-channel.response.dto';
 import { UserChannelsResponseDto } from '../dto/response/user-channels.response.dto';
 
-import { CurrentUserId } from '@libs/shared/src/decorators/current-user.decorator';
+import { CurrentUserId } from '@libs/shared/src/decorators/current-user-id.decorator';
 
 @Controller(ChannelRoutes.PREFIX)
 export class ChannelController {
