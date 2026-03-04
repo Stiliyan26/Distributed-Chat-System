@@ -27,3 +27,8 @@ export enum PresenceRoutes {
     HEARTBEAT = 'heartbeat',
     STATUS = 'status'
 }
+
+export enum DeliveryRoutes {
+    PREFIX = 'delivery',
+    RECIEVE = 'recieve'
+}

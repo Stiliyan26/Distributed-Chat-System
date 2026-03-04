@@ -37,7 +37,7 @@ export class PresenceController {
     }
 
     @Post(PresenceRoutes.HEARTBEAT)
-    @HttpCode(HttpStatus.OK)
+    @HttpCode(HttpStatus.ACCEPTED)
     async refreshHeartbeat(
         @Body() socketDto: SocketDto,
         @CurrentUserId() userId: string

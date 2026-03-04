@@ -1,18 +1,20 @@
 import { Type } from "class-transformer";
 import { IsDate, IsNotEmpty, IsString, IsUUID } from "class-validator";
 
-export class SendMessageDto {
-    @IsUUID()
+export class MessagePayloadDto {
+    @IsUUID('all')
+    messageId: string;
+
     @IsNotEmpty()
-    channelId: string;
+    @IsString()
+    content: string;
+
+    @IsUUID('all')
+    senderId: string;
 
     @IsNotEmpty()
     @IsString()
     senderUsername: string;
-
-    @IsString()
-    @IsNotEmpty()
-    content: string;
 
     @IsNotEmpty()
     @IsDate()

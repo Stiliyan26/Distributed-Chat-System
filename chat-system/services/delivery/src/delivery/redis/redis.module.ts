@@ -2,7 +2,7 @@ import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import Redis from "ioredis";
 
-import { REDIS_CLIENT, REDIS_PRESENCE_URL } from '@libs/shared/src';
+import { REDIS_CLIENT, REDIS_PUBSUB_URL } from '@libs/shared/src';
 
 @Module({
     imports: [ConfigModule],
@@ -10,7 +10,7 @@ import { REDIS_CLIENT, REDIS_PRESENCE_URL } from '@libs/shared/src';
         {
             provide: REDIS_CLIENT,
             useFactory: (configService: ConfigService) => {
-                return new Redis(configService.get<string>(REDIS_PRESENCE_URL))
+                return new Redis(configService.get<string>(REDIS_PUBSUB_URL))
             },
             inject: [ConfigService]
         }
