@@ -1,14 +1,17 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
-
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app/app.module';
+
+import { DeliveryModule } from './delivery/delivery.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(DeliveryModule);
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true, // strips properties not in DTO
+      forbidNonWhitelisted: true, // throws error on extra props
+    }));
 
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);

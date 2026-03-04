@@ -7,6 +7,6 @@ export class CreateChannelRequestDto {
 
     @IsArray()
     @ArrayMinSize(1)
-    @IsUUID(4, { each: true })
+    @IsUUID('all', { each: true })
     memberIds: string[];
 }

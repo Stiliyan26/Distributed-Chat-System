@@ -1,7 +1,7 @@
 name: chat-system-presence
 
 services:
-  redis:
+  redis-presence:
     image: redis:7-alpine
     container_name: presence-redis
     ports:
@@ -28,7 +28,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3004
-      - REDIS_URL=redis://redis:6379
+      - REDIS_PRESENCE_URL=redis://redis-presence:6379
     ports:
       - "3004:3004"
     depends_on:

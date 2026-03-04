@@ -1,0 +1,37 @@
+name: chat-system-delivery
+
+services:
+  redis-pubsub:
+    image: redis:7-alpine
+    container_name: redis-pubsub
+    ports:
+      - "6380:6379"
+    networks:
+      - chat-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  delivery-service:
+    build:
+      context: ./chat-system
+      dockerfile: services/delivery/Dockerfile
+    container_name: delivery-service
+    environment:
+      - NODE_ENV=production
+      - PORT=3005
+      - REDIS_PUBSUB_URL=redis://redis-pubsub:6379
+    ports:
+      - "3005:3005"
+    networks:
+      - chat-network
+    depends_on:
+      redis-pubsub:
+        condition: service_healthy
+
+networks:
+  chat-network:
+    name: chat-network
+    driver: bridge
