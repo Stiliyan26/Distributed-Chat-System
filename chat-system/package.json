@@ -27,10 +27,14 @@
     "docker:presence:up:build": "docker-compose -f ../docker-compose.presence.yml up -d --build",
     "docker:presence:down": "docker-compose -f ../docker-compose.presence.yml down",
     "docker:presence:logs": "docker-compose -f ../docker-compose.presence.yml logs -f",
-    "docker:all:up": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml -f ../docker-compose.chat.yml -f ../docker-compose.presence.yml up -d",
-    "docker:all:up:build": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml -f ../docker-compose.chat.yml -f ../docker-compose.presence.yml up -d --build",
-    "docker:all:down": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml -f ../docker-compose.chat.yml -f ../docker-compose.presence.yml down",
-    "docker:all:logs": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml -f ../docker-compose.chat.yml -f ../docker-compose.presence.yml logs -f"
+    "docker:delivery:up": "docker-compose -f ../docker-compose.delivery.yml up -d",
+    "docker:delivery:up:build": "docker-compose -f ../docker-compose.delivery.yml up -d --build",
+    "docker:delivery:down": "docker-compose -f ../docker-compose.delivery.yml down",
+    "docker:delivery:logs": "docker-compose -f ../docker-compose.delivery.yml logs -f",
+    "docker:all:up": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml -f ../docker-compose.chat.yml -f ../docker-compose.presence.yml -f ../docker-compose.delivery.yml up -d",
+    "docker:all:up:build": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml -f ../docker-compose.chat.yml -f ../docker-compose.presence.yml -f ../docker-compose.delivery.yml up -d --build",
+    "docker:all:down": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml -f ../docker-compose.chat.yml -f ../docker-compose.presence.yml -f ../docker-compose.delivery.yml down",
+    "docker:all:logs": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml -f ../docker-compose.chat.yml -f ../docker-compose.presence.yml -f ../docker-compose.delivery.yml logs -f"
   },
   "private": true,
   "devDependencies": {
