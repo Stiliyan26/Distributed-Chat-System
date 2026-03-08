@@ -12,4 +12,4 @@ COPY --from=build /app/dist/services/chat ./api
 RUN npm ci --omit=dev   
 
 ENV NODE_ENV=production
-CMD ["node", "api/main.js"]
+CMD ["node", "--inspect=0.0.0.0:9230", "api/main.js"]

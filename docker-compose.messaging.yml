@@ -84,6 +84,7 @@ services:
       DELIVERY_SERVICE_URL: http://delivery-service:3005
     ports:
       - "3003:3000"
+      - "9231:9231"
     depends_on:
       kafka:
         condition: service_started
