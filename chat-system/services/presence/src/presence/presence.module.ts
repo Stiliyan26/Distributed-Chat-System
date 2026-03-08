@@ -1,6 +1,8 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
-import { RedisModule } from "../redis/redis.module";
+
+import { RedisModule } from "@libs/shared/src/database/redis.module";
+
 import { PresenceController } from "./controller/presence.controller";
 import { PresenceService } from "./services/presence.service";
 

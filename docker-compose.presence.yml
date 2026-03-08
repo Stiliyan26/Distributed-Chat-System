@@ -26,9 +26,9 @@ services:
       dockerfile: services/presence/Dockerfile
     container_name: presence-service
     environment:
-      - NODE_ENV=production
-      - PORT=3004
-      - REDIS_PRESENCE_URL=redis://redis-presence:6379
+      NODE_ENV: production
+      PORT: "3004"
+      REDIS_DATABASE_URL: redis://redis-presence:6379
     ports:
       - "3004:3004"
     depends_on:

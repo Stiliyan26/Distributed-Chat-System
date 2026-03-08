@@ -1,9 +1,9 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 
+import { RedisModule } from "@libs/shared/src/database/redis.module";
 import { DeliveryController } from "./delivery.controller";
 import { DeliveryService } from "./delivery.service";
-import { RedisModule } from "./redis/redis.module";
 
 @Module({
     imports: [
