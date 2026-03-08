@@ -79,6 +79,9 @@ services:
       DB_NAME: messages_db
       DB_TYPE: postgres
       DB_SYNC: "true"
+      CHANNEL_SERVICE_URL: http://channel-service:3000
+      PRESENCE_SERVICE_URL: http://presence-service:3004
+      DELIVERY_SERVICE_URL: http://delivery-service:3005
     ports:
       - "3003:3000"
     depends_on:
@@ -110,6 +113,8 @@ services:
         condition: service_started
       messages-db:
         condition: service_healthy
+    ports:
+      - "9229:9229"
     networks:
       - chat-network
 

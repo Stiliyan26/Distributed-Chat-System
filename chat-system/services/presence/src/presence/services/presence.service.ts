@@ -25,8 +25,11 @@ export class PresenceService implements OnModuleInit {
     }
 
     async getUsersStatus(userIds: string[]): Promise<GetUserStatusResponseDto> {
+        const onlineUserIds = [];
+        const offlineUserIds = [];
+
         if (userIds.length === 0) {
-            return { online: [], offline: [] };
+            return { onlineUserIds, offlineUserIds };
         }
 
         const pipeline = this.redisService.pipeline();
@@ -35,18 +38,15 @@ export class PresenceService implements OnModuleInit {
 
         const results = await pipeline.exec();
 
-        const online = [];
-        const offline = [];
-
         results.forEach(([err, exists], idx) => {
             if (!err && exists === 1) {
-                online.push(userIds[idx]);
+                onlineUserIds.push(userIds[idx]);
             } else {
-                offline.push(userIds[idx]);
+                offlineUserIds.push(userIds[idx]);
             }
         });
 
-        return { online, offline };
+        return { onlineUserIds, offlineUserIds };
     }
 
     async markOnline(socketId: string, userId: string) {

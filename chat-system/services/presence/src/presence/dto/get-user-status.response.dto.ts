@@ -1,4 +1,4 @@
 export class GetUserStatusResponseDto {
-    online: string[];
-    offline: string[];
+    onlineUserIds: string[];
+    offlineUserIds: string[];
 }

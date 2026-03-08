@@ -5,8 +5,10 @@ import { CurrentUserId } from '@libs/shared/src/decorators/current-user-id.decor
 
 import { MessageRequestDto } from "../dto/request/message.request.dto";
 import { MessageResponseDto } from "../dto/response/message.response.dto";
+import { PublishMessageResponse } from '../interfaces/message.interface';
 import { MessageProducerService } from "../queue/producer/message.producer.service";
 import { MessageFetchService } from "../services/message.fetch.service";
+
 
 @Controller(MessageRoutes.PREFIX)
 export class MessageController {
@@ -29,7 +31,7 @@ export class MessageController {
   async createMessage(
     @Body() messageDto: MessageRequestDto,
     @CurrentUserId() senderId: string
-  ): Promise<void> {
+  ): Promise<PublishMessageResponse> {
     return this.messageProducerService.publish(messageDto, senderId);
   }
 }

@@ -12,4 +12,4 @@ COPY --from=build /app/dist/services/messaging-worker ./worker
 RUN npm ci --omit=dev
 
 ENV NODE_ENV=production
-CMD ["node", "worker/main.js"]
+CMD ["node", "--inspect=0.0.0.0:9229", "worker/main.js"]
