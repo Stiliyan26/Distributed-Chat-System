@@ -2,8 +2,8 @@ import { Inject, Injectable, OnModuleInit } from "@nestjs/common";
 import Redis from "ioredis";
 import { join } from "path";
 
+import { REDIS_CLIENT } from "@libs/shared/src/constants/redis.constants";
 import { readFileSync } from "fs";
-import { REDIS_CLIENT } from "../../constants/redis.constants";
 import { GetUserStatusResponseDto } from "../dto/get-user-status.response.dto";
 
 @Injectable()

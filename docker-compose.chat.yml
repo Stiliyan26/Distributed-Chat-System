@@ -12,6 +12,7 @@ services:
       REDIS_DATABASE_URL: redis://redis-pubsub:6379
     ports:
       - "3080:3000"
+      - "9230:9230"
     networks:
       - chat-network
 

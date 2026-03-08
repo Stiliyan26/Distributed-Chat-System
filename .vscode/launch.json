@@ -6,6 +6,18 @@
             "request": "attach",
             "name": "Docker: Attach to Messaging Worker",
             "port": 9229
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Docker: Attach to Chat Service",
+            "port": 9230
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Docker: Attach to Messaging Service",
+            "port": 9231
         }
     ]
 }
