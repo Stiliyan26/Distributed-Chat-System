@@ -4,7 +4,9 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import axios from "axios";
 import { Server, Socket } from 'socket.io';
 
-import { AuthHeader, CommonConstants, MessageRoutes, PresenceRoutes } from '@libs/shared/src';
+import { AuthHeader } from '@libs/shared/src/constants/auth.constants';
+import { CommonConstants } from '@libs/shared/src/constants/common.constants';
+import { MessageRoutes, PresenceRoutes } from '@libs/shared/src/constants/routes.constants';
 import { ChatEvents } from "./constants/chat.events";
 import { SendMessageDto } from "./dto/send-message.dto";
 
@@ -16,7 +18,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     private readonly sendMessageUrl = `${process.env.MESSAGING_SERVICE_URL}/${CommonConstants.GLOBAL_PREFIX}/${MessageRoutes.PREFIX}`;
 
-    private readonly presenceCommon = `${process.env.PRESENCE_SERVICE_URL}/${CommonConstants.GLOBAL_PREFIX}`;
+    private readonly presenceCommon = `${process.env.PRESENCE_SERVICE_URL}/${CommonConstants.GLOBAL_PREFIX}/${PresenceRoutes.PREFIX}`;
 
     private readonly presenceOnlineUrl = `${this.presenceCommon}/${PresenceRoutes.ONLINE}`;
     private readonly presenceOfflineUrl = `${this.presenceCommon}/${PresenceRoutes.OFFLINE}`;
@@ -64,10 +66,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private async updatePresenceStatus(endpointUrl: string, socket: Socket) {
         const userId = socket.handshake.headers[AuthHeader.USER_ID] as string;
 
-        await axios.post(
-            endpointUrl,
-            { socketId: socket.id },
-            { headers: { [AuthHeader.USER_ID]: userId } }
-        )
+        try {
+            await axios.post(
+                endpointUrl,
+                { socketId: socket.id },
+                { headers: { [AuthHeader.USER_ID]: userId } }
+            );
+        } catch (error: any) {
+            this.logger.error(`Failed to update presence at ${endpointUrl}: ${error?.message}`);
+        }
     }
 }

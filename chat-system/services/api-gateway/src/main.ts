@@ -20,6 +20,7 @@ async function bootstrap() {
   );
 
   const chatProxyMiddleware = app.get(ChatProxyMiddleware);
+
   server.on('upgrade', (req, socket, head) => {
     chatProxyMiddleware.proxy.upgrade(req, socket, head);
   });

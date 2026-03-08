@@ -73,6 +73,7 @@ export class ChatProxyMiddleware implements NestMiddleware {
             }
 
             proxyReq.setHeader(AuthHeader.USER_ID, payload.sub);
+            console.log('User id attached to request headers.');
 
             return true;
         } catch (error: any) {
