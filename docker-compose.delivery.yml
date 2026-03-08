@@ -20,9 +20,9 @@ services:
       dockerfile: services/delivery/Dockerfile
     container_name: delivery-service
     environment:
-      - NODE_ENV=production
-      - PORT=3005
-      - REDIS_PUBSUB_URL=redis://redis-pubsub:6379
+      NODE_ENV: production
+      PORT: "3005"
+      REDIS_DATABASE_URL: redis://redis-pubsub:6379
     ports:
       - "3005:3005"
     networks:

@@ -2,7 +2,7 @@ import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import Redis from "ioredis";
 
-import { REDIS_CLIENT, REDIS_PUBSUB_URL } from '@libs/shared/src/constants/redis.constants';
+import { REDIS_CLIENT, REDIS_DATABASE_URL } from '../constants/redis.constants';
 
 @Module({
     imports: [ConfigModule],
@@ -10,7 +10,13 @@ import { REDIS_CLIENT, REDIS_PUBSUB_URL } from '@libs/shared/src/constants/redis
         {
             provide: REDIS_CLIENT,
             useFactory: (configService: ConfigService) => {
-                return new Redis(configService.get<string>(REDIS_PUBSUB_URL))
+                const redisUrl = configService.get<string>(REDIS_DATABASE_URL);
+
+                if (!redisUrl) {
+                    throw new Error(`Configuration error: ${REDIS_DATABASE_URL} is missing`);
+                }
+
+                return new Redis(redisUrl);
             },
             inject: [ConfigService]
         }

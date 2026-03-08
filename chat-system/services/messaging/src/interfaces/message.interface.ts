@@ -1,13 +1,8 @@
+import { MessagePayload } from '@libs/shared/src/interfaces/message-payload.interface';
+
 export type PublishMessageResponse = {
     success: string;
 };
-
-export interface MessagePayload {
-    content: string;
-    senderId: string;
-    senderUsername: string;
-    sentAt: Date;
-}
 
 export interface DeliveryRequest {
     channelId: string;

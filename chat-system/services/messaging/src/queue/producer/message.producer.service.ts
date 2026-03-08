@@ -51,6 +51,7 @@ export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
         const { offlineUserIds } = await this.getAllMemberStatuses(memberIds);
 
         await this.publishMessageToDeliveryService(offlineUserIds, senderId, messageDto);
+
       } catch (err: any) {
         if (err?.response?.data) {
           console.error('[Delivery] Response data:', JSON.stringify(err.response.data));
