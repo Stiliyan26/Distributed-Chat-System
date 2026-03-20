@@ -17,6 +17,8 @@ export class DeliveryService {
     async deliverMessage(deliverMessageDto: DeliverMessageRequestDto) {
         const { channelId, message, offlineUsersEmails } = deliverMessageDto;
 
+        this.logger.log(`[DeliveryService] Received delivery request for channel: ${channelId}. Flowing offline emails: ${JSON.stringify(offlineUsersEmails)}`);
+
         await this.redisService.publish(`channel:${channelId}`, JSON.stringify(message));
 
         offlineUsersEmails.forEach(email => {

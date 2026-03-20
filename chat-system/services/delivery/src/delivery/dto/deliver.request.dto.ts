@@ -9,7 +9,6 @@ export class DeliverMessageRequestDto {
     channelId: string;
 
     @IsArray()
-    @ArrayNotEmpty()
     @IsString({ each: true })
     offlineUsersEmails: string[];
 
