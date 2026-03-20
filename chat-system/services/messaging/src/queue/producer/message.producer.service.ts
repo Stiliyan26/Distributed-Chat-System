@@ -51,9 +51,13 @@ export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
       try {
         const { memberIds } = await this.getAllMemberIdsInAChannel(messageDto.channelId, senderId);
 
-        const { offlineUserIds } = await this.getAllMemberStatuses(memberIds);
+        const { offlineUserIds, onlineUserIds } = await this.getAllMemberStatuses(memberIds);
         
+        console.log(`[MessagingWorker] Channel ${messageDto.channelId} statuses -> Online: ${onlineUserIds?.length || 0}, Offline: ${offlineUserIds.length}`);
+
         const offlineUsersEmails = await this.getOfflineUsersEmails(offlineUserIds);
+
+        console.log(`[MessagingWorker] Publish to Delivery Service -> Offline Emails: ${JSON.stringify(offlineUsersEmails)}`);
 
         await this.publishMessageToDeliveryService(offlineUsersEmails, senderId, messageDto);
 

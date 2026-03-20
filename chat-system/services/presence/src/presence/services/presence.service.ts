@@ -46,6 +46,8 @@ export class PresenceService implements OnModuleInit {
             }
         });
 
+        console.log(`[PresenceService] Looked up ${userIds.length} members. Result -> Online: ${onlineUserIds.length}, Offline: ${offlineUserIds.length}`);
+
         return { onlineUserIds, offlineUserIds };
     }
 

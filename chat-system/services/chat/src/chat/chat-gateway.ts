@@ -59,6 +59,8 @@ export class ChatGateway implements OnModuleInit, OnGatewayConnection, OnGateway
 
             try {
                 const parsedMessage = JSON.parse(message);
+                const socketIds = Array.from(this.server.sockets.adapter.rooms.get(channelId) || []);
+                this.logger.log(`[ChatGateway] Distributing message from Redis -> Channel ${channelId}, Active Sockets: ${JSON.stringify(socketIds)} | Message: ${JSON.stringify(parsedMessage)}`);
                 this.server.to(channelId).emit(ChatEvents.NEW_MESSAGE, parsedMessage);
             } catch (error: any) {
                 this.logger.error(`Failed to push message: ${error.message}`);
@@ -126,6 +128,8 @@ export class ChatGateway implements OnModuleInit, OnGatewayConnection, OnGateway
         @ConnectedSocket() socket: Socket
     ) {
         const userId = socket.handshake.headers[AuthHeader.USER_ID] as string;
+
+        this.logger.log(`[ChatService] Forwarding message to Messaging Service. UserId: ${userId}, ChannelId: ${sendMessageDto.channelId}, Message: "${sendMessageDto.content}"`);
 
         await axios.post(
             this.sendMessageUrl,
