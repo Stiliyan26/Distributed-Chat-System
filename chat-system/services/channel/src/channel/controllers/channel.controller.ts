@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Post } from '@nestjs/common';
 
-import { ChannelRoutes } from '@libs/shared/src';
+import { ChannelRoutes } from '@libs/shared/src/constants/routes.constants';
 import { ChannelService } from '../services/channel.service';
 
 import { CreateChannelRequestDto } from '../dto/request/create-channel.request.dto';

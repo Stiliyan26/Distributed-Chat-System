@@ -5,4 +5,7 @@ export * from './constants/routes.constants';
 export * from './database/database.config';
 export * from './database/database.module';
 export * from './utils/id.util';
-
+export * from './interfaces/users-emails.interface';
+export * from './interfaces/channel.interface';
+export * from './interfaces/presence.interface';
+export * from './interfaces/message-payload.interface';

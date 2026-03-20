@@ -4,7 +4,7 @@ import { initializeTransactionalContext } from 'typeorm-transactional';
 
 import cookieParser from 'cookie-parser';
 
-import { CommonConstants } from '@libs/shared/src';
+import { CommonConstants } from "@libs/shared/src/constants/common.constants";
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 

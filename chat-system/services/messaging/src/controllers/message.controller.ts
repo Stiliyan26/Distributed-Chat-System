@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, ParseUUIDPipe, Post, Query } from "@nestjs/common";
 
-import { MessageRoutes } from "@libs/shared/src";
+import { MessageRoutes } from "@libs/shared/src/constants/routes.constants";
 import { CurrentUserId } from '@libs/shared/src/decorators/current-user-id.decorator';
 
 import { MessageRequestDto } from "../dto/request/message.request.dto";

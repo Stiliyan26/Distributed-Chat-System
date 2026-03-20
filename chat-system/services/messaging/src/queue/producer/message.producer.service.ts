@@ -3,14 +3,14 @@ import axios from "axios";
 import { Kafka, Producer } from 'kafkajs';
 
 import { KAFKA_CONFIG } from "../../config/kafka.config";
-import { KafkaLog } from "../../constants";
+import { KafkaLog } from "../../constants/kafka.constants";
 import { KafkaMessagePayload } from "../../dto/kafka/kafka-message.payload";
 import { MessageRequestDto } from "../../dto/request/message.request.dto";
 import { DeliveryRequest, PublishMessageResponse } from '../../interfaces/message.interface';
 
 import { AuthHeader } from "@libs/shared/src/constants/auth.constants";
 import { CommonConstants } from "@libs/shared/src/constants/common.constants";
-import { ChannelRoutes, DeliveryRoutes, PresenceRoutes } from "@libs/shared/src/constants/routes.constants";
+import { ChannelRoutes, DeliveryRoutes, PresenceRoutes, UserRoutes } from "@libs/shared/src/constants/routes.constants";
 import { ChannelMembersResponse } from '@libs/shared/src/interfaces/channel.interface';
 import { UserStatusResponse } from '@libs/shared/src/interfaces/presence.interface';
 
@@ -22,6 +22,8 @@ export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
 
   private readonly getAllMemberStatusesUrl = `${process.env.PRESENCE_SERVICE_URL}/${CommonConstants.GLOBAL_PREFIX}/${PresenceRoutes.PREFIX}/${PresenceRoutes.STATUS}`;
   private readonly deliveryServiceDeliveryUrl = `${process.env.DELIVERY_SERVICE_URL}/${CommonConstants.GLOBAL_PREFIX}/${DeliveryRoutes.PREFIX}/${DeliveryRoutes.RECIEVE}`;
+
+  private readonly getAllEmailsUrl = `${process.env.AUTH_SERVICE_URL}/${CommonConstants.GLOBAL_PREFIX}/${UserRoutes.PREFIX}/${UserRoutes.EMAILS}`;
 
   async onModuleInit() {
     this.kafka = new Kafka({
@@ -48,9 +50,12 @@ export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
     setImmediate(async () => {
       try {
         const { memberIds } = await this.getAllMemberIdsInAChannel(messageDto.channelId, senderId);
-        const { offlineUserIds } = await this.getAllMemberStatuses(memberIds);
 
-        await this.publishMessageToDeliveryService(offlineUserIds, senderId, messageDto);
+        const { offlineUserIds } = await this.getAllMemberStatuses(memberIds);
+        
+        const offlineUsersEmails = await this.getOfflineUsersEmails(offlineUserIds);
+
+        await this.publishMessageToDeliveryService(offlineUsersEmails, senderId, messageDto);
 
       } catch (err: any) {
         if (err?.response?.data) {
@@ -87,13 +92,13 @@ export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
   }
 
   private async publishMessageToDeliveryService(
-    offlineUserIds: string[],
+    offlineUsersEmails: string[],
     senderId: string,
     messageRequestDto: MessageRequestDto
   ): Promise<void> {
     const deliveryRequest: DeliveryRequest = {
       channelId: messageRequestDto.channelId,
-      offlineUserIds,
+      offlineUsersEmails,
       message: {
         content: messageRequestDto.content,
         senderId,
@@ -103,6 +108,14 @@ export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
     };
 
     await axios.post<void>(this.deliveryServiceDeliveryUrl, deliveryRequest);
+  }
+
+  private async getOfflineUsersEmails(ids: string[]): Promise<string[]> {
+    if (ids.length === 0) return [];
+
+    const { data } = await axios.post<string[]>(this.getAllEmailsUrl, { ids });
+
+    return data;
   }
 
   private async persistMessageToKafka(

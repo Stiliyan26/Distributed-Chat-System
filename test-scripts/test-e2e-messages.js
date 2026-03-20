@@ -184,7 +184,7 @@ async function runTests() {
 
     await delay(2000); // Wait for Redis pub/sub to settle
 
-    console.log("\n--- TEST CASE 1: Sending message to shared channel ---");
+    console.log("\n--- TEST CASE 1: Sending message to shared channel (Both Online) ---");
     // Expected Result: Both User A and User B receive it
     console.log(`[${userA.username}] sending message...`);
     socketA.emit('send_message', {
@@ -196,17 +196,25 @@ async function runTests() {
 
     await delay(3000); // Wait for Kafka -> DB -> Redis delivery
 
-    console.log("\n--- TEST CASE 2: Sending message to exclusive channel ---");
-    // Expected Result: User A receives it, User B DOES NOT.
+    await delay(3000);
+
+    console.log("\n--- TEST CASE 3: Sending message to User B while OFFLINE ---");
+    console.log(`[${userB.username}] disconnecting socket...`);
+    socketB.disconnect(); 
+    await delay(1000); // Wait for presence to detect offline
+
     console.log(`[${userA.username}] sending message...`);
     socketA.emit('send_message', {
-        channelId: exclusiveChannelId,
+        channelId: sharedChannelId,
         senderUsername: userA.username,
-        content: "This is a secret message just for me (User A)",
+        content: "User B should get an email for this!",
         sentAt: new Date().toISOString()
     });
 
-    await delay(3000); // Give enough time for output to render
+    console.log(`\n💡 [TIP] Check the 'delivery-service' docker logs now:`);
+    console.log(`   You should see: [MOCK EMAIL] → user: ${userB.username}@example.com | channel: ${sharedChannelId}`);
+
+    await delay(5000); // Give enough time for the full flow to complete
 
     console.log("\n--- TESTS FINISHED ---");
     process.exit(0);

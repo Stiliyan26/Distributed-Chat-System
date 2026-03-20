@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 
-import { AuthCookie, AuthHeader } from '@libs/shared/src';
+import { AuthCookie, AuthHeader } from "@libs/shared/src/constants/auth.constants";
 
 @Injectable()
 export class AuthGuard implements CanActivate {

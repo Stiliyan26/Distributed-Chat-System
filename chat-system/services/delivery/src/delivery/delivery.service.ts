@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 
-import { REDIS_CLIENT } from "@libs/shared/src";
+import { REDIS_CLIENT } from "@libs/shared/src/constants/redis.constants";
 import Redis from "ioredis";
 import { DeliverMessageRequestDto } from "./dto/deliver.request.dto";
 
@@ -15,12 +15,12 @@ export class DeliveryService {
     ) { }
 
     async deliverMessage(deliverMessageDto: DeliverMessageRequestDto) {
-        const { channelId, message, offlineUserIds } = deliverMessageDto;
+        const { channelId, message, offlineUsersEmails } = deliverMessageDto;
 
         await this.redisService.publish(`channel:${channelId}`, JSON.stringify(message));
 
-        offlineUserIds.forEach(userId => {
-            this.logger.log(`[MOCK EMAIL] → user: ${userId} | channel: ${channelId}`);
+        offlineUsersEmails.forEach(email => {
+            this.logger.log(`[MOCK EMAIL] → user: ${email} | channel: ${channelId}`);
         })
     }
 }   

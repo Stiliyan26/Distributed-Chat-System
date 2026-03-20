@@ -6,7 +6,7 @@ import { IncomingMessage } from 'http';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { Socket } from 'net';
 
-import { AuthCookie, AuthHeader } from '@libs/shared/src';
+import { AuthCookie, AuthHeader } from "@libs/shared/src/constants/auth.constants";
 
 interface ProxyRequest {
     setHeader(name: string, value: string | number): void;
