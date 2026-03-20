@@ -3,7 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { initializeTransactionalContext } from 'typeorm-transactional';
 
 import { ApiModule } from './api.module';
-import { CommonConstants } from '@libs/shared/src';
+import { CommonConstants } from "@libs/shared/src/constants/common.constants";
 
 
 async function bootstrap() {

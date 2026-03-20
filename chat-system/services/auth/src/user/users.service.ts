@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ILike, Repository } from "typeorm";
+import { ILike, In, Repository } from "typeorm";
 
 import { UserListResponseDto } from "./dto/user-list.response.dto";
 import { UserEntity } from "./entities/user.entity";
@@ -36,6 +36,17 @@ export class UsersService {
             data: usersWithExcludedFields,
             nextCursor
         }
+    }
+
+    async getUsersEmails(ids: string[]): Promise<string[]> {
+        const users = await this.userRepo.find({
+            where: {
+                id: In(ids)
+            },
+            select: ['email']
+        });
+
+        return users.map(user => user.email);
     }
 
     private usersListWithExcludedProps(users: UserEntity[]) {

@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import proxy from "express-http-proxy";
 
-import { MessageRoutes } from '@libs/shared/src';
+import { MessageRoutes } from "@libs/shared/src/constants/routes.constants";
 import { ConfigService } from "@nestjs/config";
 import { AuthGuard } from "../../common/auth.guard";
 

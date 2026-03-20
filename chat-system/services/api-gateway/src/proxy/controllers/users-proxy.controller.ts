@@ -4,7 +4,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import proxy from "express-http-proxy";
 
-import { UserRoutes } from '@libs/shared/src';
+import { UserRoutes } from "@libs/shared/src/constants/routes.constants";
 import { AuthGuard } from "../../common/auth.guard";
 
 @UseGuards(AuthGuard)

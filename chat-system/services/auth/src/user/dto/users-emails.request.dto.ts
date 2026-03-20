@@ -1,8 +1,8 @@
 import { ArrayNotEmpty, IsArray, IsUUID } from "class-validator";
 
-export class GetUserStatusRequestDto {
+export class UserIdsRequestDto {
     @IsArray()
     @ArrayNotEmpty()
     @IsUUID('all', { each: true })
-    userIds: string[];
+    ids: string[];
 }

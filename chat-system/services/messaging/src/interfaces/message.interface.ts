@@ -6,6 +6,6 @@ export type PublishMessageResponse = {
 
 export interface DeliveryRequest {
     channelId: string;
-    offlineUserIds: string[];
+    offlineUsersEmails: string[];
     message: MessagePayload;
 }

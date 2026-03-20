@@ -7,6 +7,7 @@ export enum AuthRoutes {
 
 export enum UserRoutes {
     PREFIX = 'users',
+    EMAILS = 'emails'
 }
 
 export enum ChannelRoutes {

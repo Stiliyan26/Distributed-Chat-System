@@ -1,8 +1,8 @@
-import { DbConstants } from "@libs/shared/src";
+import { DbConstants } from "@libs/shared/src/constants/common.constants";
 import { generateId } from "@libs/shared/src/utils/id.util";
 import { Column, Entity, Index, PrimaryColumn } from "typeorm";
 
-import { MessageTable } from "../constants";
+import { MessageTable } from "../constants/message-db.constants";
 
 @Entity(MessageTable.MESSAGES)
 @Index(['channelId'])
