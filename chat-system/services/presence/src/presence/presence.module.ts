@@ -3,8 +3,8 @@ import { ConfigModule } from "@nestjs/config";
 
 import { RedisModule } from "@libs/shared/src/database/redis.module";
 
-import { PresenceController } from "./controller/presence.controller";
-import { PresenceService } from "./services/presence.service";
+import { PresenceController } from "./presence.controller";
+import { PresenceService } from "./presence.service";
 
 @Module({
     imports: [
