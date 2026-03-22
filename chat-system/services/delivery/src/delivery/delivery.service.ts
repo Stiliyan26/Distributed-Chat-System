@@ -1,8 +1,11 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 
-import { REDIS_CLIENT } from "@libs/shared/src/constants/redis.constants";
+import { MailerService } from "@nestjs-modules/mailer";
 import Redis from "ioredis";
+
+import { REDIS_CLIENT } from "@libs/shared/src/constants/redis.constants";
 import { DeliverMessageRequestDto } from "./dto/deliver.request.dto";
+import { MessagePayloadDto } from "./dto/message-payload.dto";
 
 @Injectable()
 export class DeliveryService {
@@ -11,7 +14,8 @@ export class DeliveryService {
 
     constructor(
         @Inject(REDIS_CLIENT)
-        private readonly redisService: Redis
+        private readonly redisService: Redis,
+        private readonly mailerService: MailerService
     ) { }
 
     async deliverMessage(deliverMessageDto: DeliverMessageRequestDto) {
@@ -21,8 +25,29 @@ export class DeliveryService {
 
         await this.redisService.publish(`channel:${channelId}`, JSON.stringify(message));
 
-        offlineUsersEmails.forEach(email => {
-            this.logger.log(`[MOCK EMAIL] → user: ${email} | channel: ${channelId}`);
-        })
+        await this.sendEmails(offlineUsersEmails, message, channelId);
+    }
+
+    private async sendEmails(
+        offlineUsersEmails: string[],
+        message: MessagePayloadDto,
+        channelId: string
+    ) {
+        return await Promise.all(
+            offlineUsersEmails.map(email => {
+                return this.mailerService.sendMail({
+                    to: email,
+                    subject: `New message from ${message.senderUsername}`,
+                    template: 'offline-email', //Targets 'offline-email.hbs'
+                    context: {
+                        senderUsername: message.senderUsername,
+                        messageContent: message.content,
+                        channelId: channelId
+                    }
+                })
+                    .then(() => this.logger.log(`SMTP Success: Sent email to ${email}`))
+                    .catch((e) => this.logger.error(`SMTP Failed for ${email}: ${e.message}`))
+            })
+        );
     }
 }   

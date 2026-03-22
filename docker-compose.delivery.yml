@@ -23,6 +23,10 @@ services:
       NODE_ENV: production
       PORT: "3005"
       REDIS_DATABASE_URL: redis://redis-pubsub:6379
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PORT: 465
+      SMTP_USER: stiliyan.nikolov02@gmail.com
+      SMTP_PASS: ybja zbfg warc xizo
     ports:
       - "3005:3005"
     networks:
