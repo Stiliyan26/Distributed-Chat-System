@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { ArrayNotEmpty, IsArray, IsNotEmpty, IsString, IsUUID, ValidateNested } from "class-validator";
+import { IsArray, IsNotEmpty, IsString, ValidateNested } from "class-validator";
 
 import { MessagePayloadDto } from "./message-payload.dto";
 

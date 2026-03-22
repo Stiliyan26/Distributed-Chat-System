@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: 'Inter', Helvetica, Arial, sans-serif; background-color: #f4f6f9; padding: 40px 0; margin: 0; }
+    .container { max-width: 600px; background: white; margin: 0 auto; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .header { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); padding: 30px; text-align: center; }
+    .header h1 { color: white; margin: 0; font-size: 24px; letter-spacing: 0.5px; }
+    .content { padding: 30px; color: #333; line-height: 1.6; }
+    .message-box { background: #f8fafc; border-left: 4px solid #8b5cf6; padding: 20px; border-radius: 4px; font-style: italic; margin-top: 20px; }
+    .btn { display: inline-block; padding: 12px 24px; background-color: #6366f1; color: white !important; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 30px; }
+    .footer { text-align: center; padding: 20px; font-size: 12px; color: #888; border-top: 1px solid #eee; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>New Message Notification</h1>
+    </div>
+    <div class="content">
+      <h2>Hi there!</h2>
+      <p>While you were offline, <strong>{{senderUsername}}</strong> sent a new message in your channel!</p>
+      
+      <div class="message-box">
+        "{{messageContent}}"
+      </div>
+
+      <center>
+        <a href="https://your-chat-app.com/channel/{{channelId}}" class="btn">Open Chat Now</a>
+      </center>
+    </div>
+    <div class="footer">
+      You are receiving this because you were offline when the message was sent.<br>
+      © 2026 Chat System Delivery.
+    </div>
+  </div>
+</body>
+</html>
