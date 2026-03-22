@@ -2,8 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
-import { KafkaMessagePayload } from "../dto/kafka/kafka-message.payload";
-import { MessageEntity } from "../entities/message.entity";
+import { KafkaMessagePayload } from "./dto/kafka/kafka-message.payload";
+import { MessageEntity } from "./entities/message.entity";
 
 @Injectable()
 export class MessagePersistenceService {

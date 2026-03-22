@@ -4,7 +4,7 @@ import { Consumer, EachMessagePayload, Kafka } from "kafkajs";
 import { KAFKA_CONFIG } from "../../config/kafka.config";
 import { KafkaLog } from "../../constants";
 import { KafkaMessagePayload } from "../../dto/kafka/kafka-message.payload";
-import { MessagePersistenceService } from "../../services/message.persistence.service";
+import { MessagePersistenceService } from "../../message.persistence.service";
 
 @Injectable()
 export class MessageConsumerService implements OnModuleInit, OnModuleDestroy {
