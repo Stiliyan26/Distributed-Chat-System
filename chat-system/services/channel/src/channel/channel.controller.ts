@@ -1,12 +1,12 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Post } from '@nestjs/common';
 
 import { ChannelRoutes } from '@libs/shared/src/constants/routes.constants';
-import { ChannelService } from '../services/channel.service';
+import { ChannelService } from './channel.service';
 
-import { CreateChannelRequestDto } from '../dto/request/create-channel.request.dto';
-import { ChannelMembersResponseDto } from '../dto/response/channel-members.response';
-import { CreateChannelResponseDto } from '../dto/response/create-channel.response.dto';
-import { UserChannelsResponseDto } from '../dto/response/user-channels.response.dto';
+import { CreateChannelRequestDto } from './dto/request/create-channel.request.dto';
+import { ChannelMembersResponseDto } from './dto/response/channel-members.response';
+import { CreateChannelResponseDto } from './dto/response/create-channel.response.dto';
+import { UserChannelsResponseDto } from './dto/response/user-channels.response.dto';
 
 import { CurrentUserId } from '@libs/shared/src/decorators/current-user-id.decorator';
 

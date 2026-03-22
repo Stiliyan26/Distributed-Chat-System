@@ -3,13 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 
-import { ChannelError, ChannelRole } from '../constants';
-import { CreateChannelRequestDto } from '../dto/request/create-channel.request.dto';
-import { ChannelMembersResponseDto } from '../dto/response/channel-members.response';
-import { CreateChannelResponseDto } from '../dto/response/create-channel.response.dto';
-import { UserChannelsResponseDto } from '../dto/response/user-channels.response.dto';
-import { ChannelMemberEntity } from '../entities/channel-member.entity';
-import { ChannelEntity } from '../entities/channel.entity';
+import { ChannelError, ChannelRole } from './constants';
+import { CreateChannelRequestDto } from './dto/request/create-channel.request.dto';
+import { ChannelMembersResponseDto } from './dto/response/channel-members.response';
+import { CreateChannelResponseDto } from './dto/response/create-channel.response.dto';
+import { UserChannelsResponseDto } from './dto/response/user-channels.response.dto';
+import { ChannelMemberEntity } from './entities/channel-member.entity';
+import { ChannelEntity } from './entities/channel.entity';
 
 @Injectable()
 export class ChannelService {

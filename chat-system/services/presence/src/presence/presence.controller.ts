@@ -3,9 +3,9 @@ import { Body, Controller, HttpCode, HttpStatus, Post } from "@nestjs/common";
 import { CurrentUserId } from '@libs/shared/src/decorators/current-user-id.decorator';
 
 import { PresenceRoutes } from '@libs/shared/src/constants/routes.constants';
-import { GetUserStatusRequestDto } from "../dto/get-user-status.request.dto";
-import { SocketDto } from "../dto/socket.dto";
-import { PresenceService } from "../services/presence.service";
+import { GetUserStatusRequestDto } from "./dto/get-user-status.request.dto";
+import { SocketDto } from "./dto/socket.dto";
+import { PresenceService } from "./presence.service";
 
 @Controller(PresenceRoutes.PREFIX)
 export class PresenceController {
@@ -44,4 +44,4 @@ export class PresenceController {
     ) {
         return this.presenceService.refreshHeartbeat(socketDto.socketId, userId);
     }
-}   
+}

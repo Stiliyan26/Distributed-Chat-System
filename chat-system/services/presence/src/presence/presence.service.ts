@@ -4,7 +4,7 @@ import { join } from "path";
 
 import { REDIS_CLIENT } from "@libs/shared/src/constants/redis.constants";
 import { readFileSync } from "fs";
-import { GetUserStatusResponseDto } from "../dto/get-user-status.response.dto";
+import { GetUserStatusResponseDto } from "./dto/get-user-status.response.dto";
 
 @Injectable()
 export class PresenceService implements OnModuleInit {
