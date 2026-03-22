@@ -3,12 +3,11 @@ import { Body, Controller, Get, HttpCode, HttpStatus, ParseUUIDPipe, Post, Query
 import { MessageRoutes } from "@libs/shared/src/constants/routes.constants";
 import { CurrentUserId } from '@libs/shared/src/decorators/current-user-id.decorator';
 
-import { MessageRequestDto } from "../dto/request/message.request.dto";
-import { MessageResponseDto } from "../dto/response/message.response.dto";
-import { PublishMessageResponse } from '../interfaces/message.interface';
-import { MessageProducerService } from "../queue/producer/message.producer.service";
-import { MessageFetchService } from "../services/message.fetch.service";
-
+import { MessageRequestDto } from "./dto/request/message.request.dto";
+import { MessageResponseDto } from "./dto/response/message.response.dto";
+import { PublishMessageResponse } from './interfaces/message.interface';
+import { MessageFetchService } from "./message.fetch.service";
+import { MessageProducerService } from "./queue/producer/message.producer.service";
 
 @Controller(MessageRoutes.PREFIX)
 export class MessageController {
