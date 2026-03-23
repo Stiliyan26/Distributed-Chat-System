@@ -5,10 +5,10 @@ import { AuthCookie } from "@libs/shared/src/constants/auth.constants";
 import { AuthRoutes } from "@libs/shared/src/constants/routes.constants";
 
 import { AuthService } from './auth.service';
-import { LoginRequestDto } from './dto/request/login-request.dto';
-import { RegisterRequestDto } from './dto/request/register-request-user.dto';
-import { LoginResponseDto } from './dto/response/login-response.dto';
-import { RegisterResponseDto } from './dto/response/register-response.dto';
+import { LoginUserRequestDto } from './dto/request/login-user.request.dto';
+import { RegisterUserRequestDto } from './dto/request/register-user.request.dto';
+import { LoginUserResponseDto } from './dto/response/login-user.response.dto';
+import { RegisterUserResponseDto } from './dto/response/register-user.response.dto';
 
 @Controller(AuthRoutes.PREFIX)
 export class AuthController {
@@ -18,19 +18,19 @@ export class AuthController {
   @Post(AuthRoutes.REGISTER)
   @HttpCode(HttpStatus.CREATED)
   async register(
-    @Body() registerDto: RegisterRequestDto,
+    @Body() registerUserRequestDto: RegisterUserRequestDto,
     @Res({ passthrough: true }) res: Response
-  ): Promise<RegisterResponseDto> {
-    return this.authService.register(registerDto, res);
+  ): Promise<RegisterUserResponseDto> {
+    return this.authService.register(registerUserRequestDto, res);
   }
 
   @Post(AuthRoutes.LOGIN)
   @HttpCode(HttpStatus.OK)
   async login(
-    @Body() loginDto: LoginRequestDto,
+    @Body() loginUserRequestDto: LoginUserRequestDto,
     @Res({ passthrough: true }) res: Response
-  ): Promise<LoginResponseDto> {
-    return this.authService.login(loginDto, res);
+  ): Promise<LoginUserResponseDto> {
+    return this.authService.login(loginUserRequestDto, res);
   }
 
   @Post(AuthRoutes.REFRESH)

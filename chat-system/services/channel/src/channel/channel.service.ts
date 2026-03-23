@@ -5,9 +5,9 @@ import { Transactional } from 'typeorm-transactional';
 
 import { ChannelError, ChannelRole } from './constants';
 import { CreateChannelRequestDto } from './dto/request/create-channel.request.dto';
-import { ChannelMembersResponseDto } from './dto/response/channel-members.response';
+import { GetChannelMembersResponseDto } from './dto/response/get-channel-members.response.dto';
 import { CreateChannelResponseDto } from './dto/response/create-channel.response.dto';
-import { UserChannelsResponseDto } from './dto/response/user-channels.response.dto';
+import { GetUserChannelsResponseDto } from './dto/response/get-user-channels.response.dto';
 import { ChannelMemberEntity } from './entities/channel-member.entity';
 import { ChannelEntity } from './entities/channel.entity';
 
@@ -23,10 +23,10 @@ export class ChannelService {
 
   @Transactional()
   async create(
-    createChannelDto: CreateChannelRequestDto,
+    createChannelRequestDto: CreateChannelRequestDto,
     creatorId: string
   ): Promise<CreateChannelResponseDto> {
-    const { channelName, memberIds } = createChannelDto;
+    const { channelName, memberIds } = createChannelRequestDto;
 
     const savedChannel = await this.createChannel(channelName, creatorId);
 
@@ -41,7 +41,7 @@ export class ChannelService {
     };
   }
 
-  async getAllMembersByChannelId(channelId: string): Promise<ChannelMembersResponseDto> {
+  async getAllMembersByChannelId(channelId: string): Promise<GetChannelMembersResponseDto> {
     const members = await this.channelMemberRepository.find({
       where: { channelId },
       select: ['memberId']
@@ -56,7 +56,7 @@ export class ChannelService {
     };
   }
 
-  async getAllChannelsByUserId(userId: string): Promise<UserChannelsResponseDto> {
+  async getAllChannelsByUserId(userId: string): Promise<GetUserChannelsResponseDto> {
     const memberships = await this.channelMemberRepository.find({
       where: { memberId: userId },
       select: ['channelId']

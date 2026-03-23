@@ -4,8 +4,8 @@ import { MailerService } from "@nestjs-modules/mailer";
 import Redis from "ioredis";
 
 import { REDIS_CLIENT } from "@libs/shared/src/constants/redis.constants";
-import { DeliverMessageRequestDto } from "./dto/deliver.request.dto";
-import { MessagePayloadDto } from "./dto/message-payload.dto";
+import { DeliverMessageRequestDto } from "./dto/deliver-message.request.dto";
+import { DeliveryPayloadDto } from "./dto/delivery-payload.dto";
 
 @Injectable()
 export class DeliveryService {
@@ -18,19 +18,31 @@ export class DeliveryService {
         private readonly mailerService: MailerService
     ) { }
 
-    async deliverMessage(deliverMessageDto: DeliverMessageRequestDto) {
-        const { channelId, message, offlineUsersEmails } = deliverMessageDto;
+    async deliverMessage(deliverMessageRequestDto: DeliverMessageRequestDto) {
+        const { channelId, message, offlineUsersEmails } = deliverMessageRequestDto;
 
         this.logger.log(`[DeliveryService] Received delivery request for channel: ${channelId}. Flowing offline emails: ${JSON.stringify(offlineUsersEmails)}`);
 
+        // Real-time broadcast to online users via Redis Pub/Sub
         await this.redisService.publish(`channel:${channelId}`, JSON.stringify(message));
 
-        await this.sendEmails(offlineUsersEmails, message, channelId);
+        // Background email delivery for offline users
+        if (offlineUsersEmails.length > 0) {
+            await this.sendEmails(offlineUsersEmails, message, channelId);
+        }
+    }
+
+    private async publishToSmtp(
+        emails: string[],
+        channelId: string,
+        message: DeliveryPayloadDto,
+    ) {
+        await this.sendEmails(emails, message, channelId);
     }
 
     private async sendEmails(
         offlineUsersEmails: string[],
-        message: MessagePayloadDto,
+        message: DeliveryPayloadDto,
         channelId: string
     ) {
         return await Promise.all(

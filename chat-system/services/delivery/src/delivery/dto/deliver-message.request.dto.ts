@@ -1,7 +1,7 @@
 import { Type } from "class-transformer";
 import { IsArray, IsNotEmpty, IsString, ValidateNested } from "class-validator";
 
-import { MessagePayloadDto } from "./message-payload.dto";
+import { DeliveryPayloadDto } from "./delivery-payload.dto";
 
 export class DeliverMessageRequestDto {
     @IsNotEmpty()
@@ -13,6 +13,6 @@ export class DeliverMessageRequestDto {
     offlineUsersEmails: string[];
 
     @ValidateNested()
-    @Type(() => MessagePayloadDto)
-    message: MessagePayloadDto;
+    @Type(() => DeliveryPayloadDto)
+    message: DeliveryPayloadDto;
 }

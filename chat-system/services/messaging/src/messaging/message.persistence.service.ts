@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
-import { KafkaMessagePayload } from "./dto/kafka/kafka-message.payload";
+import { KafkaMessagePayloadDto } from "./dto/kafka/kafka-message-payload.dto";
 import { MessageEntity } from "./entities/message.entity";
 
 @Injectable()
@@ -13,9 +13,15 @@ export class MessagePersistenceService {
     private readonly messageRepo: Repository<MessageEntity>
   ) { }
 
-  async save(payload: KafkaMessagePayload): Promise<MessageEntity> {
-    const messageEntity = this.messageRepo.create(payload);
+  async save(kafkaMessagePayloadDto: KafkaMessagePayloadDto): Promise<MessageEntity> {
+    const message = this.messageRepo.create({
+      channelId: kafkaMessagePayloadDto.channelId,
+      senderId: kafkaMessagePayloadDto.senderId,
+      senderUsername: kafkaMessagePayloadDto.senderUsername,
+      content: kafkaMessagePayloadDto.content,
+      sentAt: kafkaMessagePayloadDto.sentAt,
+    });
 
-    return await this.messageRepo.save(messageEntity);
+    return await this.messageRepo.save(message);
   }
 }

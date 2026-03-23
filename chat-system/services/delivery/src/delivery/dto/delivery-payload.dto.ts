@@ -1,7 +1,7 @@
 import { Type } from "class-transformer";
 import { IsDate, IsNotEmpty, IsString, IsUUID } from "class-validator";
 
-export class MessagePayloadDto {
+export class DeliveryPayloadDto {
     @IsNotEmpty()
     @IsString()
     content: string;

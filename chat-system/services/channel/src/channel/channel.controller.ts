@@ -4,9 +4,9 @@ import { ChannelRoutes } from '@libs/shared/src/constants/routes.constants';
 import { ChannelService } from './channel.service';
 
 import { CreateChannelRequestDto } from './dto/request/create-channel.request.dto';
-import { ChannelMembersResponseDto } from './dto/response/channel-members.response';
+import { GetChannelMembersResponseDto } from './dto/response/get-channel-members.response.dto';
 import { CreateChannelResponseDto } from './dto/response/create-channel.response.dto';
-import { UserChannelsResponseDto } from './dto/response/user-channels.response.dto';
+import { GetUserChannelsResponseDto } from './dto/response/get-user-channels.response.dto';
 
 import { CurrentUserId } from '@libs/shared/src/decorators/current-user-id.decorator';
 
@@ -19,7 +19,7 @@ export class ChannelController {
   @HttpCode(HttpStatus.OK)
   getAllMembersByChannelId(
     @Param('channelId', ParseUUIDPipe) channelId: string
-  ): Promise<ChannelMembersResponseDto> {
+  ): Promise<GetChannelMembersResponseDto> {
     return this.channelService.getAllMembersByChannelId(channelId);
   }
 
@@ -27,16 +27,16 @@ export class ChannelController {
   @HttpCode(HttpStatus.OK)
   getAllChannelsByUserId(
     @CurrentUserId() userId: string
-  ): Promise<UserChannelsResponseDto> {
+  ): Promise<GetUserChannelsResponseDto> {
     return this.channelService.getAllChannelsByUserId(userId);
   }
 
   @Post(ChannelRoutes.CREATE)
   @HttpCode(HttpStatus.CREATED)
   createChannel(
-    @Body() createChannelDto: CreateChannelRequestDto,
+    @Body() createChannelRequestDto: CreateChannelRequestDto,
     @CurrentUserId() userId: string
   ): Promise<CreateChannelResponseDto> {
-    return this.channelService.create(createChannelDto, userId);
+    return this.channelService.create(createChannelRequestDto, userId);
   }
 }

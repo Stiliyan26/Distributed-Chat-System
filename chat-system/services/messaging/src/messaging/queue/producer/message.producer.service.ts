@@ -4,8 +4,8 @@ import { Kafka, Producer } from 'kafkajs';
 
 import { KAFKA_CONFIG } from "../../config/kafka.config";
 import { KafkaLog } from "../../constants/kafka.constants";
-import { KafkaMessagePayload } from "../../dto/kafka/kafka-message.payload";
-import { MessageRequestDto } from "../../dto/request/message.request.dto";
+import { KafkaMessagePayloadDto } from "../../dto/kafka/kafka-message-payload.dto";
+import { PublishMessageRequestDto } from "../../dto/request/publish-message.request.dto";
 import { DeliveryRequest, PublishMessageResponse } from '../../interfaces/message.interface';
 
 import { AuthHeader } from "@libs/shared/src/constants/auth.constants";
@@ -44,22 +44,22 @@ export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
     console.log(KafkaLog.DISCONNECTED);
   }
 
-  async publish(messageDto: MessageRequestDto, senderId: string): Promise<PublishMessageResponse> {
-    await this.persistMessageToKafka(messageDto, senderId);
+  async publish(publishMessageRequestDto: PublishMessageRequestDto, senderId: string): Promise<PublishMessageResponse> {
+    await this.persistMessageToKafka(publishMessageRequestDto, senderId);
 
     setImmediate(async () => {
       try {
-        const { memberIds } = await this.getAllMemberIdsInAChannel(messageDto.channelId, senderId);
+        const { memberIds } = await this.getAllMemberIdsInAChannel(publishMessageRequestDto.channelId, senderId);
 
         const { offlineUserIds, onlineUserIds } = await this.getAllMemberStatuses(memberIds);
         
-        console.log(`[MessagingWorker] Channel ${messageDto.channelId} statuses -> Online: ${onlineUserIds?.length || 0}, Offline: ${offlineUserIds.length}`);
+        console.log(`[MessagingWorker] Channel ${publishMessageRequestDto.channelId} statuses -> Online: ${onlineUserIds?.length || 0}, Offline: ${offlineUserIds.length}`);
 
         const offlineUsersEmails = await this.getOfflineUsersEmails(offlineUserIds);
 
         console.log(`[MessagingWorker] Publish to Delivery Service -> Offline Emails: ${JSON.stringify(offlineUsersEmails)}`);
 
-        await this.publishMessageToDeliveryService(offlineUsersEmails, senderId, messageDto);
+        await this.publishMessageToDeliveryService(offlineUsersEmails, senderId, publishMessageRequestDto);
 
       } catch (err: any) {
         if (err?.response?.data) {
@@ -98,20 +98,20 @@ export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
   private async publishMessageToDeliveryService(
     offlineUsersEmails: string[],
     senderId: string,
-    messageRequestDto: MessageRequestDto
+    publishMessageRequestDto: PublishMessageRequestDto
   ): Promise<void> {
     const deliveryRequest: DeliveryRequest = {
-      channelId: messageRequestDto.channelId,
+      channelId: publishMessageRequestDto.channelId,
       offlineUsersEmails,
       message: {
-        content: messageRequestDto.content,
+        content: publishMessageRequestDto.content,
         senderId,
-        senderUsername: messageRequestDto.senderUsername,
-        sentAt: messageRequestDto.sentAt
+        senderUsername: publishMessageRequestDto.senderUsername,
+        sentAt: publishMessageRequestDto.sentAt
       }
     };
 
-    await axios.post<void>(this.deliveryServiceDeliveryUrl, deliveryRequest);
+    await axios.post(this.deliveryServiceDeliveryUrl, deliveryRequest);
   }
 
   private async getOfflineUsersEmails(ids: string[]): Promise<string[]> {
@@ -123,23 +123,23 @@ export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
   }
 
   private async persistMessageToKafka(
-    messageDto: MessageRequestDto,
+    publishMessageRequestDto: PublishMessageRequestDto,
     senderId: string
   ): Promise<void> {
-    const payload: KafkaMessagePayload = {
-      channelId: messageDto.channelId,
+    const kafkaMessagePayloadDto: KafkaMessagePayloadDto = {
+      channelId: publishMessageRequestDto.channelId,
       senderId,
-      senderUsername: messageDto.senderUsername,
-      content: messageDto.content,
-      sentAt: messageDto.sentAt,
+      senderUsername: publishMessageRequestDto.senderUsername,
+      content: publishMessageRequestDto.content,
+      sentAt: publishMessageRequestDto.sentAt,
     };
 
     await this.producer.send({
       topic: KAFKA_CONFIG.topic,
       messages: [
         {
-          key: payload.channelId,
-          value: JSON.stringify(payload),
+          key: kafkaMessagePayloadDto.channelId,
+          value: JSON.stringify(kafkaMessagePayloadDto),
         }
       ]
     });

@@ -3,4 +3,4 @@ export class UserChannelItemDto {
     channelName: string;
 }
 
-export type UserChannelsResponseDto = UserChannelItemDto[];
+export type GetUserChannelsResponseDto = UserChannelItemDto[];

@@ -19,7 +19,7 @@ import { CommonConstants } from '@libs/shared/src/constants/common.constants';
 import { MessageRoutes, PresenceRoutes } from '@libs/shared/src/constants/routes.constants';
 
 import { ChatEvents } from "./constants/chat.events";
-import { SendMessageDto } from "./dto/send-message.dto";
+import { SendMessageRequestDto } from "./dto/send-message.request.dto";
 
 @WebSocketGateway({
     transports: ['websocket'],
@@ -124,16 +124,16 @@ export class ChatGateway implements OnModuleInit, OnGatewayConnection, OnGateway
 
     @SubscribeMessage(ChatEvents.SEND_MESSAGE)
     async handleSendMessage(
-        @MessageBody() sendMessageDto: SendMessageDto,
+        @MessageBody() sendMessageRequestDto: SendMessageRequestDto,
         @ConnectedSocket() socket: Socket
     ) {
         const userId = socket.handshake.headers[AuthHeader.USER_ID] as string;
 
-        this.logger.log(`[ChatService] Forwarding message to Messaging Service. UserId: ${userId}, ChannelId: ${sendMessageDto.channelId}, Message: "${sendMessageDto.content}"`);
+        this.logger.log(`[ChatService] Forwarding message to Messaging Service. UserId: ${userId}, ChannelId: ${sendMessageRequestDto.channelId}, Message: "${sendMessageRequestDto.content}"`);
 
         await axios.post(
             this.sendMessageUrl,
-            sendMessageDto,
+            sendMessageRequestDto,
             { headers: { [AuthHeader.USER_ID]: userId } }
         );
     }
