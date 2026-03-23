@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ILike, In, Repository } from "typeorm";
 
-import { UserListResponseDto } from "./dto/user-list.response.dto";
+import { GetUserListResponseDto } from "./dto/get-user-list.response.dto";
 import { UserEntity } from "./entities/user.entity";
 
 @Injectable()
@@ -13,7 +13,7 @@ export class UsersService {
         private readonly userRepo: Repository<UserEntity>
     ) { }
 
-    async getPaginatedUsersByUsername(username: string | null): Promise<UserListResponseDto> {
+    async getPaginatedUsersByUsername(username: string | null): Promise<GetUserListResponseDto> {
         const whereCondition = username
             ? { username: ILike(`${username}%`) }
             : {}

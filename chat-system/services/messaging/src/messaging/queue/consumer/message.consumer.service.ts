@@ -3,7 +3,7 @@ import { Consumer, EachMessagePayload, Kafka } from "kafkajs";
 
 import { KAFKA_CONFIG } from "../../config/kafka.config";
 import { KafkaLog } from "../../constants";
-import { KafkaMessagePayload } from "../../dto/kafka/kafka-message.payload";
+import { KafkaMessagePayloadDto } from "../../dto/kafka/kafka-message-payload.dto";
 import { MessagePersistenceService } from "../../message.persistence.service";
 
 @Injectable()
@@ -59,10 +59,10 @@ export class MessageConsumerService implements OnModuleInit, OnModuleDestroy {
       return;
     }
 
-    const payload: KafkaMessagePayload = JSON.parse(value);
+    const kafkaMessagePayloadDto: KafkaMessagePayloadDto = JSON.parse(value);
 
-    console.log(`Processing message from channel ${payload.channelId} partition ${partition}`);
+    console.log(`Processing message from channel ${kafkaMessagePayloadDto.channelId} partition ${partition}`);
 
-    await this.messagePersistenceService.save(payload);
+    await this.messagePersistenceService.save(kafkaMessagePayloadDto);
   }
 }

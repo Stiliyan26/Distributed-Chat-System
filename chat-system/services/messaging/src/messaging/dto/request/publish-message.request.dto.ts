@@ -1,21 +1,19 @@
-import { Type } from "class-transformer";
-import { IsDate, IsNotEmpty, IsString, IsUUID } from "class-validator";
+import { IsDate, IsNotEmpty, IsString } from "class-validator";
 
-export class SendMessageDto {
-    @IsUUID()
+export class PublishMessageRequestDto {
     @IsNotEmpty()
+    @IsString()
     channelId: string;
 
     @IsNotEmpty()
     @IsString()
     senderUsername: string;
 
-    @IsString()
     @IsNotEmpty()
+    @IsString()
     content: string;
 
     @IsNotEmpty()
     @IsDate()
-    @Type(() => Date)
     sentAt: Date;
 }

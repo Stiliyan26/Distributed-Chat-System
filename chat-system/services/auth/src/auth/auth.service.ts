@@ -8,10 +8,10 @@ import { AuthCookie, AuthTokenExpiry, CookiePath } from "@libs/shared/src/consta
 import { JwtService } from '@nestjs/jwt';
 import { AuthError } from '../constants/auth-error-constants';
 import { UserEntity } from '../user/entities/user.entity';
-import { LoginRequestDto } from './dto/request/login-request.dto';
-import { RegisterRequestDto } from './dto/request/register-request-user.dto';
-import { LoginResponseDto } from './dto/response/login-response.dto';
-import { RegisterResponseDto } from './dto/response/register-response.dto';
+import { LoginUserRequestDto } from './dto/request/login-user.request.dto';
+import { RegisterUserRequestDto } from './dto/request/register-user.request.dto';
+import { LoginUserResponseDto } from './dto/response/login-user.response.dto';
+import { RegisterUserResponseDto } from './dto/response/register-user.response.dto';
 
 @Injectable()
 export class AuthService {
@@ -22,8 +22,8 @@ export class AuthService {
         private readonly jwtService: JwtService
     ) { }
 
-    async register(registerDto: RegisterRequestDto, res: Response): Promise<RegisterResponseDto> {
-        const { password, repeatPassword, ...userData } = registerDto;
+    async register(registerUserRequestDto: RegisterUserRequestDto, res: Response): Promise<RegisterUserResponseDto> {
+        const { password, repeatPassword, ...userData } = registerUserRequestDto;
 
         if (password !== repeatPassword) {
             throw new BadRequestException(AuthError.PASSWORDS_MISMATCH);
@@ -55,15 +55,15 @@ export class AuthService {
         }
     }
 
-    async login(loginDto: LoginRequestDto, res: Response): Promise<LoginResponseDto> {
-        const existingUser = await this.userRepo.findOneBy({ email: loginDto.email });
+    async login(loginUserRequestDto: LoginUserRequestDto, res: Response): Promise<LoginUserResponseDto> {
+        const existingUser = await this.userRepo.findOneBy({ email: loginUserRequestDto.email });
 
         if (!existingUser) {
             throw new UnauthorizedException(AuthError.USER_NOT_FOUND)
         }
 
         const isPasswordMatching = await bcrypt.compare(
-            loginDto.password,
+            loginUserRequestDto.password,
             existingUser.password
         )
 

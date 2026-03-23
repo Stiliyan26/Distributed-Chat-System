@@ -4,7 +4,7 @@ import { CurrentUserId } from '@libs/shared/src/decorators/current-user-id.decor
 
 import { PresenceRoutes } from '@libs/shared/src/constants/routes.constants';
 import { GetUserStatusRequestDto } from "./dto/get-user-status.request.dto";
-import { SocketDto } from "./dto/socket.dto";
+import { SocketConnectionRequestDto } from "./dto/socket-connection.request.dto";
 import { PresenceService } from "./presence.service";
 
 @Controller(PresenceRoutes.PREFIX)
@@ -21,27 +21,27 @@ export class PresenceController {
     @Post(PresenceRoutes.ONLINE)
     @HttpCode(HttpStatus.CREATED)
     async markOnline(
-        @Body() socketDto: SocketDto,
+        @Body() socketConnectionRequestDto: SocketConnectionRequestDto,
         @CurrentUserId() userId: string
     ) {
-        return this.presenceService.markOnline(socketDto.socketId, userId);
+        return this.presenceService.markOnline(socketConnectionRequestDto.socketId, userId);
     }
 
     @Post(PresenceRoutes.OFFLINE)
     @HttpCode(HttpStatus.NO_CONTENT)
     async markOffline(
-        @Body() socketDto: SocketDto,
+        @Body() socketConnectionRequestDto: SocketConnectionRequestDto,
         @CurrentUserId() userId: string
     ) {
-        return this.presenceService.markOffline(socketDto.socketId, userId);
+        return this.presenceService.markOffline(socketConnectionRequestDto.socketId, userId);
     }
 
     @Post(PresenceRoutes.HEARTBEAT)
     @HttpCode(HttpStatus.ACCEPTED)
     async refreshHeartbeat(
-        @Body() socketDto: SocketDto,
+        @Body() socketConnectionRequestDto: SocketConnectionRequestDto,
         @CurrentUserId() userId: string
     ) {
-        return this.presenceService.refreshHeartbeat(socketDto.socketId, userId);
+        return this.presenceService.refreshHeartbeat(socketConnectionRequestDto.socketId, userId);
     }
 }

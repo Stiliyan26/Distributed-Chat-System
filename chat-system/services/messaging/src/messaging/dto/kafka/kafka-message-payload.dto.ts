@@ -1,4 +1,4 @@
-export interface KafkaMessagePayload {
+export interface KafkaMessagePayloadDto {
     channelId: string;
     senderId: string;
     senderUsername: string;
