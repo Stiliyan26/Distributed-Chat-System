@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { Request } from "express";
 
 import { AuthHeader } from "../constants/auth.constants";
-import { MISSING_USER_IDENDIFIER } from '../constants/error-message.constants';
+import { MISSING_USER_IDENTIFIER } from '../constants/error.constants';
 
 @Injectable()
 export class UserHeaderGuard implements CanActivate {
@@ -14,7 +14,7 @@ export class UserHeaderGuard implements CanActivate {
         const userId = request.headers[AuthHeader.USER_ID];
 
         if (!userId) {
-            throw new UnauthorizedException(MISSING_USER_IDENDIFIER)
+            throw new UnauthorizedException(MISSING_USER_IDENTIFIER)
         }
 
         return true;
