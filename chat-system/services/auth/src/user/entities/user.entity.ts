@@ -1,7 +1,7 @@
 import { generateId } from "@libs/shared/src/utils/id.util";
 import { Column, Entity, PrimaryColumn } from "typeorm";
 
-import { UserTable } from "../../constants";
+import { UserTable } from "../../constants/auth.constants";
 
 @Entity(UserTable.USERS)
 export class UserEntity {

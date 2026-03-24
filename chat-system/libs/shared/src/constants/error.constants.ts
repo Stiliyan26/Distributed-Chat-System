@@ -1,0 +1,1 @@
+export const MISSING_USER_IDENTIFIER = 'Missing user identification header';

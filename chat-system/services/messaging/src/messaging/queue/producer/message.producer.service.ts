@@ -2,16 +2,16 @@ import { Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import axios from "axios";
 import { Kafka, Producer } from 'kafkajs';
 
+import { ChannelRoutes, DeliveryRoutes, PresenceRoutes, UserRoutes } from "@libs/shared/src/constants/routes.constants";
+import { CommonConstants } from "@libs/shared/src/constants/common.constants";
+import { AuthHeader } from "@libs/shared/src/constants/auth.constants";
+
 import { KAFKA_CONFIG } from "../../config/kafka.config";
-import { KafkaLog } from "../../constants/kafka.constants";
+import { KafkaLog } from "../../constants/messaging.constants";
 import { KafkaMessagePayloadDto } from "../../dto/kafka/kafka-message-payload.dto";
 import { PublishMessageRequestDto } from "../../dto/request/publish-message.request.dto";
-import { DeliveryRequest, PublishMessageResponse } from '../../interfaces/message.interface';
-
-import { AuthHeader } from "@libs/shared/src/constants/auth.constants";
-import { CommonConstants } from "@libs/shared/src/constants/common.constants";
-import { ChannelRoutes, DeliveryRoutes, PresenceRoutes, UserRoutes } from "@libs/shared/src/constants/routes.constants";
 import { ChannelMembersResponse } from '@libs/shared/src/interfaces/channel.interface';
+import { DeliveryRequest, PublishMessageResponse } from '../../interfaces/message.interface';
 import { UserStatusResponse } from '@libs/shared/src/interfaces/presence.interface';
 
 @Injectable()
@@ -21,7 +21,7 @@ export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
 
 
   private readonly getAllMemberStatusesUrl = `${process.env.PRESENCE_SERVICE_URL}/${CommonConstants.GLOBAL_PREFIX}/${PresenceRoutes.PREFIX}/${PresenceRoutes.STATUS}`;
-  private readonly deliveryServiceDeliveryUrl = `${process.env.DELIVERY_SERVICE_URL}/${CommonConstants.GLOBAL_PREFIX}/${DeliveryRoutes.PREFIX}/${DeliveryRoutes.RECIEVE}`;
+  private readonly deliveryServiceDeliveryUrl = `${process.env.DELIVERY_SERVICE_URL}/${CommonConstants.GLOBAL_PREFIX}/${DeliveryRoutes.PREFIX}/${DeliveryRoutes.RECEIVE}`;
 
   private readonly getAllEmailsUrl = `${process.env.AUTH_SERVICE_URL}/${CommonConstants.GLOBAL_PREFIX}/${UserRoutes.PREFIX}/${UserRoutes.EMAILS}`;
 

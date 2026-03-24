@@ -1,3 +1,16 @@
+export enum AuthError {
+    PASSWORDS_MISMATCH = "Passwords don't match.",
+    USER_EXISTS = 'User with this email already exists',
+    USER_NOT_FOUND = 'User not found.',
+    INVALID_CREDENTIALS = 'Invalid credentials',
+    INVALID_REFRESH_TOKEN = 'Invalid refresh token',
+    REFRESH_TOKEN_IS_ABSENT = 'Refresh token is absent'
+}
+
+export enum UserTable {
+    USERS = 'users',
+}
+
 export const ValidationMessages = {
   USERNAME_INVALID_CHARS: 'Username can only contain letters, numbers, and underscores',
   PASSWORD_TOO_SHORT: (min: number) => `Password is too short (min ${min} characters)`,

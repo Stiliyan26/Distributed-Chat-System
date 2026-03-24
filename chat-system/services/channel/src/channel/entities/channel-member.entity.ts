@@ -1,8 +1,7 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { ChannelEntity } from "./channel.entity";
 
-import { ChannelTable } from "../constants/channel-db.constants";
-import { ChannelRole } from "../constants/channel.constants";
+import { ChannelTable, ChannelRole } from "../constants/channel.constants";
 
 @Entity(ChannelTable.CHANNEL_MEMBERS)
 @Index(['memberId', 'channelId'])
