@@ -10,3 +10,6 @@ export enum KafkaLog {
     DISCONNECTED = 'Kafka connection disconnected',
 }
 
+export enum MessageTable {
+    MESSAGES = 'messages',
+}

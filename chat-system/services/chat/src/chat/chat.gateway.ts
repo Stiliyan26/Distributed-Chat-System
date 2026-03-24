@@ -18,7 +18,7 @@ import { AuthHeader } from '@libs/shared/src/constants/auth.constants';
 import { CommonConstants } from '@libs/shared/src/constants/common.constants';
 import { MessageRoutes, PresenceRoutes } from '@libs/shared/src/constants/routes.constants';
 
-import { ChatEvents } from "./constants/chat.events";
+import { ChatEvents } from "./constants/chat-events.constants";
 import { SendMessageRequestDto } from "./dto/send-message.request.dto";
 
 @WebSocketGateway({

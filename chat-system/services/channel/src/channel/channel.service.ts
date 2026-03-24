@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 
-import { ChannelError, ChannelRole } from './constants';
+import { ChannelError, ChannelRole } from './constants/channel.constants';
 import { CreateChannelRequestDto } from './dto/request/create-channel.request.dto';
 import { GetChannelMembersResponseDto } from './dto/response/get-channel-members.response.dto';
 import { CreateChannelResponseDto } from './dto/response/create-channel.response.dto';

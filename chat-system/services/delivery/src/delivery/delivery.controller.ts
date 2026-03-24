@@ -9,9 +9,9 @@ export class DeliveryController {
 
     constructor(private readonly deliveryService: DeliveryService) { }
 
-    @Post(DeliveryRoutes.RECIEVE)
+    @Post(DeliveryRoutes.RECEIVE)
     @HttpCode(HttpStatus.ACCEPTED)
-    recieveMessage(@Body() deliverMessageRequestDto: DeliverMessageRequestDto) {
+    receiveMessage(@Body() deliverMessageRequestDto: DeliverMessageRequestDto) {
         return this.deliveryService.deliverMessage(deliverMessageRequestDto);
     }
 }

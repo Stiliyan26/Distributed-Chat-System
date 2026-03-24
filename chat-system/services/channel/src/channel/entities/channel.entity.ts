@@ -1,7 +1,7 @@
 import { generateId } from "@libs/shared/src/utils/id.util";
 import { Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from "typeorm";
 
-import { ChannelTable } from "../constants/channel-db.constants";
+import { ChannelTable } from "../constants/channel.constants";
 
 @Entity(ChannelTable.CHANNELS)
 export class ChannelEntity {

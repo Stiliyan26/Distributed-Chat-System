@@ -5,7 +5,8 @@ import {
   MaxLength,
   MinLength
 } from "class-validator";
-import { ValidationMessages } from "../../constants/error-messages";
+
+import { ValidationMessages } from "../../../constants/auth.constants";
 
 export class LoginUserRequestDto {
 

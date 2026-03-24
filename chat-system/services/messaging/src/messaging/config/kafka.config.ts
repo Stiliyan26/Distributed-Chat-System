@@ -1,4 +1,4 @@
-import { KafkaConfig } from "../constants/kafka.constants";
+import { KafkaConfig } from "../constants/messaging.constants";
 
 export const KAFKA_CONFIG = {
   clientId: KafkaConfig.CLIENT_ID,

@@ -31,5 +31,5 @@ export enum PresenceRoutes {
 
 export enum DeliveryRoutes {
     PREFIX = 'delivery',
-    RECIEVE = 'recieve'
+    RECEIVE = 'receive'
 }

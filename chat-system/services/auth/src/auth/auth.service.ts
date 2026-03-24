@@ -5,13 +5,14 @@ import { Response } from 'express';
 import { Repository } from 'typeorm';
 
 import { AuthCookie, AuthTokenExpiry, CookiePath } from "@libs/shared/src/constants/auth.constants";
+
 import { JwtService } from '@nestjs/jwt';
-import { AuthError } from '../constants/auth-error-constants';
 import { UserEntity } from '../user/entities/user.entity';
 import { LoginUserRequestDto } from './dto/request/login-user.request.dto';
 import { RegisterUserRequestDto } from './dto/request/register-user.request.dto';
 import { LoginUserResponseDto } from './dto/response/login-user.response.dto';
 import { RegisterUserResponseDto } from './dto/response/register-user.response.dto';
+import { AuthError } from '../constants/auth.constants';
 
 @Injectable()
 export class AuthService {

@@ -2,9 +2,9 @@ import { Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { Consumer, EachMessagePayload, Kafka } from "kafkajs";
 
 import { KAFKA_CONFIG } from "../../config/kafka.config";
-import { KafkaLog } from "../../constants";
-import { KafkaMessagePayloadDto } from "../../dto/kafka/kafka-message-payload.dto";
 import { MessagePersistenceService } from "../../message.persistence.service";
+import { KafkaLog } from "../../constants/messaging.constants";
+import { KafkaMessagePayloadDto } from "../../dto/kafka/kafka-message-payload.dto";
 
 @Injectable()
 export class MessageConsumerService implements OnModuleInit, OnModuleDestroy {
