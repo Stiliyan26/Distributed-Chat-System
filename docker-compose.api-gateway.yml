@@ -16,6 +16,7 @@ services:
       CHAT_SERVICE_URL: http://chat-service:3000
     ports:
       - "3000:3000"
+      - "9236:9236"
     networks:
       - chat-network
 

@@ -39,6 +39,7 @@ services:
       PORT: "3001"
     ports:
       - "3002:3001"
+      - "9232:9232"
     depends_on:
       users-db:
         condition: service_healthy

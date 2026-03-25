@@ -18,6 +18,36 @@
             "request": "attach",
             "name": "Docker: Attach to Messaging Service",
             "port": 9231
-        }
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Docker: Attach to Auth Service",
+            "port": 9232
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Docker: Attach to Presence Service",
+            "port": 9233
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Docker: Attach to Delivery Service",
+            "port": 9234
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Docker: Attach to Channel Service",
+            "port": 9235
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Docker: Attach to Api-Gateway Service",
+            "port": 9236
+        },
     ]
 }
