@@ -4,7 +4,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
 import { addTransactionalDataSource } from "typeorm-transactional";
 
-import { DATABASE_CONFIG_KEY } from "../../../../libs/shared/src/database/database.config";
+import { DATABASE_CONFIG_KEY } from "./database.config";
 
 
 @Global()
@@ -28,7 +28,11 @@ import { DATABASE_CONFIG_KEY } from "../../../../libs/shared/src/database/databa
       },
       inject: [ConfigService],
       dataSourceFactory: async (options) => {
-        return addTransactionalDataSource(new DataSource(options))
+        if (!options) {
+          throw new Error('DataSource options are not defined');
+        }
+        
+        return addTransactionalDataSource(new DataSource(options));
       }
     }),
   ],

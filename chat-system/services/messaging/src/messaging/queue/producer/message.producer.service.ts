@@ -1,4 +1,4 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import axios from "axios";
 import { Kafka, Producer } from 'kafkajs';
 
@@ -6,7 +6,8 @@ import { ChannelRoutes, DeliveryRoutes, PresenceRoutes, UserRoutes } from "@libs
 import { CommonConstants } from "@libs/shared/src/constants/common.constants";
 import { AuthHeader } from "@libs/shared/src/constants/auth.constants";
 
-import { KAFKA_CONFIG } from "../../config/kafka.config";
+import { ConfigService } from "@nestjs/config";
+import { MESSAGING_CONFIG_KEY, MessagingConfig } from "../../../config/messaging.config";
 import { KafkaLog } from "../../constants/messaging.constants";
 import { KafkaMessagePayloadDto } from "../../dto/kafka/kafka-message-payload.dto";
 import { PublishMessageRequestDto } from "../../dto/request/publish-message.request.dto";
@@ -16,32 +17,63 @@ import { UserStatusResponse } from '@libs/shared/src/interfaces/presence.interfa
 
 @Injectable()
 export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
+  
+  private readonly logger = new Logger(MessageProducerService.name);
   private kafka: Kafka;
   private producer: Producer;
 
+  constructor(private readonly configService: ConfigService<{ [MESSAGING_CONFIG_KEY]: MessagingConfig }>) { }
 
-  private readonly getAllMemberStatusesUrl = `${process.env.PRESENCE_SERVICE_URL}/${CommonConstants.GLOBAL_PREFIX}/${PresenceRoutes.PREFIX}/${PresenceRoutes.STATUS}`;
-  private readonly deliveryServiceDeliveryUrl = `${process.env.DELIVERY_SERVICE_URL}/${CommonConstants.GLOBAL_PREFIX}/${DeliveryRoutes.PREFIX}/${DeliveryRoutes.RECEIVE}`;
+  private get messagingConfig() {
+    return this.configService.get(MESSAGING_CONFIG_KEY, { infer: true })!;
+  }
 
-  private readonly getAllEmailsUrl = `${process.env.AUTH_SERVICE_URL}/${CommonConstants.GLOBAL_PREFIX}/${UserRoutes.PREFIX}/${UserRoutes.EMAILS}`;
+
+  private get presenceServiceUrl() {
+    return this.messagingConfig.services.presenceUrl;
+  }
+
+  private get deliveryServiceUrl() {
+    return this.messagingConfig.services.deliveryUrl;
+  }
+
+  private get authServiceUrl() {
+    return this.messagingConfig.services.authUrl;
+  }
+
+  private get channelServiceUrl() {
+    return this.messagingConfig.services.channelUrl;
+  }
+
+  private get getAllMemberStatusesUrl() {
+    return `${this.presenceServiceUrl}/${CommonConstants.GLOBAL_PREFIX}/${PresenceRoutes.PREFIX}/${PresenceRoutes.STATUS}`;
+  }
+
+  private get deliveryServiceDeliveryUrl() {
+    return `${this.deliveryServiceUrl}/${CommonConstants.GLOBAL_PREFIX}/${DeliveryRoutes.PREFIX}/${DeliveryRoutes.RECEIVE}`;
+  }
+
+  private get getAllEmailsUrl() {
+    return `${this.authServiceUrl}/${CommonConstants.GLOBAL_PREFIX}/${UserRoutes.PREFIX}/${UserRoutes.EMAILS}`;
+  }
 
   async onModuleInit() {
     this.kafka = new Kafka({
-      clientId: KAFKA_CONFIG.clientId,
-      brokers: KAFKA_CONFIG.brokers,
+      clientId: this.messagingConfig.kafka.clientId,
+      brokers: [this.messagingConfig.kafka.broker],
     });
 
     this.producer = this.kafka.producer();
 
-    console.log(KafkaLog.CONNECTING);
+    this.logger.log(KafkaLog.CONNECTING);
     await this.producer.connect();
-    console.log(KafkaLog.CONNECTED);
+    this.logger.log(KafkaLog.CONNECTED);
   }
 
   async onModuleDestroy() {
-    console.log(KafkaLog.DISCONNECTING);
+    this.logger.log(KafkaLog.DISCONNECTING);
     await this.producer.disconnect();
-    console.log(KafkaLog.DISCONNECTED);
+    this.logger.log(KafkaLog.DISCONNECTED);
   }
 
   async publish(publishMessageRequestDto: PublishMessageRequestDto, senderId: string): Promise<PublishMessageResponse> {
@@ -53,20 +85,20 @@ export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
 
         const { offlineUserIds, onlineUserIds } = await this.getAllMemberStatuses(memberIds);
         
-        console.log(`[MessagingWorker] Channel ${publishMessageRequestDto.channelId} statuses -> Online: ${onlineUserIds?.length || 0}, Offline: ${offlineUserIds.length}`);
+        this.logger.debug(`[MessagingWorker] Channel ${publishMessageRequestDto.channelId} statuses -> Online: ${onlineUserIds?.length || 0}, Offline: ${offlineUserIds.length}`);
 
         const offlineUsersEmails = await this.getOfflineUsersEmails(offlineUserIds);
 
-        console.log(`[MessagingWorker] Publish to Delivery Service -> Offline Emails: ${JSON.stringify(offlineUsersEmails)}`);
+        this.logger.debug(`[MessagingWorker] Publish to Delivery Service -> Offline Emails: ${JSON.stringify(offlineUsersEmails)}`);
 
         await this.publishMessageToDeliveryService(offlineUsersEmails, senderId, publishMessageRequestDto);
 
       } catch (err: any) {
         if (err?.response?.data) {
-          console.error('[Delivery] Response data:', JSON.stringify(err.response.data));
+          this.logger.error(`[Delivery] Response data: ${JSON.stringify(err.response.data)}`);
         }
         if (err?.config?.url) {
-          console.error('[Delivery] Failed URL:', err.config.method?.toUpperCase(), err.config.url);
+          this.logger.error(`[Delivery] Failed URL: ${err.config.method?.toUpperCase()} ${err.config.url}`);
         }
       }
     });
@@ -135,7 +167,7 @@ export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
     };
 
     await this.producer.send({
-      topic: KAFKA_CONFIG.topic,
+      topic: this.messagingConfig.kafka.topic,
       messages: [
         {
           key: kafkaMessagePayloadDto.channelId,
@@ -146,6 +178,6 @@ export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
   }
 
   private getAllChannelMembersUrl(channelId: string) {
-    return `${process.env.CHANNEL_SERVICE_URL}/${CommonConstants.GLOBAL_PREFIX}/${ChannelRoutes.PREFIX}/${channelId}/members`;
+    return `${this.channelServiceUrl}/${CommonConstants.GLOBAL_PREFIX}/${ChannelRoutes.PREFIX}/${channelId}/members`;
   }
 }

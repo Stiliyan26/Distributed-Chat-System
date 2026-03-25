@@ -28,7 +28,7 @@ export class GlobalExceptionFilter<T extends HttpException | TypeORMError> imple
             : HttpStatus.INTERNAL_SERVER_ERROR;
 
         try {
-            const { statusCode, message, error }: CustomExceptionResponse =
+            const { statusCode, message }: CustomExceptionResponse =
                 exception instanceof HttpException
                     ? (exception.getResponse() as CustomExceptionResponse)
                     : {

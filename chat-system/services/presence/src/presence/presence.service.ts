@@ -1,22 +1,31 @@
-import { Inject, Injectable, OnModuleInit } from "@nestjs/common";
+import { Inject, Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import Redis from "ioredis";
 import { join } from "path";
 
 import { REDIS_CLIENT } from "@libs/shared/src/constants/redis.constants";
+import { PRESENCE_CONFIG_KEY, PresenceConfig } from "../config/presence.config";
 import { readFileSync } from "fs";
 import { GetUserStatusResponseDto } from "./dto/get-user-status.response.dto";
 
 @Injectable()
 export class PresenceService implements OnModuleInit {
+
+    private readonly logger = new Logger(PresenceService.name);
     private markOfflineScript: string;
 
     constructor(
         @Inject(REDIS_CLIENT)
-        private readonly redisService: Redis
+        private readonly redisService: Redis,
+        private readonly configService: ConfigService<{ [PRESENCE_CONFIG_KEY]: PresenceConfig }>
     ) { }
 
+    private get presenceConfig() {
+        return this.configService.get(PRESENCE_CONFIG_KEY, { infer: true })!;
+    }
+
     onModuleInit() {
-        const isProd = process.env.NODE_ENV === 'production';
+        const isProd = this.presenceConfig.nodeEnv === 'production';
         const scriptPath = isProd
             ? join(__dirname, './assets/redis/markOffline.lua')
             : join(__dirname, '../../assets/redis/markOffline.lua');
@@ -46,7 +55,7 @@ export class PresenceService implements OnModuleInit {
             }
         });
 
-        console.log(`[PresenceService] Looked up ${userIds.length} members. Result -> Online: ${onlineUserIds.length}, Offline: ${offlineUserIds.length}`);
+        this.logger.log(`[PresenceService] Looked up ${userIds.length} members. Result -> Online: ${onlineUserIds.length}, Offline: ${offlineUserIds.length}`);
 
         return { onlineUserIds, offlineUserIds };
     }

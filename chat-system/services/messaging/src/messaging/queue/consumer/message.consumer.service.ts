@@ -1,45 +1,55 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { Consumer, EachMessagePayload, Kafka } from "kafkajs";
 
-import { KAFKA_CONFIG } from "../../config/kafka.config";
+import { ConfigService } from "@nestjs/config";
+import { MESSAGING_CONFIG_KEY, MessagingConfig } from "../../../config/messaging.config";
 import { MessagePersistenceService } from "../../message.persistence.service";
 import { KafkaLog } from "../../constants/messaging.constants";
 import { KafkaMessagePayloadDto } from "../../dto/kafka/kafka-message-payload.dto";
 
 @Injectable()
 export class MessageConsumerService implements OnModuleInit, OnModuleDestroy {
+  
+  private readonly logger = new Logger(MessageConsumerService.name);
   private kafka: Kafka;
   private consumer: Consumer;
 
-  constructor(private messagePersistenceService: MessagePersistenceService) { }
+  constructor(
+    private readonly messagePersistenceService: MessagePersistenceService,
+    private readonly configService: ConfigService<{ [MESSAGING_CONFIG_KEY]: MessagingConfig }>
+  ) { }
+
+  private get messagingConfig() {
+    return this.configService.get(MESSAGING_CONFIG_KEY, { infer: true })!;
+  }
 
   async onModuleInit() {
     this.kafka = new Kafka({
-      clientId: KAFKA_CONFIG.clientId,
-      brokers: KAFKA_CONFIG.brokers
+      clientId: this.messagingConfig.kafka.clientId,
+      brokers: [this.messagingConfig.kafka.broker]
     });
 
     this.consumer = this.kafka.consumer({
-      groupId: KAFKA_CONFIG.consumerGroup
+      groupId: this.messagingConfig.kafka.consumerGroup
     });
 
-    console.log(KafkaLog.CONNECTING);
+    this.logger.log(KafkaLog.CONNECTING);
     await this.consumer.connect();
-    console.log(KafkaLog.CONNECTED);
+    this.logger.log(KafkaLog.CONNECTED);
 
     this.subscribeToTopic();
     this.onMessage();
   }
 
   async onModuleDestroy() {
-    console.log(KafkaLog.DISCONNECTING);
+    this.logger.log(KafkaLog.DISCONNECTING);
     await this.consumer.disconnect();
-    console.log(KafkaLog.DISCONNECTED);
+    this.logger.log(KafkaLog.DISCONNECTED);
   }
 
   private async subscribeToTopic() {
     await this.consumer.subscribe({
-      topics: [KAFKA_CONFIG.topic],
+      topics: [this.messagingConfig.kafka.topic],
       fromBeginning: false
     });
   }
@@ -61,7 +71,7 @@ export class MessageConsumerService implements OnModuleInit, OnModuleDestroy {
 
     const kafkaMessagePayloadDto: KafkaMessagePayloadDto = JSON.parse(value);
 
-    console.log(`Processing message from channel ${kafkaMessagePayloadDto.channelId} partition ${partition}`);
+    this.logger.log(`Processing message from channel ${kafkaMessagePayloadDto.channelId} partition ${partition}`);
 
     await this.messagePersistenceService.save(kafkaMessagePayloadDto);
   }
