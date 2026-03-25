@@ -1,4 +1,4 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { NextFunction, Request, Response } from 'express';
@@ -15,6 +15,8 @@ interface ProxyRequest {
 
 @Injectable()
 export class ChatProxyMiddleware implements NestMiddleware {
+    
+    private readonly logger = new Logger(ChatProxyMiddleware.name);
     private _proxy: ReturnType<typeof createProxyMiddleware>;
 
     get proxy() { return this._proxy; }
@@ -39,7 +41,7 @@ export class ChatProxyMiddleware implements NestMiddleware {
                     }
 
                     if (!token) {
-                        console.error('[SocketIoProxy] Missing token on WS upgrade — rejecting socket connection');
+                        this.logger.warn('[SocketIoProxy] Missing token on WS upgrade — rejecting socket connection');
                         socket.destroy();
                         return;
                     }
@@ -49,7 +51,7 @@ export class ChatProxyMiddleware implements NestMiddleware {
                     }
                 },
                 error: (err: Error, req: IncomingMessage, res: Socket) => {
-                    console.error('[SocketIoProxy] Upstream error:', err.message);
+                    this.logger.error(`[SocketIoProxy] Upstream error: ${err.message}`);
                     res.destroy();
                 }
             }
@@ -73,11 +75,11 @@ export class ChatProxyMiddleware implements NestMiddleware {
             }
 
             proxyReq.setHeader(AuthHeader.USER_ID, payload.sub);
-            console.log('User id attached to request headers.');
+            this.logger.debug('User id attached to request headers.');
 
             return true;
         } catch (error: any) {
-            console.error(`[SocketIoProxy] Invalid JWT token — connection rejected: ${error.message}`);
+            this.logger.error(`[SocketIoProxy] Invalid JWT token — connection rejected: ${error.message}`);
 
             proxyReq.destroy();
 

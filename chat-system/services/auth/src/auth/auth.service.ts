@@ -1,4 +1,5 @@
-import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
@@ -7,21 +8,29 @@ import { Repository } from 'typeorm';
 import { AuthCookie, AuthTokenExpiry, CookiePath } from "@libs/shared/src/constants/auth.constants";
 
 import { JwtService } from '@nestjs/jwt';
+import { AUTH_CONFIG_KEY, AuthConfig } from '../config/auth.config';
+import { AuthError } from '../constants/auth.constants';
 import { UserEntity } from '../user/entities/user.entity';
 import { LoginUserRequestDto } from './dto/request/login-user.request.dto';
 import { RegisterUserRequestDto } from './dto/request/register-user.request.dto';
 import { LoginUserResponseDto } from './dto/response/login-user.response.dto';
 import { RegisterUserResponseDto } from './dto/response/register-user.response.dto';
-import { AuthError } from '../constants/auth.constants';
 
 @Injectable()
 export class AuthService {
 
+    private readonly logger = new Logger(AuthService.name);
+
     constructor(
         @InjectRepository(UserEntity)
         private readonly userRepo: Repository<UserEntity>,
-        private readonly jwtService: JwtService
+        private readonly jwtService: JwtService,
+        private readonly configService: ConfigService<{ [AUTH_CONFIG_KEY]: AuthConfig }>
     ) { }
+
+    private get authConfig() {
+        return this.configService.get(AUTH_CONFIG_KEY, { infer: true })!;
+    }
 
     async register(registerUserRequestDto: RegisterUserRequestDto, res: Response): Promise<RegisterUserResponseDto> {
         const { password, repeatPassword, ...userData } = registerUserRequestDto;
@@ -90,18 +99,21 @@ export class AuthService {
 
         try {
             payload = this.jwtService.verify(refreshToken, {
-                secret: process.env.JWT_REFRESH_SECRET
+                secret: this.authConfig.jwtRefreshSecret
             });
         } catch {
+            this.logger.warn(`Failed refresh attempt: Invalid token format`);
             throw new UnauthorizedException(AuthError.INVALID_REFRESH_TOKEN);
         }
-        console.log("id: ", payload);
+
         const user = await this.userRepo.findOneBy({ id: payload.sub });
-        console.log(user);
 
         if (!user) {
+            this.logger.error(`Token valid but user ${payload.sub} not found in DB`);
             throw new UnauthorizedException(AuthError.USER_NOT_FOUND);
         }
+
+        this.logger.debug(`Refreshing session for user: ${user.id}`);
 
         this.setAuthCookie(res, user);
     }
@@ -118,7 +130,7 @@ export class AuthService {
             username: user.username,
             email: user.email
         }, {
-            secret: process.env.JWT_SECRET,
+            secret: this.authConfig.jwtSecret,
             expiresIn: AuthTokenExpiry.ACCESS_TOKEN
         });
     }
@@ -127,7 +139,7 @@ export class AuthService {
         return this.jwtService.sign(
             { sub: user.id },
             {
-                secret: process.env.JWT_REFRESH_SECRET,
+                secret: this.authConfig.jwtRefreshSecret,
                 expiresIn: AuthTokenExpiry.REFRESH_TOKEN
             }
         )
@@ -139,7 +151,7 @@ export class AuthService {
 
         res.cookie(AuthCookie.ACCESS_TOKEN, accessToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: this.authConfig.nodeEnv === 'production',
             sameSite: AuthCookie.SAME_SITE_STRICT,
             maxAge: 15 * 60 * 1000, // 15 minutes
             path: '/'
@@ -147,7 +159,7 @@ export class AuthService {
 
         res.cookie(AuthCookie.REFRESH_TOKEN, refreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: this.authConfig.nodeEnv === 'production',
             sameSite: AuthCookie.SAME_SITE_STRICT,
             maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
             path: CookiePath.REFRESH

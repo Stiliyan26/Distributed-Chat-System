@@ -29,7 +29,7 @@ async function bootstrap() {
     }));
 
   app.useGlobalFilters(new GlobalExceptionFilter());
-
+  app.enableShutdownHooks()
   app.use(cookieParser())
 
   const port = process.env.PORT || 3000;

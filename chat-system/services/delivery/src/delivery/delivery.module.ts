@@ -1,5 +1,7 @@
 import { Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import deliveryConfig, { DELIVERY_CONFIG_KEY } from "../config/delivery.config";
+import redisConfig from "@libs/shared/src/database/redis.config";
 
 import { MailerModule } from "@nestjs-modules/mailer";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/adapters/handlebars.adapter";
@@ -11,28 +13,34 @@ import { DeliveryService } from "./delivery.service";
 
 @Module({
     imports: [
-        ConfigModule.forRoot({ isGlobal: true }),
+        ConfigModule.forRoot({
+            isGlobal: true,
+            load: [deliveryConfig, redisConfig]
+        }),
         RedisModule,
-        MailerModule.forRoot({
-            transport: {
-                host: process.env.SMTP_HOST || 'smtp.ethereal.email',
-                port: parseInt(process.env.SMTP_PORT) || 587,
-                secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
-                auth: {
-                    user: process.env.SMTP_USER,
-                    pass: process.env.SMTP_PASS
+        MailerModule.forRootAsync({
+            useFactory: (configService: ConfigService) => ({
+                transport: {
+                    host: configService.get(`${DELIVERY_CONFIG_KEY}.smtpHost`),
+                    port: configService.get(`${DELIVERY_CONFIG_KEY}.smtpPort`),
+                    secure: configService.get(`${DELIVERY_CONFIG_KEY}.smtpPort`) === 465,
+                    auth: {
+                        user: configService.get(`${DELIVERY_CONFIG_KEY}.smtpUser`),
+                        pass: configService.get(`${DELIVERY_CONFIG_KEY}.smtpPass`)
+                    },
                 },
-            },
-            defaults: {
-                from: '"Chat System" <noreply@chat-system.com>',
-            },
-            template: {
-                dir: join(__dirname, 'assets/templates'),
-                adapter: new HandlebarsAdapter(),
-                options: {
-                    strict: true,
+                defaults: {
+                    from: '"Chat System" <noreply@chat-system.com>',
                 },
-            },
+                template: {
+                    dir: join(__dirname, 'assets/templates'),
+                    adapter: new HandlebarsAdapter(),
+                    options: {
+                        strict: true,
+                    },
+                },
+            }),
+            inject: [ConfigService]
         })
     ],
     controllers: [DeliveryController],

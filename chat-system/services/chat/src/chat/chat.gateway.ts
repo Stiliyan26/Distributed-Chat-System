@@ -1,4 +1,5 @@
 import { Inject, Logger, OnModuleInit } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import {
     ConnectedSocket,
     MessageBody,
@@ -20,6 +21,7 @@ import { MessageRoutes, PresenceRoutes } from '@libs/shared/src/constants/routes
 
 import { ChatEvents } from "./constants/chat-events.constants";
 import { SendMessageRequestDto } from "./dto/send-message.request.dto";
+import { CHAT_CONFIG_KEY, ChatConfig } from "../config/chat.config";
 
 @WebSocketGateway({
     transports: ['websocket'],
@@ -27,13 +29,37 @@ import { SendMessageRequestDto } from "./dto/send-message.request.dto";
 })
 export class ChatGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDisconnect {
 
-    private readonly sendMessageUrl = `${process.env.MESSAGING_SERVICE_URL}/${CommonConstants.GLOBAL_PREFIX}/${MessageRoutes.PREFIX}`;
+    private get chatConfig() {
+        return this.configService.get(CHAT_CONFIG_KEY, { infer: true })!;
+    }
 
-    private readonly presenceCommon = `${process.env.PRESENCE_SERVICE_URL}/${CommonConstants.GLOBAL_PREFIX}/${PresenceRoutes.PREFIX}`;
+    private get messagingServiceUrl() {
+        return this.chatConfig.services.messagingUrl;
+    }
 
-    private readonly presenceOnlineUrl = `${this.presenceCommon}/${PresenceRoutes.ONLINE}`;
-    private readonly presenceOfflineUrl = `${this.presenceCommon}/${PresenceRoutes.OFFLINE}`;
-    private readonly presenceHeartbeatUrl = `${this.presenceCommon}/${PresenceRoutes.HEARTBEAT}`;
+    private get presenceServiceUrl() {
+        return this.chatConfig.services.presenceUrl;
+    }
+
+    private get sendMessageUrl() {
+        return `${this.messagingServiceUrl}/${CommonConstants.GLOBAL_PREFIX}/${MessageRoutes.PREFIX}`;
+    }
+
+    private get presenceCommon() {
+        return `${this.presenceServiceUrl}/${CommonConstants.GLOBAL_PREFIX}/${PresenceRoutes.PREFIX}`;
+    }
+
+    private get presenceOnlineUrl() {
+        return `${this.presenceCommon}/${PresenceRoutes.ONLINE}`;
+    }
+
+    private get presenceOfflineUrl() {
+        return `${this.presenceCommon}/${PresenceRoutes.OFFLINE}`;
+    }
+
+    private get presenceHeartbeatUrl() {
+        return `${this.presenceCommon}/${PresenceRoutes.HEARTBEAT}`;
+    }
 
     private readonly heartbeatInterval = 20_000;
 
@@ -44,7 +70,8 @@ export class ChatGateway implements OnModuleInit, OnGatewayConnection, OnGateway
 
     constructor(
         @Inject(REDIS_CLIENT)
-        private readonly redisService: Redis
+        private readonly redisService: Redis,
+        private readonly configService: ConfigService<{ [CHAT_CONFIG_KEY]: ChatConfig }>
     ) { }
 
     onModuleInit() {

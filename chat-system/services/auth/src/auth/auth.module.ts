@@ -10,12 +10,13 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UsersModule } from '../user/users.module';
 import { UserEntity } from '../user/entities/user.entity';
+import authConfig from '../config/auth.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig],
+      load: [databaseConfig, authConfig],
     }),
     SharedDatabaseModule,
     TypeOrmModule.forFeature([UserEntity]),
