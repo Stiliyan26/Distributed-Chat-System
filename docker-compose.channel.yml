@@ -37,6 +37,7 @@ services:
       PORT: "3000"
     ports:
       - "3020:3000"
+      - "9235:9235"
     depends_on:
       channels-db:
         condition: service_healthy

@@ -29,6 +29,7 @@ services:
       SMTP_PASS: ybja zbfg warc xizo
     ports:
       - "3005:3005"
+      - "9234:9234"
     networks:
       - chat-network
     depends_on:

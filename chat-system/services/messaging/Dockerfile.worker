@@ -8,8 +8,9 @@ RUN npx nx run messaging:build-worker
 FROM node:20-alpine
 WORKDIR /app
 COPY --from=build /app/package.json /app/package-lock.json ./
-COPY --from=build /app/dist/services/messaging-worker ./worker
+COPY --from=build /app/dist/services/messaging-worker ./
 RUN npm install --omit=dev
 
 ENV NODE_ENV=production
-CMD ["node", "--inspect=0.0.0.0:9229", "worker/main.js"]
+EXPOSE 9229
+CMD ["node", "--inspect=0.0.0.0:9229", "main.js"]

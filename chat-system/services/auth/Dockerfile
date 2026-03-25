@@ -12,5 +12,6 @@ COPY --from=build /app/package.json /app/package-lock.json ./
 RUN npm install --omit=dev
 ENV NODE_ENV=production
 EXPOSE 3001
-CMD ["node", "main.js"]
+EXPOSE 9232
+CMD ["node", "--inspect=0.0.0.0:9232", "main.js"]
 

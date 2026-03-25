@@ -4,3 +4,13 @@ dist
 *.md
 .env
 .env.*
+.vscode
+.editorconfig
+.prettierrc
+.prettierignore
+.gitignore
+.dockerignore
+.DS_Store
+nx/cache
+npm-debug.log*
+
