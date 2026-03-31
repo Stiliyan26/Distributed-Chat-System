@@ -14,8 +14,11 @@ export class UsersController {
     constructor(private readonly userService: UsersService) { }
 
     @Get()
-    getUsers(@Query('username') username?: string): Promise<GetUserListResponseDto> {
-        return this.userService.getPaginatedUsersByUsername(username);
+    getUsers(
+        @Query('username') username?: string,
+        @Query('cursor') cursor?: string
+    ): Promise<GetUserListResponseDto> {
+        return this.userService.getPaginatedUsersByUsername(username, cursor);
     }
 
     @Post(UserRoutes.EMAILS)

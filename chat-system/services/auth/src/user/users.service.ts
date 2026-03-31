@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ILike, In, Repository } from "typeorm";
+import { And, FindOptionsWhere, ILike, In, MoreThan, Repository } from "typeorm";
 
 import { GetUserListResponseDto } from "./dto/get-user-list.response.dto";
 import { UserEntity } from "./entities/user.entity";
@@ -13,17 +13,14 @@ export class UsersService {
         private readonly userRepo: Repository<UserEntity>
     ) { }
 
-    async getPaginatedUsersByUsername(username: string | null): Promise<GetUserListResponseDto> {
-        const whereCondition = username
-            ? { username: ILike(`${username}%`) }
-            : {}
-
+    async getPaginatedUsersByUsername(
+        username: string | null,
+        cursor: string | null
+    ): Promise<GetUserListResponseDto> {
         const users = await this.userRepo.find({
-            where: whereCondition,
+            where: this.buildUsernameWhere(username, cursor),
             select: ['id', 'username', 'email'],
-            order: {
-                username: 'ASC'
-            },
+            order: { username: 'ASC' },
             take: 10
         });
 
@@ -46,5 +43,30 @@ export class UsersService {
         });
 
         return users.map(user => user.email);
+    }
+
+    private buildUsernameWhere(
+        username: string | null,
+        cursor: string | null
+    ): FindOptionsWhere<UserEntity> {
+        const prefixFilter = username
+            ? ILike(`${username}%`)
+            : null;
+
+        if (prefixFilter && cursor) {
+            return {
+                username: And(prefixFilter, MoreThan(cursor))
+            };
+        }
+
+        else if (prefixFilter) {
+            return { username: prefixFilter }
+        }
+
+        else if (cursor) {
+            return { username: MoreThan(cursor) }
+        }
+
+        return {};
     }
 }

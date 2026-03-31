@@ -1,12 +1,9 @@
 import { Transform } from "class-transformer";
 import {
-  IsEmail,
-  Matches,
-  MaxLength,
-  MinLength
+  IsEmail
 } from "class-validator";
 
-import { ValidationMessages } from "../../../constants/auth.constants";
+import { IsStrongPassword } from "../../decorators/is-strong-password.decorator";
 
 export class LoginUserRequestDto {
 
@@ -14,10 +11,6 @@ export class LoginUserRequestDto {
   @Transform(({ value }) => value?.toLowerCase().trim())
   readonly email: string;
 
-  @MinLength(8, { message: ValidationMessages.PASSWORD_TOO_SHORT(8) })
-  @MaxLength(64, { message: ValidationMessages.PASSWORD_TOO_LONG(64) })
-  @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: ValidationMessages.PASSWORD_TOO_WEAK,
-  })
+  @IsStrongPassword()
   readonly password: string;
 }

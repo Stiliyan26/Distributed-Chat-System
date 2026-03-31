@@ -1,6 +1,7 @@
 import { Transform } from "class-transformer";
-import { IsEmail, IsStrongPassword, Matches, MaxLength, MinLength } from "class-validator";
+import { IsEmail, Matches, MaxLength, MinLength } from "class-validator";
 import { ValidationMessages } from "../../../constants/auth.constants";
+import { IsStrongPassword } from "../../decorators/is-strong-password.decorator";
 
 export class RegisterUserRequestDto {
   @MinLength(5)
