@@ -20,6 +20,7 @@ export class UsersService {
 
         const users = await this.userRepo.find({
             where: whereCondition,
+            select: ['id', 'username', 'email'],
             order: {
                 username: 'ASC'
             },
@@ -30,10 +31,8 @@ export class UsersService {
             ? users[users.length - 1].username
             : null;
 
-        const usersWithExcludedFields = this.usersListWithExcludedProps(users);
-
         return {
-            data: usersWithExcludedFields,
+            data: users,
             nextCursor
         }
     }
@@ -47,13 +46,5 @@ export class UsersService {
         });
 
         return users.map(user => user.email);
-    }
-
-    private usersListWithExcludedProps(users: UserEntity[]) {
-        return users.map((user) => ({
-            id: user.id,
-            username: user.username,
-            email: user.email
-        }));
     }
 }
