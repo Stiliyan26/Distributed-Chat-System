@@ -20,9 +20,9 @@ export class DeliveryService {
 
     async deliverMessage(deliverMessageRequestDto: DeliverMessageRequestDto) {
         const { channelId, message, offlineUsersEmails } = deliverMessageRequestDto;
-
+        
         this.logger.log(`[DeliveryService] Received delivery request for channel: ${channelId}. Flowing offline emails: ${JSON.stringify(offlineUsersEmails)}`);
-
+        
         // Real-time broadcast to online users via Redis Pub/Sub
         await this.redisService.publish(`channel:${channelId}`, JSON.stringify(message));
 
@@ -32,34 +32,36 @@ export class DeliveryService {
         }
     }
 
-    private async publishToSmtp(
-        emails: string[],
-        channelId: string,
-        message: DeliveryPayloadDto,
-    ) {
-        await this.sendEmails(emails, message, channelId);
-    }
-
     private async sendEmails(
         offlineUsersEmails: string[],
         message: DeliveryPayloadDto,
         channelId: string
-    ) {
-        return await Promise.all(
-            offlineUsersEmails.map(email => {
-                return this.mailerService.sendMail({
+    ): Promise<void> {
+        const results = await Promise.allSettled(
+            offlineUsersEmails.map(async (email) => {
+                await this.mailerService.sendMail({
                     to: email,
                     subject: `New message from ${message.senderUsername}`,
-                    template: 'offline-email', //Targets 'offline-email.hbs'
+                    template: 'offline-email',
                     context: {
                         senderUsername: message.senderUsername,
                         messageContent: message.content,
-                        channelId: channelId
+                        channelId
                     }
-                })
-                    .then(() => this.logger.log(`SMTP Success: Sent email to ${email}`))
-                    .catch((e) => this.logger.error(`SMTP Failed for ${email}: ${e.message}`))
+                });
+
+                this.logger.log(`SMTP Success: Sent email to ${email}`);
             })
         );
+
+        const failed = results.filter(r => r.status === 'rejected');
+
+        failed.forEach((result, index) => {
+            const email = offlineUsersEmails[index];
+            
+            if (result.status === 'rejected') {
+                this.logger.error(`SMTP Failed for ${email}: ${result.reason}`);
+            }
+        });
     }
 }   

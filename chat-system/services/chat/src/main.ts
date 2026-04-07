@@ -2,11 +2,15 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 
+import { GlobalExceptionFilter } from '@libs/shared/src/filters/global-exception.filter';
+
 import { CommonConstants } from '@libs/shared/src/constants/common.constants';
 import { ChatModule } from './chat/chat.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(ChatModule);
+
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   app.useGlobalPipes(
     new ValidationPipe({

@@ -1,11 +1,15 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
+import { GlobalExceptionFilter } from '@libs/shared/src/filters/global-exception.filter';
+
 import { CommonConstants } from '@libs/shared/src/constants/common.constants';
 import { PresenceModule } from './presence/presence.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(PresenceModule);
+
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   app.useGlobalPipes(
     new ValidationPipe({

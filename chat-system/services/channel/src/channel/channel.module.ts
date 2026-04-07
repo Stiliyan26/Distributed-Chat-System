@@ -7,6 +7,7 @@ import { ChannelEntity } from './entities/channel.entity';
 import { ChannelService } from './channel.service';
 
 import databaseConfig from '@libs/shared/src/database/database.config';
+import channelConfig from '../config/channel.config';
 import { SharedDatabaseModule } from '@libs/shared/src/database/database.module';
 import { UserHeaderGuard } from '@libs/shared/src/guards/user-header.guard';
 import { APP_GUARD } from '@nestjs/core';
@@ -17,7 +18,7 @@ import { ChannelMemberEntity } from './entities/channel-member.entity';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig]
+      load: [databaseConfig, channelConfig]
     }),
     SharedDatabaseModule,
     TypeOrmModule.forFeature([

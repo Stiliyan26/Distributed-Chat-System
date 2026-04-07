@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 
 import { ChannelError, ChannelRole } from './constants/channel.constants';
 import { CreateChannelRequestDto } from './dto/request/create-channel.request.dto';
-import { GetChannelMembersResponseDto } from './dto/response/get-channel-members.response.dto';
 import { CreateChannelResponseDto } from './dto/response/create-channel.response.dto';
+import { GetChannelMembersResponseDto } from './dto/response/get-channel-members.response.dto';
 import { GetUserChannelsResponseDto } from './dto/response/get-user-channels.response.dto';
 import { ChannelMemberEntity } from './entities/channel-member.entity';
 import { ChannelEntity } from './entities/channel.entity';
@@ -30,7 +30,7 @@ export class ChannelService {
 
     const savedChannel = await this.createChannel(channelName, creatorId);
 
-    const uniqueMemberIds = this.getUniqueMmeberIds(memberIds, creatorId);
+    const uniqueMemberIds = this.getUniqueMemberIds(memberIds, creatorId);
 
     await this.createChannelMembers(savedChannel.id, uniqueMemberIds, creatorId);
 
@@ -59,20 +59,20 @@ export class ChannelService {
   async getAllChannelsByUserId(userId: string): Promise<GetUserChannelsResponseDto> {
     const memberships = await this.channelMemberRepository.find({
       where: { memberId: userId },
-      select: ['channelId']
+      relations: ['channel'],
+      select: {
+        channelId: true,
+        memberId: true,
+        channel: {
+          id: true,
+          channelName: true
+        }
+      }
     });
 
-    if (!memberships.length) {
-      return [];
-    }
-
-    const channelIds = memberships.map(m => m.channelId);
-
-    const channels = await this.channelRepository.findBy({ id: In(channelIds) });
-
-    return channels.map(c => ({
-      channelId: c.id,
-      channelName: c.channelName
+    return memberships.map(m => ({
+      channelId: m.channel.id,
+      channelName: m.channel.channelName
     }));
   }
 
@@ -85,7 +85,7 @@ export class ChannelService {
     return await this.channelRepository.save(channel);
   }
 
-  private getUniqueMmeberIds(memberIds: string[], creatorId: string) {
+  private getUniqueMemberIds(memberIds: string[], creatorId: string) {
     return Array.from(new Set([...memberIds, creatorId]));
   }
 
