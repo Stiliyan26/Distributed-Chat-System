@@ -1,15 +1,17 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { plainToInstance } from "class-transformer";
+import { validate, ValidationError } from "class-validator";
 import { Consumer, EachMessagePayload, Kafka } from "kafkajs";
 
-import { ConfigService } from "@nestjs/config";
 import { MESSAGING_CONFIG_KEY, MessagingConfig } from "../../../config/messaging.config";
-import { MessagePersistenceService } from "../../message.persistence.service";
 import { KafkaLog } from "../../constants/messaging.constants";
 import { KafkaMessagePayloadDto } from "../../dto/kafka/kafka-message-payload.dto";
+import { MessagePersistenceService } from "../../message.persistence.service";
 
 @Injectable()
 export class MessageConsumerService implements OnModuleInit, OnModuleDestroy {
-  
+
   private readonly logger = new Logger(MessageConsumerService.name);
   private kafka: Kafka;
   private consumer: Consumer;
@@ -66,13 +68,41 @@ export class MessageConsumerService implements OnModuleInit, OnModuleDestroy {
     const value = message.value?.toString();
 
     if (!value) {
+      this.logger.warn(`Received empty message on partition ${partition}`);
       return;
     }
 
-    const kafkaMessagePayloadDto: KafkaMessagePayloadDto = JSON.parse(value);
+    try {
+      const rawPayload = JSON.parse(value);
 
-    this.logger.log(`Processing message from channel ${kafkaMessagePayloadDto.channelId} partition ${partition}`);
+      const payload = plainToInstance(KafkaMessagePayloadDto, rawPayload);
 
-    await this.messagePersistenceService.save(kafkaMessagePayloadDto);
+      const errors = await validate(payload);
+
+      if (errors.length > 0) {
+        this.extractErrorMessage(errors);
+        return;
+      }
+
+      if (!payload.channelId || !payload.senderId || !payload.content) {
+        this.logger.error(`Malformed message payload: ${value}`);
+        return;
+      }
+
+      this.logger.log(`Processing message from channel ${payload.channelId} partition ${partition}`);
+      await this.messagePersistenceService.save(payload);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+
+      this.logger.error(`Failed to parse Kafka message: ${errorMessage}. Raw message: ${value}`);
+    }
+  }
+
+  private extractErrorMessage(errors: ValidationError[]): void {
+    const message = errors
+      .map(err => Object.values(err.constraints || {}).join(', '))
+      .join('; ');
+
+    this.logger.error(`Validation failed for Kafka message: ${message}`);
   }
 }

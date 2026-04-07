@@ -4,6 +4,7 @@ import { CurrentUserId } from '@libs/shared/src/decorators/current-user-id.decor
 
 import { PresenceRoutes } from '@libs/shared/src/constants/routes.constants';
 import { GetUserStatusRequestDto } from "./dto/get-user-status.request.dto";
+import { GetUserStatusResponseDto } from "./dto/get-user-status.response.dto";
 import { SocketConnectionRequestDto } from "./dto/socket-connection.request.dto";
 import { PresenceService } from "./presence.service";
 
@@ -14,7 +15,7 @@ export class PresenceController {
 
     @Post(PresenceRoutes.STATUS)
     @HttpCode(HttpStatus.OK)
-    getUsersStatus(@Body() getStatusDto: GetUserStatusRequestDto) {
+    getUsersStatus(@Body() getStatusDto: GetUserStatusRequestDto): Promise<GetUserStatusResponseDto> {
         return this.presenceService.getUsersStatus(getStatusDto.userIds);
     }
 
@@ -23,8 +24,8 @@ export class PresenceController {
     async markOnline(
         @Body() socketConnectionRequestDto: SocketConnectionRequestDto,
         @CurrentUserId() userId: string
-    ) {
-        return this.presenceService.markOnline(socketConnectionRequestDto.socketId, userId);
+    ): Promise<void> {
+        await this.presenceService.markOnline(socketConnectionRequestDto.socketId, userId);
     }
 
     @Post(PresenceRoutes.OFFLINE)
@@ -32,8 +33,8 @@ export class PresenceController {
     async markOffline(
         @Body() socketConnectionRequestDto: SocketConnectionRequestDto,
         @CurrentUserId() userId: string
-    ) {
-        return this.presenceService.markOffline(socketConnectionRequestDto.socketId, userId);
+    ): Promise<void> {
+        await this.presenceService.markOffline(socketConnectionRequestDto.socketId, userId);
     }
 
     @Post(PresenceRoutes.HEARTBEAT)
@@ -41,7 +42,7 @@ export class PresenceController {
     async refreshHeartbeat(
         @Body() socketConnectionRequestDto: SocketConnectionRequestDto,
         @CurrentUserId() userId: string
-    ) {
-        return this.presenceService.refreshHeartbeat(socketConnectionRequestDto.socketId, userId);
+    ): Promise<void> {
+        await this.presenceService.refreshHeartbeat(socketConnectionRequestDto.socketId, userId);
     }
 }

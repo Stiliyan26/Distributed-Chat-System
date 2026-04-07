@@ -1,5 +1,5 @@
 import { All, Controller, Next, Req, Res, UseGuards } from "@nestjs/common";
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, RequestHandler, Response } from 'express';
 
 import proxy from "express-http-proxy";
 
@@ -12,9 +12,11 @@ import { AuthGuard } from "../../common/auth.guard";
 export class ChannelProxyController {
 
     private readonly channelServiceUrl: string;
+    private readonly proxyMiddleware: RequestHandler;
 
     constructor(private readonly configService: ConfigService) {
         this.channelServiceUrl = this.configService.get<string>('services.channel.url');
+        this.proxyMiddleware = proxy(this.channelServiceUrl);
     }
 
     @All('*')
@@ -23,6 +25,6 @@ export class ChannelProxyController {
         @Res() res: Response,
         @Next() next: NextFunction
     ) {
-        return proxy(this.channelServiceUrl)(req, res, next);
+        return this.proxyMiddleware(req, res, next);
     }
 }

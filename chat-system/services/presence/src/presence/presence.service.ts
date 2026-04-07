@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { Inject, Injectable, InternalServerErrorException, Logger, OnModuleInit } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import Redis from "ioredis";
 import { join } from "path";
@@ -60,21 +60,23 @@ export class PresenceService implements OnModuleInit {
         return { onlineUserIds, offlineUserIds };
     }
 
-    async markOnline(socketId: string, userId: string) {
+    async markOnline(socketId: string, userId: string): Promise<void> {
         const userOnlineKey = this.getUserOnlineKey(userId);
         const userConnectionsKey = this.getUserConnectionsKey(userId);
         const heartbeatKey = this.getHeartbeatKey(socketId);
 
-        await this.redisService.pipeline()
+        const results = await this.redisService.pipeline()
             .set(userOnlineKey, '1', 'EX', 35)
             .sadd(userConnectionsKey, socketId)
             .expire(userConnectionsKey, 35)
             .set(heartbeatKey, '1', 'EX', 35)
             .exec();
+            
+        this.checkPipelineResults(results);
     }
 
-    async markOffline(socketId: string, userId: string) {
-        return this.redisService.eval(
+    async markOffline(socketId: string, userId: string): Promise<void> {
+        await this.redisService.eval(
             this.markOfflineScript, // The script string
             2, // Number of keys
             this.getUserConnectionsKey(userId), // KEYS[1]
@@ -85,12 +87,25 @@ export class PresenceService implements OnModuleInit {
         );
     }
 
-    async refreshHeartbeat(socketId: string, userId: string) {
-        await this.redisService.pipeline()
+    async refreshHeartbeat(socketId: string, userId: string): Promise<void> {
+        const results = await this.redisService.pipeline()
             .set(this.getUserOnlineKey(userId), '1', 'EX', 35)
             .set(this.getHeartbeatKey(socketId), '1', 'EX', 35)
             .expire(this.getUserConnectionsKey(userId), 35)
             .exec();
+            
+        this.checkPipelineResults(results);
+    }
+
+    private checkPipelineResults(results: [Error | null, any][] | null) {
+        if (!results) return;
+        
+        const firstError = results.find(([err]) => err !== null);
+
+        if (firstError) {
+            this.logger.error(`Redis pipeline execution failed: ${firstError[0]?.message}`);
+            throw new InternalServerErrorException(`Presence database failure`);
+        }
     }
 
     private getUserOnlineKey(userId: string) {

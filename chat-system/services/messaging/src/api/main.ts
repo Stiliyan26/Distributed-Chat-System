@@ -2,14 +2,17 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { initializeTransactionalContext } from 'typeorm-transactional';
 
-import { ApiModule } from './api.module';
 import { CommonConstants } from "@libs/shared/src/constants/common.constants";
+import { GlobalExceptionFilter } from '@libs/shared/src/filters/global-exception.filter';
 
+import { ApiModule } from './api.module';
 
 async function bootstrap() {
   initializeTransactionalContext();
 
   const app = await NestFactory.create(ApiModule);
+
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   app.useGlobalPipes(
     new ValidationPipe({

@@ -1,23 +1,25 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import axios from "axios";
+import { plainToInstance } from "class-transformer";
+import { validate } from "class-validator";
 import { Kafka, Producer } from 'kafkajs';
 
-import { ChannelRoutes, DeliveryRoutes, PresenceRoutes, UserRoutes } from "@libs/shared/src/constants/routes.constants";
-import { CommonConstants } from "@libs/shared/src/constants/common.constants";
 import { AuthHeader } from "@libs/shared/src/constants/auth.constants";
+import { CommonConstants } from "@libs/shared/src/constants/common.constants";
+import { ChannelRoutes, DeliveryRoutes, PresenceRoutes, UserRoutes } from "@libs/shared/src/constants/routes.constants";
 
+import { ChannelMembersResponse } from '@libs/shared/src/interfaces/channel.interface';
+import { UserStatusResponse } from '@libs/shared/src/interfaces/presence.interface';
 import { ConfigService } from "@nestjs/config";
 import { MESSAGING_CONFIG_KEY, MessagingConfig } from "../../../config/messaging.config";
 import { KafkaLog } from "../../constants/messaging.constants";
 import { KafkaMessagePayloadDto } from "../../dto/kafka/kafka-message-payload.dto";
 import { PublishMessageRequestDto } from "../../dto/request/publish-message.request.dto";
-import { ChannelMembersResponse } from '@libs/shared/src/interfaces/channel.interface';
 import { DeliveryRequest, PublishMessageResponse } from '../../interfaces/message.interface';
-import { UserStatusResponse } from '@libs/shared/src/interfaces/presence.interface';
 
 @Injectable()
 export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
-  
+
   private readonly logger = new Logger(MessageProducerService.name);
   private kafka: Kafka;
   private producer: Producer;
@@ -84,7 +86,7 @@ export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
         const { memberIds } = await this.getAllMemberIdsInAChannel(publishMessageRequestDto.channelId, senderId);
 
         const { offlineUserIds, onlineUserIds } = await this.getAllMemberStatuses(memberIds);
-        
+
         this.logger.debug(`[MessagingWorker] Channel ${publishMessageRequestDto.channelId} statuses -> Online: ${onlineUserIds?.length || 0}, Offline: ${offlineUserIds.length}`);
 
         const offlineUsersEmails = await this.getOfflineUsersEmails(offlineUserIds);
@@ -158,13 +160,24 @@ export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
     publishMessageRequestDto: PublishMessageRequestDto,
     senderId: string
   ): Promise<void> {
-    const kafkaMessagePayloadDto: KafkaMessagePayloadDto = {
+    const rawPayload = {
       channelId: publishMessageRequestDto.channelId,
       senderId,
       senderUsername: publishMessageRequestDto.senderUsername,
       content: publishMessageRequestDto.content,
       sentAt: publishMessageRequestDto.sentAt,
     };
+
+    const kafkaMessagePayloadDto = plainToInstance(KafkaMessagePayloadDto, rawPayload);
+    const errors = await validate(kafkaMessagePayloadDto);
+
+    if (errors.length > 0) {
+      const errorMessage = errors
+        .map(err => Object.values(err.constraints || {}).join(', '))
+        .join('; ');
+      this.logger.error(`Validation failed for Kafka message payload: ${errorMessage}`);
+      throw new Error(`Invalid message payload: ${errorMessage}`);
+    }
 
     await this.producer.send({
       topic: this.messagingConfig.kafka.topic,

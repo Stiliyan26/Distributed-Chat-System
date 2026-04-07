@@ -1,7 +1,10 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 
 import { initializeTransactionalContext } from 'typeorm-transactional';
+
+import { GlobalExceptionFilter } from '@libs/shared/src/filters/global-exception.filter';
 
 import { CommonConstants } from "@libs/shared/src/constants/common.constants";
 import { ChannelModule } from './channel/channel.module';
@@ -10,6 +13,8 @@ async function bootstrap() {
   initializeTransactionalContext()
 
   const app = await NestFactory.create(ChannelModule);
+  
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -25,7 +30,8 @@ async function bootstrap() {
   const globalPrefix = CommonConstants.GLOBAL_PREFIX;
   app.setGlobalPrefix(globalPrefix);
 
-  const port = process.env.PORT || CommonConstants.DEFAULT_PORT;
+  const configService = app.get(ConfigService);
+  const port = configService.get<number>('channel.port');
   await app.listen(port);
 
   Logger.log(

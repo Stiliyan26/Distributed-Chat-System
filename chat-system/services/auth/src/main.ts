@@ -6,8 +6,8 @@ import cookieParser from 'cookie-parser';
 
 import { CommonConstants } from "@libs/shared/src/constants/common.constants";
 
+import { GlobalExceptionFilter } from '@libs/shared/src/filters/global-exception.filter';
 import { AuthModule } from './auth/auth.module';
-import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 
 async function bootstrap() {
   initializeTransactionalContext();
@@ -21,6 +21,8 @@ async function bootstrap() {
     credentials: true // Allows cookies to be sent
   });
 
+  app.useGlobalFilters(new GlobalExceptionFilter());
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -28,7 +30,6 @@ async function bootstrap() {
       forbidNonWhitelisted: true, // throws error on extra props
     }));
 
-  app.useGlobalFilters(new GlobalExceptionFilter());
   app.enableShutdownHooks()
   app.use(cookieParser())
 
