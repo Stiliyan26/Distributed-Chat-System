@@ -1,5 +1,5 @@
 import { All, Controller, Next, Req, Res, UseGuards } from "@nestjs/common";
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, RequestHandler, Response } from 'express';
 
 import proxy from "express-http-proxy";
 
@@ -12,17 +12,19 @@ import { AuthGuard } from "../../common/auth.guard";
 export class MessagingProxyController {
 
     private readonly messagingServiceUrl: string;
+    private readonly proxyMiddleware: RequestHandler;
 
     constructor(private readonly configService: ConfigService) {
         this.messagingServiceUrl = this.configService.get<string>('services.messaging.url');
+        this.proxyMiddleware = proxy(this.messagingServiceUrl);
     }
 
-    @All()
+    @All('*')
     proxyMessagingRoot(
         @Req() req: Request,
         @Res() res: Response,
         @Next() next: NextFunction
     ) {
-        return proxy(this.messagingServiceUrl)(req, res, next);
+        return this.proxyMiddleware(req, res, next);
     }
 }

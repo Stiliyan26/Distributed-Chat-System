@@ -1,13 +1,13 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import deliveryConfig, { DELIVERY_CONFIG_KEY } from "../config/delivery.config";
-import redisConfig from "@libs/shared/src/database/redis.config";
-
 import { MailerModule } from "@nestjs-modules/mailer";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/adapters/handlebars.adapter";
 import { join } from "path";
 
+import redisPubSubConfig from "@libs/shared/src/database/redis-pubsub.config";
 import { RedisModule } from "@libs/shared/src/database/redis.module";
+
+import deliveryConfig, { DELIVERY_CONFIG_KEY } from "../config/delivery.config";
 import { DeliveryController } from "./delivery.controller";
 import { DeliveryService } from "./delivery.service";
 
@@ -15,7 +15,7 @@ import { DeliveryService } from "./delivery.service";
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
-            load: [deliveryConfig, redisConfig]
+            load: [deliveryConfig, redisPubSubConfig]
         }),
         RedisModule,
         MailerModule.forRootAsync({

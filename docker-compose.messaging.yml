@@ -89,6 +89,8 @@ services:
       PRESENCE_SERVICE_URL: http://presence-service:3004
       DELIVERY_SERVICE_URL: http://delivery-service:3005
       AUTH_SERVICE_URL: http://auth-service:3001
+      KAFKA_CONSUMER_GROUP: "messaging-service-group"
+      KAFKAJS_NO_PARTITIONER_WARNING: "1"
     ports:
       - "3003:3000"
       - "9231:9231"
@@ -116,6 +118,10 @@ services:
       DB_NAME: messages_db
       DB_TYPE: postgres
       DB_SYNC: "true"
+      CHANNEL_SERVICE_URL: http://channel-service:3000
+      PRESENCE_SERVICE_URL: http://presence-service:3004
+      DELIVERY_SERVICE_URL: http://delivery-service:3005
+      AUTH_SERVICE_URL: http://auth-service:3001
     depends_on:
       kafka:
         condition: service_healthy

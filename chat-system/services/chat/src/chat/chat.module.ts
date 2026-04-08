@@ -2,7 +2,8 @@ import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 
 import { RedisModule } from "@libs/shared/src/database/redis.module";
-import redisConfig from "@libs/shared/src/database/redis.config";
+import redisPubSubConfig from "@libs/shared/src/database/redis-pubsub.config";
+
 import chatConfig from "../config/chat.config";
 import { ChatGateway } from "./chat.gateway";
 
@@ -10,7 +11,7 @@ import { ChatGateway } from "./chat.gateway";
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
-            load: [chatConfig, redisConfig]
+            load: [chatConfig, redisPubSubConfig]
         }),
         RedisModule
     ],

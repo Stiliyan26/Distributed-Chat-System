@@ -5,11 +5,11 @@ RUN npm install
 COPY . .
 RUN npx nx run chat:build
 
-FROM node:20-alpine 
+FROM node:20-alpine
 WORKDIR /app
-COPY --from=build /app/package.json /app/package-lock.json ./
 COPY --from=build /app/dist/services/chat ./
-RUN npm install --omit=dev   
+COPY --from=build /app/package.json /app/package-lock.json ./
+RUN npm install --omit=dev
 
 ENV NODE_ENV=production
 EXPOSE 3000

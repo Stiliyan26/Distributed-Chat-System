@@ -1,6 +1,10 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
+
+import { GlobalExceptionFilter } from '@libs/shared/src/filters/global-exception.filter';
+
+
 import { ApiGatewayModule } from './api-gateway.module';
 import { ChatProxyMiddleware } from './proxy/middleware/chat-proxy.middleware';
 
@@ -9,6 +13,8 @@ async function bootstrap() {
   const globalPrefix = 'api';
 
   app.use(cookieParser());
+
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   app.setGlobalPrefix(globalPrefix);
 
