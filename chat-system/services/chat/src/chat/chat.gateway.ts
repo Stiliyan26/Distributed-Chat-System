@@ -1,4 +1,4 @@
-import { Inject, Logger, OnModuleInit } from "@nestjs/common";
+import { Inject, Logger, OnModuleInit, UsePipes, ValidationPipe } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import {
     ConnectedSocket,
@@ -19,10 +19,12 @@ import { AuthHeader } from '@libs/shared/src/constants/auth.constants';
 import { CommonConstants } from '@libs/shared/src/constants/common.constants';
 import { MessageRoutes, PresenceRoutes } from '@libs/shared/src/constants/routes.constants';
 
-import { ChatEvents } from "./constants/chat-events.constants";
-import { SendMessageRequestDto } from "./dto/send-message.request.dto";
 import { CHAT_CONFIG_KEY, ChatConfig } from "../config/chat.config";
+import { ChatEvents } from "./constants/chat-events.constants";
+import { JoinChannelDto } from "./dto/join-channel.dto";
+import { SendMessageRequestDto } from "./dto/send-message.request.dto";
 
+@UsePipes(new ValidationPipe())
 @WebSocketGateway({
     transports: ['websocket'],
     cors: { origin: '*' }
@@ -62,6 +64,10 @@ export class ChatGateway implements OnModuleInit, OnGatewayConnection, OnGateway
     }
 
     private readonly heartbeatInterval = 20_000;
+    private readonly heartbeatMaxFailures = 3;
+
+    private readonly CHANNEL_PREFIX = 'channel:';
+    private readonly DLQ_FAILED_MESSAGES = 'dlq:chat:failed_messages';
 
     @WebSocketServer()
     server: Server
@@ -70,36 +76,80 @@ export class ChatGateway implements OnModuleInit, OnGatewayConnection, OnGateway
 
     constructor(
         @Inject(REDIS_CLIENT)
-        private readonly redisService: Redis,
+        private readonly redisClient: Redis,
         private readonly configService: ConfigService<{ [CHAT_CONFIG_KEY]: ChatConfig }>
     ) { }
 
     onModuleInit() {
-        this.redisService.on('message', (channel: string, message: string) => {
-            const channelPrefix = 'channel:';
-
-            if (!channel.startsWith(channelPrefix)) {
+        this.redisClient.on('message', async (channel: string, message: string) => {
+            if (!channel.startsWith(this.CHANNEL_PREFIX)) {
                 return;
             }
 
-            const channelId = channel.substring(channelPrefix.length);
+            const channelId = channel.substring(this.CHANNEL_PREFIX.length);
 
             try {
                 const parsedMessage = JSON.parse(message);
                 const socketIds = Array.from(this.server.sockets.adapter.rooms.get(channelId) || []);
+
                 this.logger.log(`[ChatGateway] Distributing message from Redis -> Channel ${channelId}, Active Sockets: ${JSON.stringify(socketIds)} | Message: ${JSON.stringify(parsedMessage)}`);
+
                 this.server.to(channelId).emit(ChatEvents.NEW_MESSAGE, parsedMessage);
             } catch (error: any) {
-                this.logger.error(`Failed to push message: ${error.message}`);
+                this.logger.error(
+                    `Failed to parse/push message. Channel: ${channelId}, Raw Message: ${message}, Error: ${error.message}`
+                );
+
+                try {
+                    // Replace with kafka or some other durable log
+                    await this.redisClient.lpush(
+                        this.DLQ_FAILED_MESSAGES,
+                        JSON.stringify({
+                            timestamp: new Date().toISOString(),
+                            channel: channelId,
+                            rawContent: message,
+                            error: error.message
+                        })
+                    );
+                } catch (dlqError: any) {
+                    this.logger.error(`Failed to push to DLQ: ${dlqError.message}`);
+                }
             }
         });
     }
 
     async handleConnection(socket: Socket) {
-        this.updatePresenceStatus(this.presenceOnlineUrl, socket);
+        const isPresenceTracked = await this.updatePresenceStatus(this.presenceOnlineUrl, socket);
 
-        socket.data.heartbeatId = setInterval(() => {
-            this.updatePresenceStatus(this.presenceHeartbeatUrl, socket);
+        if (!isPresenceTracked) {
+            this.logger.warn(`Disconnecting client ${socket.id} because initial presence update failed`);
+            socket.disconnect();
+            return;
+        }
+
+        socket.data.heartbeatFailures = 0;
+        socket.data.heartbeatId = setInterval(async () => {
+            const success = await this.updatePresenceStatus(this.presenceHeartbeatUrl, socket);
+
+            if (!success) {
+                socket.data.heartbeatFailures += 1;
+
+                this.logger.warn(
+                    `Heartbeat failed for socket ${socket.id} (${socket.data.heartbeatFailures}/${this.heartbeatMaxFailures})`
+                );
+
+                if (socket.data.heartbeatFailures >= this.heartbeatMaxFailures) {
+                    this.logger.warn(
+                        `Max heartbeat failures reached for socket ${socket.id}. Disconnecting.`
+                    );
+
+                    clearInterval(socket.data.heartbeatId);
+                    socket.disconnect();
+                }
+            } else {
+                // Reset on recovery so a brief blip doesn't accumulate
+                socket.data.heartbeatFailures = 0;
+            }
         }, this.heartbeatInterval);
 
         this.logger.log(`Client connected: ${socket.id}`);
@@ -119,12 +169,12 @@ export class ChatGateway implements OnModuleInit, OnGatewayConnection, OnGateway
 
             // If the size is 1, this disconnecting socket is the absolute last one in the room!
             if (socketInRoom <= 1) {
-                channelsToUnsubscribe.push(`channel:${channelId}`);
+                channelsToUnsubscribe.push(`${this.CHANNEL_PREFIX}${channelId}`);
             }
         }
 
         if (channelsToUnsubscribe.length > 0) {
-            await this.redisService.unsubscribe(...channelsToUnsubscribe);
+            await this.redisClient.unsubscribe(...channelsToUnsubscribe);
             this.logger.log(`Unsubscribed from ${channelsToUnsubscribe.length} empty channels`);
         }
 
@@ -135,18 +185,17 @@ export class ChatGateway implements OnModuleInit, OnGatewayConnection, OnGateway
 
     @SubscribeMessage(ChatEvents.JOIN_ALL_USER_CHANNELS)
     async handleAllUserChannelMemberships(
-        @MessageBody() channelIds: string[],
+        @MessageBody() joinChannelDto: JoinChannelDto,
         @ConnectedSocket() socket: Socket
     ) {
+        const { channelIds } = joinChannelDto;
+
         if (!channelIds || channelIds.length === 0) {
             return;
         }
 
-        socket.join(channelIds);
+        await this.ensureSocketSubscribedToChannels(socket, channelIds);
         this.logger.log(`Socket ${socket.id} joined ${channelIds.length} channels`);
-
-        const channels = channelIds.map(id => `channel:${id}`);
-        await this.redisService.subscribe(...channels);
     }
 
     @SubscribeMessage(ChatEvents.SEND_MESSAGE)
@@ -156,16 +205,38 @@ export class ChatGateway implements OnModuleInit, OnGatewayConnection, OnGateway
     ) {
         const userId = socket.handshake.headers[AuthHeader.USER_ID] as string;
 
+        await this.ensureSocketSubscribedToChannels(socket, [sendMessageRequestDto.channelId]);
+
         this.logger.log(`[ChatService] Forwarding message to Messaging Service. UserId: ${userId}, ChannelId: ${sendMessageRequestDto.channelId}, Message: "${sendMessageRequestDto.content}"`);
 
-        await axios.post(
-            this.sendMessageUrl,
-            sendMessageRequestDto,
-            { headers: { [AuthHeader.USER_ID]: userId } }
-        );
+        try {
+            await axios.post(
+                this.sendMessageUrl,
+                sendMessageRequestDto,
+                { headers: { [AuthHeader.USER_ID]: userId } }
+            );
+        } catch (error: any) {
+            this.logger.error(`[ChatService] Message forwarding failed: ${error.message}`, error.stack);
+
+            socket.emit(ChatEvents.ERROR, {
+                event: ChatEvents.SEND_MESSAGE,
+                message: 'Failed to send message',
+                details: error.response?.data?.message || error.message
+            });
+        }
     }
 
-    private async updatePresenceStatus(endpointUrl: string, socket: Socket) {
+    private async ensureSocketSubscribedToChannels(socket: Socket, channelIds: string[]): Promise<void> {
+        if (channelIds.length === 0) {
+            return;
+        }
+
+        socket.join(channelIds);
+        const redisChannels = channelIds.map(id => `${this.CHANNEL_PREFIX}${id}`);
+        await this.redisClient.subscribe(...redisChannels);
+    }
+
+    private async updatePresenceStatus(endpointUrl: string, socket: Socket): Promise<boolean> {
         const userId = socket.handshake.headers[AuthHeader.USER_ID] as string;
 
         try {
@@ -174,8 +245,13 @@ export class ChatGateway implements OnModuleInit, OnGatewayConnection, OnGateway
                 { socketId: socket.id },
                 { headers: { [AuthHeader.USER_ID]: userId } }
             );
+
+            return true;
         } catch (error: any) {
-            this.logger.error(`Failed to update presence at ${endpointUrl}: ${error?.message}`);
+            const reason = error.response?.data?.message || error.message;
+            this.logger.error(`Failed to update presence at ${endpointUrl}: ${reason}`);
+
+            return false;
         }
     }
 }

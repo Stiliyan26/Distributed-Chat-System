@@ -4,9 +4,8 @@ import { UsersService } from "./users.service";
 
 import { UserRoutes } from '@libs/shared/src/constants/routes.constants';
 
-import { UsersEmailsResponse } from "@libs/shared/src/interfaces/users-emails.interface";
-import { GetUserListResponseDto } from "./dto/get-user-list.response.dto";
 import { GetUserEmailsRequestDto } from "./dto/get-user-emails.request.dto";
+import { GetUserListResponseDto } from "./dto/get-user-list.response.dto";
 
 @Controller(UserRoutes.PREFIX)
 export class UsersController {
@@ -22,7 +21,7 @@ export class UsersController {
     }
 
     @Post(UserRoutes.EMAILS)
-    getUsersEmails(@Body() getUserEmailsRequestDto: GetUserEmailsRequestDto): Promise<UsersEmailsResponse> {
+    getUsersEmails(@Body() getUserEmailsRequestDto: GetUserEmailsRequestDto): Promise<string[]> {
         return this.userService.getUsersEmails(getUserEmailsRequestDto.ids);
     }
 }
