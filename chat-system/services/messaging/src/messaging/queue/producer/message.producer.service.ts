@@ -63,6 +63,13 @@ export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
     this.kafka = new Kafka({
       clientId: this.messagingConfig.kafka.clientId,
       brokers: [this.messagingConfig.kafka.broker],
+      retry: {
+        initialRetryTime: 300,
+        retries: 10,
+        maxRetryTime: 30_000,
+        multiplier: 2,
+        factor: 0.2
+      }
     });
 
     this.producer = this.kafka.producer();
@@ -99,9 +106,15 @@ export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
         if (err?.response?.data) {
           this.logger.error(`[Delivery] Response data: ${JSON.stringify(err.response.data)}`);
         }
+
         if (err?.config?.url) {
           this.logger.error(`[Delivery] Failed URL: ${err.config.method?.toUpperCase()} ${err.config.url}`);
         }
+
+        this.logger.error(
+          `Delivery pipeline failed: ${err?.message ?? err}`,
+          err?.stack,
+        );
       }
     });
 

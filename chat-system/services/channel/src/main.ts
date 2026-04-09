@@ -30,6 +30,8 @@ async function bootstrap() {
   const globalPrefix = CommonConstants.GLOBAL_PREFIX;
   app.setGlobalPrefix(globalPrefix);
 
+  app.enableShutdownHooks();
+
   const configService = app.get(ConfigService);
   const port = configService.get<number>('channel.port');
   await app.listen(port);

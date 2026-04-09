@@ -18,6 +18,8 @@ async function bootstrap() {
 
   app.setGlobalPrefix(globalPrefix);
 
+  app.enableShutdownHooks();
+
   const port = process.env.PORT || 3000;
   const server = await app.listen(port);
 

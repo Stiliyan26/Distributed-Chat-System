@@ -1,11 +1,14 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { initializeTransactionalContext } from 'typeorm-transactional';
+import axios from 'axios';
 
 import { CommonConstants } from "@libs/shared/src/constants/common.constants";
 import { GlobalExceptionFilter } from '@libs/shared/src/filters/global-exception.filter';
 
 import { ApiModule } from './api.module';
+
+axios.defaults.timeout = 5000;
 
 async function bootstrap() {
   initializeTransactionalContext();
@@ -28,6 +31,8 @@ async function bootstrap() {
   const globalPrefix = CommonConstants.GLOBAL_PREFIX;
 
   app.setGlobalPrefix(globalPrefix);
+
+  app.enableShutdownHooks();
 
   const port = process.env.PORT || CommonConstants.DEFAULT_PORT;
   await app.listen(port);
