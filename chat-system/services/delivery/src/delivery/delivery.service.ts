@@ -54,13 +54,9 @@ export class DeliveryService {
             })
         );
 
-        const failed = results.filter(r => r.status === 'rejected');
-
-        failed.forEach((result, index) => {
-            const email = offlineUsersEmails[index];
-            
+        results.forEach((result, index) => {
             if (result.status === 'rejected') {
-                this.logger.error(`SMTP Failed for ${email}: ${result.reason}`);
+                this.logger.error(`SMTP Failed for ${offlineUsersEmails[index]}: ${result.reason}`);
             }
         });
     }
