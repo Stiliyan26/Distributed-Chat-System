@@ -15,7 +15,7 @@ interface ProxyRequest {
 
 @Injectable()
 export class ChatProxyMiddleware implements NestMiddleware {
-    
+
     private readonly logger = new Logger(ChatProxyMiddleware.name);
     private _proxy: ReturnType<typeof createProxyMiddleware>;
 
@@ -88,10 +88,13 @@ export class ChatProxyMiddleware implements NestMiddleware {
     }
 
     private extractTokenFromCookie(req: IncomingMessage) {
-        const parsedCookies = req.headers.cookie.split(';').reduce((acc, cookie) => {
-            const [name, value] = cookie.split('=').map(c => c.trim());
+        const parsedCookies = req.headers.cookie.split(';').reduce((acc, part) => {
+            const idx = part.trim().indexOf('=');
 
-            acc[name] = value;
+            const key = part.substring(0, idx).trim();
+            const value = part.substring(idx + 1).trim();
+
+            acc[key] = value;
 
             return acc;
         }, {} as Record<string, string>);

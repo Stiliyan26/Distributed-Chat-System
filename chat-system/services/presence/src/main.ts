@@ -25,6 +25,8 @@ async function bootstrap() {
   const globalPrefix = CommonConstants.GLOBAL_PREFIX;
   app.setGlobalPrefix(globalPrefix);
 
+  app.enableShutdownHooks();
+
   const port = process.env.PORT || 3000;
   await app.listen(port);
 

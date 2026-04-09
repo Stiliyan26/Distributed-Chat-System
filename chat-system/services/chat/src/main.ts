@@ -1,11 +1,14 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { IoAdapter } from '@nestjs/platform-socket.io';
+import axios from 'axios';
 
 import { GlobalExceptionFilter } from '@libs/shared/src/filters/global-exception.filter';
 
 import { CommonConstants } from '@libs/shared/src/constants/common.constants';
 import { ChatModule } from './chat/chat.module';
+
+axios.defaults.timeout = 5000;
 
 async function bootstrap() {
   const app = await NestFactory.create(ChatModule);
@@ -27,6 +30,8 @@ async function bootstrap() {
 
   const globalPrefix = CommonConstants.GLOBAL_PREFIX;
   app.setGlobalPrefix(globalPrefix);
+
+  app.enableShutdownHooks();
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
