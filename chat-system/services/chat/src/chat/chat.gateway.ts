@@ -174,8 +174,15 @@ export class ChatGateway implements OnModuleInit, OnGatewayConnection, OnGateway
         }
 
         if (channelsToUnsubscribe.length > 0) {
-            await this.redisClient.unsubscribe(...channelsToUnsubscribe);
-            this.logger.log(`Unsubscribed from ${channelsToUnsubscribe.length} empty channels`);
+            try {
+                await this.redisClient.unsubscribe(...channelsToUnsubscribe);
+                this.logger.log(`Unsubscribed from ${channelsToUnsubscribe.length} empty channels`);
+            } catch (err: any) {
+                this.logger.error(
+                    `Redis unsubscribe failed during disconnect (socket ${socket.id}, channels=${JSON.stringify(channelsToUnsubscribe)}): ${err?.message ?? err}`,
+                    err?.stack,
+                );
+            }
         }
 
         this.updatePresenceStatus(this.presenceOfflineUrl, socket);

@@ -14,6 +14,7 @@ export class GetMessagesResponseDto {
         dto.senderUsername = entity.senderUsername;
         dto.content = entity.content;
         dto.sentAt = entity.sentAt;
+
         return dto;
     }
 }

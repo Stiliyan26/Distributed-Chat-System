@@ -92,9 +92,17 @@ export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
       try {
         const { memberIds } = await this.getAllMemberIdsInAChannel(publishMessageRequestDto.channelId, senderId);
 
-        const { offlineUserIds, onlineUserIds } = await this.getAllMemberStatuses(memberIds);
+        const { offlineUserIds, onlineUserIds, statusUnknownUserIds } = await this.getAllMemberStatuses(memberIds);
 
-        this.logger.debug(`[Messsaging Service] Channel ${publishMessageRequestDto.channelId} statuses -> Online: ${onlineUserIds?.length || 0}, Offline: ${offlineUserIds.length}`);
+        if (statusUnknownUserIds.length > 0) {
+          this.logger.warn(
+            `[Messaging Service] Channel ${publishMessageRequestDto.channelId}: presence unknown for ${statusUnknownUserIds.length} member(s); not sending offline emails for them`,
+          );
+        }
+
+        this.logger.debug(
+          `[Messsaging Service] Channel ${publishMessageRequestDto.channelId} statuses -> Online: ${onlineUserIds.length}, Offline: ${offlineUserIds.length}, Unknown: ${statusUnknownUserIds.length}`,
+        );
 
         const offlineUsersEmails = await this.getOfflineUsersEmails(offlineUserIds);
 

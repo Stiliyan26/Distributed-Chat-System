@@ -24,12 +24,12 @@ interface PostgresError extends Error {
 const DATABASE_ERROR_MAP: Record<string, DatabaseErrorResponse> = {
     '23505': {
         status: HttpStatus.CONFLICT,
-        message: 'A record with that value already existts',
+        message: 'A record with that value already exists',
         error: 'Conflict',
     },
     '23503': {
         status: HttpStatus.BAD_REQUEST,
-        message: 'Referenced resources does not exist',
+        message: 'Referenced resource does not exist',
         error: 'Bad Request'
     },
     '23502': {
@@ -95,10 +95,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         }
     }
 
-    private readonly exceptionMapper = {
-
-    }
-
     private resolveException(exception: unknown): ResolvedException {
         // 1) NestJS HTTP exceptions
         if (exception instanceof HttpException) {
@@ -140,7 +136,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         // 6) Everything else
         return {
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: 'An unexpected error occured',
+            message: 'An unexpected error occurred',
             error: 'Internal Server Error'
         }
     }

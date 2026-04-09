@@ -34,11 +34,12 @@ export class PresenceService implements OnModuleInit {
     }
 
     async getUsersStatus(userIds: string[]): Promise<GetUserStatusResponseDto> {
-        const onlineUserIds = [];
-        const offlineUserIds = [];
+        const onlineUserIds: string[] = [];
+        const offlineUserIds: string[] = [];
+        const statusUnknownUserIds: string[] = [];
 
         if (userIds.length === 0) {
-            return { onlineUserIds, offlineUserIds };
+            return { onlineUserIds, offlineUserIds, statusUnknownUserIds };
         }
 
         const pipeline = this.redisService.pipeline();
@@ -47,17 +48,37 @@ export class PresenceService implements OnModuleInit {
 
         const results = await pipeline.exec();
 
+        if (!results || results.length !== userIds.length) {
+            this.logger.error(
+                `Redis pipeline exec invalid: got ${results ? results.length : 'null'} results, expected ${userIds.length}`,
+            );
+            throw new InternalServerErrorException('Presence database failure');
+        }
+
         results.forEach(([err, exists], idx) => {
-            if (!err && exists === 1) {
-                onlineUserIds.push(userIds[idx]);
+            const userId = userIds[idx];
+
+            if (err) {
+                this.logger.error(
+                    `Redis EXISTS failed for user ${userId}: ${err.message}`,
+                    err.stack,
+                );
+                statusUnknownUserIds.push(userId);
+                return;
+            }
+
+            if (exists === 1) {
+                onlineUserIds.push(userId);
             } else {
-                offlineUserIds.push(userIds[idx]);
+                offlineUserIds.push(userId);
             }
         });
 
-        this.logger.log(`[PresenceService] Looked up ${userIds.length} members. Result -> Online: ${onlineUserIds.length}, Offline: ${offlineUserIds.length}`);
+        this.logger.log(
+            `[PresenceService] Looked up ${userIds.length} members. Result -> Online: ${onlineUserIds.length}, Offline: ${offlineUserIds.length}, Unknown: ${statusUnknownUserIds.length}`,
+        );
 
-        return { onlineUserIds, offlineUserIds };
+        return { onlineUserIds, offlineUserIds, statusUnknownUserIds };
     }
 
     async markOnline(socketId: string, userId: string): Promise<void> {
@@ -71,7 +92,7 @@ export class PresenceService implements OnModuleInit {
             .expire(userConnectionsKey, 35)
             .set(heartbeatKey, '1', 'EX', 35)
             .exec();
-            
+
         this.checkPipelineResults(results);
     }
 
@@ -93,13 +114,13 @@ export class PresenceService implements OnModuleInit {
             .set(this.getHeartbeatKey(socketId), '1', 'EX', 35)
             .expire(this.getUserConnectionsKey(userId), 35)
             .exec();
-            
+
         this.checkPipelineResults(results);
     }
 
     private checkPipelineResults(results: [Error | null, any][] | null) {
         if (!results) return;
-        
+
         const firstError = results.find(([err]) => err !== null);
 
         if (firstError) {
