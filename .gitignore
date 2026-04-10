@@ -46,3 +46,6 @@ Thumbs.db
 test-output
 
 .angular
+
+# Local secrets (Azure Service Bus scripts)
+service-bus/.env
