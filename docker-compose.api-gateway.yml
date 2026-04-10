@@ -14,6 +14,15 @@ services:
       CHANNEL_SERVICE_URL: http://channel-service:3000
       MESSAGING_SERVICE_URL: http://messaging-service:3000
       CHAT_SERVICE_URL: http://chat-service:3000
+      # Matches chat-system/services/api-gateway/src/config/configuration.ts (GATEWAY_*)
+      GATEWAY_PROXY_TIMEOUT_MS: "30000"
+      GATEWAY_BODY_LIMIT: "512kb"
+      GATEWAY_BREAKER_HALF_OPEN_MS: "10000"
+      GATEWAY_BREAKER_CONSECUTIVE_FAILURES: "5"
+      GATEWAY_BULKHEAD_CONCURRENCY: "50"
+      GATEWAY_BULKHEAD_QUEUE: "200"
+      GATEWAY_THROTTLE_TTL_MS: "60000"
+      GATEWAY_THROTTLE_LIMIT: "200"
     ports:
       - "3000:3000"
       - "9236:9236"

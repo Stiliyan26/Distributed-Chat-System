@@ -133,12 +133,37 @@ export class GlobalExceptionFilter implements ExceptionFilter {
             };
         }
 
-        // 6) Everything else
+        // 6) Request body over express/body-parser limit (json(), urlencoded(), etc.)
+        if (this.isPayloadTooLarge(exception)) {
+            return {
+                status: HttpStatus.PAYLOAD_TOO_LARGE,
+                message: 'Request body exceeds maximum allowed size',
+                error: 'Payload Too Large',
+            };
+        }
+
+        // 7) Everything else
         return {
             status: HttpStatus.INTERNAL_SERVER_ERROR,
             message: 'An unexpected error occurred',
             error: 'Internal Server Error'
         }
+    }
+
+    private isPayloadTooLarge(exception: unknown): boolean {
+        if (!exception || typeof exception !== 'object') {
+            return false;
+        }
+
+        const e = exception as Record<string, unknown>;
+
+        if (e.type === 'entity.too.large') {
+            return true;
+        }
+
+        const code = e.statusCode ?? e.status;
+
+        return code === HttpStatus.PAYLOAD_TOO_LARGE;
     }
 
     private resolveQueryFailedError(exception: QueryFailedError<PostgresError>): ResolvedException {
