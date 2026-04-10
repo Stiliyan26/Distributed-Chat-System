@@ -1,0 +1,16 @@
+# Maps NodePorts on the kind node to your Mac so you can hit the API and Kafka UI without kubectl port-forward.
+# API: http://127.0.0.1:3000  (cluster NodePort 30080)
+# Kafka UI: http://127.0.0.1:8080 (cluster NodePort 30808)
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 30080
+        hostPort: 3000
+        listenAddress: "127.0.0.1"
+        protocol: TCP
+      - containerPort: 30808
+        hostPort: 8080
+        listenAddress: "127.0.0.1"
+        protocol: TCP
