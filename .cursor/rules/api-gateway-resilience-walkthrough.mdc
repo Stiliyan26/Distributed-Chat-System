@@ -1,0 +1,41 @@
+---
+description: Handoff for teaching API gateway resilience—what was built, step-by-step forward/back, diagrams on request.
+alwaysApply: false
+---
+
+# API gateway resilience — next-session teaching prompt
+
+Use this when the user wants to **continue learning** how the gateway resilience work was built and behaves. **One focused step per reply** unless they ask for more.
+
+## Teaching mode
+
+1. Ask whether they want to walk **forward** (request entry → downstream), **backward** (client response / error → what produced it), or a **deep dive** on one file (`resilient-proxy.factory.ts`, throttler, `main.ts`, chat WS vs HTTP, global filter).
+2. On **continue** / **next**, advance **one step**; on **back** / **previous**, revisit the prior step with a diagram or example.
+3. Prefer **code citations** to real paths; add **one short example** (e.g. `POST /api/auth/login`, or `503` → breaker) when it clarifies.
+4. **Diagrams:** offer **mermaid** when the flow spans more than two layers (Express → guard → policy → proxy).
+
+## What was implemented (ground truth)
+
+| Area | Location |
+|------|----------|
+| Body size + parsers | `chat-system/services/api-gateway/src/main.ts` (`bodyParser: false`, `json` / `urlencoded` limits, `GATEWAY_BODY_LIMIT`) |
+| Rate limit | `api-gateway.module.ts` — `ThrottlerModule.forRootAsync`, `APP_GUARD` + `ThrottlerGuard`; config `gateway.throttleTtlMs` / `gateway.throttleLimit` |
+| Circuit + bulkhead + proxy | `services/api-gateway/src/resilience/resilient-proxy.factory.ts` — `wrap(circuitBreaker(handleAll, …), bulkhead)`, `runProxyWithCompletion`, `createHttpProxy` / `wrapRequestHandler` |
+| Downstream key | `policyByDownstream`: `auth` \| `channel` \| `messaging` \| `chat` (not keyed by URL) |
+| Proxy middleware cache | `httpProxyByKey`: `` `${downstream}::${host}` `` |
+| REST proxies | Controllers call `createHttpProxy` in constructor (once); per request runs cached `RequestHandler` |
+| Chat / Socket.IO | `chat-proxy.middleware.ts`: `_httpProxy` = resilient; `get proxy()` = `_innerProxy` for `upgrade` in `main.ts` (upgrade skips cockatiel wrapper) |
+| 413 body too large | `libs/shared/src/filters/global-exception.filter.ts` — `isPayloadTooLarge` |
+| Circuit / bulkhead 503 | Set **directly** in `resilient-proxy.factory.ts` `.catch`; **not** via `GlobalExceptionFilter` |
+| Docker env | `docker-compose.api-gateway.yml` — `GATEWAY_*` aligned with `config/configuration.ts` |
+
+## Concepts to reinforce when confused
+
+- **Node:** one JS thread, many **in-flight I/O** operations; bulkhead limits **concurrent async proxy work**, not “CPU threads.”
+- **`handleAll`:** circuit breaker **counts all** thrown failures from the wrapped execution (unless policy is narrowed).
+- **Throttler default storage:** in-memory **per-hit decay** (~rolling window), not a simple wall-clock fixed minute bucket.
+- **Bulkhead reject** may still interact with **`handleAll`** breaker; do not assume it never affects the circuit without checking cockatiel composition.
+
+## Optional opener for the user (paste into chat)
+
+> Follow `.cursor/rules/api-gateway-resilience-walkthrough.mdc`. Start **forward** from `main.ts` step 1, or **backward** from `CircuitOpen` 503—one step per message.

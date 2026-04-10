@@ -3,6 +3,7 @@ import { ConfigModule } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 
 import { AuthGuard } from "../common/auth.guard";
+import { ResilientProxyFactory } from "../resilience/resilient-proxy.factory";
 import { AuthProxyController } from "./controllers/auth-proxy.controller";
 import { ChannelProxyController } from "./controllers/channel-proxy.controller";
 import { MessagingProxyController } from "./controllers/messaging-proxy.controller";
@@ -17,7 +18,7 @@ import { ChatProxyMiddleware } from "./middleware/chat-proxy.middleware";
         MessagingProxyController,
         UsersProxyController
     ],
-    providers: [AuthGuard, ChatProxyMiddleware]
+    providers: [AuthGuard, ChatProxyMiddleware, ResilientProxyFactory]
 })
 export class ProxyModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {

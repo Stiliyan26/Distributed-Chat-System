@@ -1,12 +1,14 @@
 import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { IncomingMessage } from 'http';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { Socket } from 'net';
 
 import { AuthCookie, AuthHeader } from "@libs/shared/src/constants/auth.constants";
+
+import { ResilientProxyFactory } from '../../resilience/resilient-proxy.factory';
 
 interface ProxyRequest {
     setHeader(name: string, value: string | number): void;
@@ -17,21 +19,26 @@ interface ProxyRequest {
 export class ChatProxyMiddleware implements NestMiddleware {
 
     private readonly logger = new Logger(ChatProxyMiddleware.name);
-    private _proxy: ReturnType<typeof createProxyMiddleware>;
+    private readonly _innerProxy: ReturnType<typeof createProxyMiddleware>;
+    private readonly _httpProxy: RequestHandler;
 
-    get proxy() { return this._proxy; }
+    get proxy() { return this._innerProxy; }
 
     constructor(
         private readonly configService: ConfigService,
-        private readonly jwtService: JwtService
+        private readonly jwtService: JwtService,
+        private readonly resilientProxy: ResilientProxyFactory,
     ) {
         const chatServiceUrl = this.configService.get<string>('services.chat.url');
         const jwtSecret = this.configService.get<string>('jwtSecret');
+        const timeoutMs = this.configService.get<number>('gateway.proxyTimeoutMs')!;
 
-        this._proxy = createProxyMiddleware({
+        this._innerProxy = createProxyMiddleware({
             target: chatServiceUrl,
             changeOrigin: true,
             ws: true,
+            timeout: timeoutMs,
+            proxyTimeout: timeoutMs,
             on: {
                 proxyReqWs: (proxyReq, req, socket) => {
                     let token: string | undefined;
@@ -56,10 +63,15 @@ export class ChatProxyMiddleware implements NestMiddleware {
                 }
             }
         });
+
+        this._httpProxy = this.resilientProxy.wrapRequestHandler(
+            this._innerProxy,
+            'chat',
+        );
     }
 
     use(req: Request, res: Response, next: NextFunction) {
-        this._proxy(req, res, next);
+        this._httpProxy(req, res, next);
     }
 
     private attachUserHeaders(
