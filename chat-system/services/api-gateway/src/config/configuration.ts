@@ -26,6 +26,9 @@ const configSchema = z.object({
         chat: z.object({
             url: z.url().default('http://localhost:3000'),
         }),
+        presence: z.object({
+            url: z.url().default('http://localhost:3004'),
+        }),
     }),
 });
 
@@ -55,6 +58,9 @@ export default () => {
             },
             chat: {
                 url: process.env.CHAT_SERVICE_URL,
+            },
+            presence: {
+                url: process.env.PRESENCE_SERVICE_URL,
             },
         },
     });

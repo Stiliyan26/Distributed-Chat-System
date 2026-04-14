@@ -89,12 +89,17 @@ export class ChatGateway implements OnModuleInit, OnGatewayConnection, OnGateway
             const channelId = channel.substring(this.CHANNEL_PREFIX.length);
 
             try {
-                const parsedMessage = JSON.parse(message);
+                const parsedMessage = JSON.parse(message) as Record<string, unknown>;
                 const socketIds = Array.from(this.server.sockets.adapter.rooms.get(channelId) || []);
 
-                this.logger.log(`[ChatGateway] Distributing message from Redis -> Channel ${channelId}, Active Sockets: ${JSON.stringify(socketIds)} | Message: ${JSON.stringify(parsedMessage)}`);
+                const payload = {
+                    ...parsedMessage,
+                    channelId,
+                };
 
-                this.server.to(channelId).emit(ChatEvents.NEW_MESSAGE, parsedMessage);
+                this.logger.log(`[ChatGateway] Distributing message from Redis -> Channel ${channelId}, Active Sockets: ${JSON.stringify(socketIds)} | Message: ${JSON.stringify(payload)}`);
+
+                this.server.to(channelId).emit(ChatEvents.NEW_MESSAGE, payload);
             } catch (error: any) {
                 this.logger.error(
                     `Failed to parse/push message. Channel: ${channelId}, Raw Message: ${message}, Error: ${error.message}`

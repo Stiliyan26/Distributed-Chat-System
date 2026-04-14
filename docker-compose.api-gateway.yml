@@ -14,7 +14,7 @@ services:
       CHANNEL_SERVICE_URL: http://channel-service:3000
       MESSAGING_SERVICE_URL: http://messaging-service:3000
       CHAT_SERVICE_URL: http://chat-service:3000
-      # Matches chat-system/services/api-gateway/src/config/configuration.ts (GATEWAY_*)
+      PRESENCE_SERVICE_URL: http://presence-service:3004
       GATEWAY_PROXY_TIMEOUT_MS: "30000"
       GATEWAY_BODY_LIMIT: "512kb"
       GATEWAY_BREAKER_HALF_OPEN_MS: "10000"

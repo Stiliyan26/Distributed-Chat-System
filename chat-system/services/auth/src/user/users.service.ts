@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { And, FindOptionsWhere, ILike, In, MoreThan, Repository } from "typeorm";
 
 import { GetUserListResponseDto } from "./dto/get-user-list.response.dto";
+import { ResolvedUserDto } from "./dto/resolve-users.response.dto";
 import { UserEntity } from "./entities/user.entity";
 
 @Injectable()
@@ -32,6 +33,28 @@ export class UsersService {
             data: users,
             nextCursor
         }
+    }
+
+    async resolveUsersByIds(ids: string[]): Promise<ResolvedUserDto[]> {
+        if (!ids.length) {
+            return [];
+        }
+
+        const users = await this.userRepo.find({
+            where: {
+                id: In(ids)
+            },
+            select: ['id', 'username', 'email']
+        });
+
+        return users;
+    }
+
+    async findById(id: string): Promise<ResolvedUserDto | null> {
+        return this.userRepo.findOne({
+            where: { id },
+            select: ['id', 'username', 'email'],
+        });
     }
 
     async getUsersEmails(ids: string[]): Promise<string[]> {

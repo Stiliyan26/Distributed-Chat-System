@@ -39,6 +39,7 @@ export class ChatProxyMiddleware implements NestMiddleware {
             ws: true,
             timeout: timeoutMs,
             proxyTimeout: timeoutMs,
+            pathRewrite: (path) => this.rewriteSocketPath(path),
             on: {
                 proxyReqWs: (proxyReq, req, socket) => {
                     let token: string | undefined;
@@ -99,14 +100,38 @@ export class ChatProxyMiddleware implements NestMiddleware {
         }
     }
 
-    private extractTokenFromCookie(req: IncomingMessage) {
-        const parsedCookies = req.headers.cookie.split(';').reduce((acc, part) => {
-            const idx = part.trim().indexOf('=');
+    private rewriteSocketPath(path: string): string {
+        if (!path || path === '/') {
+            return '/socket.io';
+        }
 
-            const key = part.substring(0, idx).trim();
-            const value = part.substring(idx + 1).trim();
+        return path.replace(/^\/api\/socket\.io/, '/socket.io');
+    }
 
-            acc[key] = value;
+    private extractTokenFromCookie(req: IncomingMessage): string | undefined {
+        const rawCookie = req.headers.cookie;
+
+        if (!rawCookie) {
+            return undefined;
+        }
+
+        const parsedCookies = rawCookie.split(';').reduce((acc, part) => {
+            const trimmedPart = part.trim();
+
+            if (!trimmedPart) {
+                return acc;
+            }
+
+            const idx = trimmedPart.indexOf('=');
+
+            if (idx === -1) {
+                return acc;
+            }
+
+            const key = trimmedPart.substring(0, idx).trim();
+            const value = trimmedPart.substring(idx + 1).trim();
+
+            acc[key] = decodeURIComponent(value);
 
             return acc;
         }, {} as Record<string, string>);

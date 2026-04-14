@@ -20,7 +20,16 @@ export class AuthProxyController {
         this.proxyMiddleware = this.resilientProxy.createHttpProxy('auth', this.authServiceUrl);
     }
 
-    @All('*')
+    @All()
+    proxyAuthBase(
+        @Req() req: Request,
+        @Res() res: Response,
+        @Next() next: NextFunction
+    ) {
+        return this.proxyMiddleware(req, res, next);
+    }
+
+    @All('*path')
     proxyAuth(
         @Req() req: Request,
         @Res() res: Response,

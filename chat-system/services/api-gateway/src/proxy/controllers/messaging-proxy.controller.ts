@@ -21,7 +21,16 @@ export class MessagingProxyController {
         this.proxyMiddleware = this.resilientProxy.createHttpProxy('messaging', this.messagingServiceUrl);
     }
 
-    @All('*')
+    @All()
+    proxyMessagingBase(
+        @Req() req: Request,
+        @Res() res: Response,
+        @Next() next: NextFunction
+    ) {
+        return this.proxyMiddleware(req, res, next);
+    }
+
+    @All('*path')
     proxyMessagingRoot(
         @Req() req: Request,
         @Res() res: Response,

@@ -107,6 +107,23 @@ export class ResilientProxyFactory {
       proxyReqOptDecorator: (proxyReqOpts) => {
         return { ...proxyReqOpts, timeout: timeoutMs };
       },
+      // Ensure JSON bodies parsed by Nest reach the upstream (avoids empty-body edge cases).
+      // Only touch methods that may carry a JSON body — never attach a body to GET/HEAD or it can break upstream routes.
+      proxyReqBodyDecorator: (bodyContent, srcReq) => {
+        const req = srcReq as Request;
+        const m = req.method?.toUpperCase() ?? '';
+        if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(m)) {
+          return bodyContent;
+        }
+        if (
+          req.body &&
+          typeof req.body === 'object' &&
+          !Buffer.isBuffer(req.body)
+        ) {
+          return JSON.stringify(req.body);
+        }
+        return bodyContent;
+      },
     });
 
     const wrapped = this.wrapRequestHandler(inner, downstream);
