@@ -21,7 +21,16 @@ export class ChannelProxyController {
         this.proxyMiddleware = this.resilientProxy.createHttpProxy('channel', this.channelServiceUrl);
     }
 
-    @All('*')
+    @All()
+    proxyChannelBase(
+        @Req() req: Request,
+        @Res() res: Response,
+        @Next() next: NextFunction
+    ) {
+        return this.proxyMiddleware(req, res, next);
+    }
+
+    @All('*path')
     proxyChannel(
         @Req() req: Request,
         @Res() res: Response,

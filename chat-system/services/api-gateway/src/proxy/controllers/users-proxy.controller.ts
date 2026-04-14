@@ -21,7 +21,16 @@ export class UsersProxyController {
         this.proxyMiddleware = this.resilientProxy.createHttpProxy('auth', this.authServiceUrl);
     }
 
-    @All('*')
+    @All()
+    proxyUsersBase(
+        @Req() req: Request,
+        @Res() res: Response,
+        @Next() next: NextFunction
+    ) {
+        return this.proxyMiddleware(req, res, next);
+    }
+
+    @All('*path')
     proxyUsersRoot(
         @Req() req: Request,
         @Res() res: Response,
