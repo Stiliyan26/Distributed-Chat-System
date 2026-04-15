@@ -1,37 +1,48 @@
-import React, { useCallback, useState } from 'react';
-import { ThemeContext, type Theme } from './theme-context';
+import React, { useCallback, useState } from "react";
+import { STORAGE_KEYS } from "@/shared/constants/storage";
+import { DEFAULT_THEME } from "@/shared/constants/theme";
+import { ThemeContext, type Theme } from "./theme-context";
 
-const STORAGE_KEY = 'nexus_theme';
+function warnThemeStorageFailure(action: "read" | "write", error: unknown) {
+  if (import.meta.env.DEV) {
+    console.warn(`Theme storage ${action} failed`, error);
+  }
+}
 
 function readStoredTheme(): Theme {
   try {
-    const v = localStorage.getItem(STORAGE_KEY);
-    if (v === 'light' || v === 'dark') return v;
-  } catch {
-    /* ignore */
+    const v = localStorage.getItem(STORAGE_KEYS.theme);
+
+    if (v === "light" || v === "dark") {
+      return v;
+    }
+  } catch (error) {
+    warnThemeStorageFailure("read", error);
   }
-  return 'dark';
+
+  return DEFAULT_THEME;
 }
 
 function applyTheme(t: Theme) {
-  document.documentElement.setAttribute('data-theme', t);
-  document.documentElement.classList.toggle('dark', t === 'dark');
+  document.documentElement.setAttribute("data-theme", t);
+  document.documentElement.classList.toggle("dark", t === "dark");
+
   try {
-    localStorage.setItem(STORAGE_KEY, t);
-  } catch {
-    /* ignore */
+    localStorage.setItem(STORAGE_KEYS.theme, t);
+  } catch (error) {
+    warnThemeStorageFailure("write", error);
   }
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>(readStoredTheme);
 
-  // Apply DOM changes immediately on click — no effect timing or StrictMode issues.
   const toggleTheme = useCallback(() => {
     setTheme((current) => {
-      const next: Theme = current === 'dark' ? 'light' : 'dark';
-      // Run synchronously right now, before React's render cycle
+      const next: Theme = current === "dark" ? "light" : "dark";
+
       applyTheme(next);
+
       return next;
     });
   }, []);
