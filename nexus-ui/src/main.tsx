@@ -1,15 +1,13 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import { DEFAULT_THEME } from "./shared/constants/theme";
-import { STORAGE_KEYS } from "./shared/constants/storage";
-import App from "./App";
 import "./index.css";
 
-const stored = localStorage.getItem(STORAGE_KEYS.theme);
-const initialTheme = stored === "light" || stored === "dark" ? stored : DEFAULT_THEME;
+import App from "./App";
 
-document.documentElement.setAttribute("data-theme", initialTheme);
-document.documentElement.classList.toggle("dark", initialTheme === "dark");
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+
+import { applyStoredThemeToDocument } from "./shared/theme/theme.bootstrap";
+
+applyStoredThemeToDocument();
 
 const root = document.getElementById("root");
 

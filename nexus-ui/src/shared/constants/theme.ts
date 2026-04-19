@@ -1,3 +1,8 @@
-import type { Theme } from "@/context/theme-context";
+export enum Theme {
+  DARK = "dark",
+  LIGHT = "light",
+}
 
-export const DEFAULT_THEME: Theme = "dark";
+export function isTheme(value: string | null | undefined): value is Theme {
+  return Object.values(Theme).includes(value as Theme);
+}

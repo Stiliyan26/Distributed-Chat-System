@@ -1,6 +1,8 @@
-import { createContext } from 'react';
+import { createContext } from "react";
 
-export type Theme = 'dark' | 'light';
+import { type Theme } from "@/shared/constants/theme";
+
+export type { Theme };
 
 export interface ThemeContextType {
   theme: Theme;

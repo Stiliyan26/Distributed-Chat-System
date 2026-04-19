@@ -6,6 +6,7 @@ import { getUserChannels } from '@/api/channels';
 import { useAuth } from '@/context/useAuth';
 import { useSocket } from '@/context/useSocket';
 import { useTheme } from '@/context/useTheme';
+import { Theme } from '@/shared/constants/theme';
 import { cn } from '@/lib/cn';
 import type { Channel } from '@/types';
 
@@ -153,8 +154,8 @@ export function Sidebar({ activeChannelId, onSelectChannel, onCreateChannel, unr
           onClick={toggleTheme}
           className="nav-item w-full"
         >
-          {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
-          <span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
+          {theme === Theme.DARK ? <Sun size={15} /> : <Moon size={15} />}
+          <span>{theme === Theme.DARK ? 'Light mode' : 'Dark mode'}</span>
         </button>
         <button onClick={logout} className="nav-item w-full text-red-400/70 hover:text-red-400 hover:bg-red-900/20">
           <LogOut size={15} />
