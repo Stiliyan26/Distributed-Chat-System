@@ -1,5 +1,5 @@
-import type { AuthResponse } from '@/types';
-import { createContext } from 'react';
+import type { AuthResponse } from "@/types";
+import { createContext } from "react";
 
 export interface AuthContextType {
   user: AuthResponse | null;

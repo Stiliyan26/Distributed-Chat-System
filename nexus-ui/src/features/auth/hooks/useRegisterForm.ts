@@ -1,4 +1,4 @@
-import { useAuth } from "@/context/hooks/useAuth";
+import { useAuth } from "@/context/auth/useAuth";
 import { ROUTES } from "@/shared/constants/routes";
 import { extractApiErrorMessage } from "@/shared/utils/extractApiErrorMessage";
 import { useMemo, useReducer } from "react";

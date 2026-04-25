@@ -1,6 +1,6 @@
 import z from "zod";
-import { STORAGE_KEYS } from "../../shared/constants/storage";
 
+import { STORAGE_KEYS } from "@/shared/constants/storage";
 import type { AuthResponse } from "@/types";
 
 const authResponseSchema = z.object({

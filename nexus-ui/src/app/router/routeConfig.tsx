@@ -1,4 +1,4 @@
-import { SocketProvider } from "@/context/SocketProvider";
+import { SocketProvider } from "@/context/socket/SocketProvider";
 import { ChatPage } from "@/pages/ChatPage";
 import { LoginPage } from "@/pages/LoginPage";
 import { RegisterPage } from "@/pages/RegisterPage";

@@ -7,8 +7,8 @@ import { resolveUsersByIds } from '@/api/users';
 import { getUsersPresenceStatus } from '@/api/presence';
 import { cn } from '@/lib/cn';
 import { AddMemberModal } from './AddMemberModal';
-import { useAuth } from "@/context/hooks/useAuth";
-import { useSocket } from "@/context/hooks/useSocket";
+import { useAuth } from "@/context/auth/useAuth";
+import { useSocket } from "@/context/socket/useSocket";
 import type { Channel, UserSearchResult } from '@/types';
 
 interface ChannelDetailsProps {

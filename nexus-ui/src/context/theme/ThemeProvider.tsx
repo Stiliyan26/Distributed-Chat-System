@@ -5,7 +5,7 @@ import { Theme } from "@/shared/constants/theme";
 import {
   persistThemeAndSyncDom,
   readThemeFromStorage,
-} from "../shared/theme/theme-sync";
+} from "@/shared/theme/theme-sync";
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>(readThemeFromStorage);
