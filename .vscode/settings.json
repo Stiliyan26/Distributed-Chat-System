@@ -1,8 +1,16 @@
 {
+  // Tailwind / PostCSS at-rules (@apply, @tailwind, @layer) — built-in CSS validator
+  "css.lint.unknownAtRules": "ignore",
+  "scss.lint.unknownAtRules": "ignore",
+
   // TypeScript/JavaScript automatic import updates
   "typescript.updateImportsOnFileMove.enabled": "always",
   "javascript.updateImportsOnFileMove.enabled": "always",
-  
+
+  // Use the app’s TypeScript for the language service (import-on-move + @/ paths need this project TS)
+  "typescript.tsdk": "nexus-ui/node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+
   // NO file extensions in imports (TypeScript standard)
   "typescript.preferences.importModuleSpecifier": "relative",
   "typescript.preferences.importModuleSpecifierEnding": "minimal",

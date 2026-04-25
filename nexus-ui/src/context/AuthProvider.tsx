@@ -1,42 +1,41 @@
-import {
-  login as apiLogin,
-  refresh as apiRefresh,
-  register as apiRegister,
-} from "@/api/auth";
-import { ROUTES } from "@/shared/constants/routes";
+import React, { useEffect, useMemo, useState } from "react";
+import { AuthContext } from "./auth-context";
+import { createAuthSessionHandlers } from "./utils/auth-handlers";
+import { parseStoredAuthUser } from "./utils/parse-stored-auth-user";
+
+import { authApi } from "@/api/auth";
 import { STORAGE_KEYS } from "@/shared/constants/storage";
 import type { AuthResponse } from "@/types";
-import React, { useCallback, useEffect, useState } from "react";
-import { AuthContext } from "./auth-context";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<AuthResponse | null>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEYS.user);
-
-      return stored ? JSON.parse(stored) : null;
-    } catch {
-      return null;
-    }
-  });
-
-  const [sessionReady, setSessionReady] = useState(
-    () => !localStorage.getItem(STORAGE_KEYS.user),
+  const [user, setUser] = useState<AuthResponse | null>(() =>
+    parseStoredAuthUser(),
   );
 
+  const [sessionReady, setSessionReady] = useState(() => {
+    return !localStorage.getItem(STORAGE_KEYS.user);
+  });
+
+  const { login, register, logout } = useMemo(
+    () => createAuthSessionHandlers(setUser),
+    [setUser],
+  );
+
+  const isAuthenticated = !!user && sessionReady;
+
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEYS.user);
-
-    if (!stored) {
-      setSessionReady(true);
-      return;
-    }
-
     let cancelled = false;
 
-    void (async () => {
+    async function restoreSession() {
+      const stored = localStorage.getItem(STORAGE_KEYS.user);
+
+      if (!stored) {
+        setSessionReady(true);
+        return;
+      }
+
       try {
-        await apiRefresh();
+        await authApi.refresh();
       } catch {
         if (!cancelled) {
           setUser(null);
@@ -47,54 +46,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setSessionReady(true);
         }
       }
-    })();
+    }
+
+    restoreSession();
 
     return () => {
       cancelled = true;
     };
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const data = await apiLogin(email, password);
-
-    setUser(data);
-
-    localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(data));
-  }, []);
-
-  const register = useCallback(
-    async (username: string, email: string, password: string) => {
-      const data = await apiRegister(username, email, password);
-
-      setUser(data);
-
-      localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(data));
-    },
-    [],
-  );
-
-  const logout = useCallback(() => {
-    setUser(null);
-
-    localStorage.removeItem(STORAGE_KEYS.user);
-
-    window.location.href = ROUTES.login;
-  }, []);
-
-  const isAuthenticated = !!user && sessionReady;
+  const authContextValue = useMemo(() => {
+    return {
+      user,
+      sessionReady,
+      isAuthenticated,
+      login,
+      register,
+      logout,
+    };
+  }, [user, sessionReady, isAuthenticated, login, register, logout]);
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        sessionReady,
-        isAuthenticated,
-        login,
-        register,
-        logout,
-        setUser,
-      }}
-    >
+    <AuthContext.Provider value={authContextValue}>
       {children}
     </AuthContext.Provider>
   );

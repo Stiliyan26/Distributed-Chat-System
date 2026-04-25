@@ -3,9 +3,9 @@ import { Hash, MessageSquare, FolderOpen, Settings, LogOut, Sun, Moon, Plus } fr
 import { useQuery } from '@tanstack/react-query';
 import { Avatar } from '@/components/ui/Avatar';
 import { getUserChannels } from '@/api/channels';
-import { useAuth } from '@/context/useAuth';
-import { useSocket } from '@/context/useSocket';
-import { useTheme } from '@/context/useTheme';
+import { useAuth } from "@/context/hooks/useAuth";
+import { useSocket } from "@/context/hooks/useSocket";
+import { useTheme } from "@/context/hooks/useTheme";
 import { Theme } from '@/shared/constants/theme';
 import { cn } from '@/lib/cn';
 import type { Channel } from '@/types';
