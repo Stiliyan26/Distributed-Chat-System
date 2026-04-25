@@ -3,7 +3,7 @@ import { io, Socket } from 'socket.io-client';
 import type { ConnectionStatus, SocketMessage } from '@/types';
 import { getUserChannels } from '@/api/channels';
 import { SocketContext } from './socket-context';
-import { useAuth } from './useAuth';
+import { useAuth } from "./hooks/useAuth";
 
 export function SocketProvider({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();

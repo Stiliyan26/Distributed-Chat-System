@@ -1,8 +1,9 @@
-import { ThemeProvider } from "@/context/ThemeProvider";
-import { QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { queryClient } from "../queryClient";
+import { QueryClientProvider } from "@tanstack/react-query";
+
+import { ThemeProvider } from "@/context/ThemeProvider";
 
 import { AuthProvider } from "@/context/AuthProvider";
 

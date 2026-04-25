@@ -1,4 +1,4 @@
-import { useAuth } from "@/context/useAuth";
+import { useAuth } from "@/context/hooks/useAuth";
 import { ROUTES } from "@/shared/constants/routes";
 import type { ReactNode } from "react";
 import { Navigate } from "react-router-dom";

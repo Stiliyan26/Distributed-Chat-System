@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Avatar } from '@/components/ui/Avatar';
 import { addChannelMember } from '@/api/channels';
 import { searchUsers } from '@/api/users';
-import { useSocket } from '@/context/useSocket';
+import { useSocket } from "@/context/hooks/useSocket";
 import type { UserSearchResult } from '@/types';
 
 interface AddMemberModalProps {
