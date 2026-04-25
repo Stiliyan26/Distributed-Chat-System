@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { AuthContext } from "./auth-context";
-import { createAuthSessionHandlers } from "./utils/auth-handlers";
-import { parseStoredAuthUser } from "./utils/parse-stored-auth-user";
+import { createAuthSessionHandlers } from "./auth-handlers";
+import { parseStoredAuthUser } from "./parse-stored-auth-user";
 
 import { authApi } from "@/api/auth";
 import { STORAGE_KEYS } from "@/shared/constants/storage";
@@ -48,7 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    restoreSession();
+    void restoreSession();
 
     return () => {
       cancelled = true;

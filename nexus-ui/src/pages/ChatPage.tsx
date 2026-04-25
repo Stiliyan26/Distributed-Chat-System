@@ -5,7 +5,7 @@ import { ChannelDetails } from "@/components/channel/ChannelDetails";
 import { CreateChannelModal } from "@/components/channel/CreateChannelModal";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { ConnectionBanner } from "@/components/ui/ConnectionBanner";
-import { useAuth } from "@/context/hooks/useAuth";
+import { useAuth } from "@/context/auth/useAuth";
 import { ChatHeader } from "@/features/chat/components/ChatHeader";
 import { ChatMessagesPanel } from "@/features/chat/components/ChatMessagesPanel";
 import { useChatPageState } from "@/features/chat/hooks/useChatPageState";

@@ -1,5 +1,5 @@
-import { useAuth } from "@/context/hooks/useAuth";
-import { useSocket } from "@/context/hooks/useSocket";
+import { useAuth } from "@/context/auth/useAuth";
+import { useSocket } from "@/context/socket/useSocket";
 import type { Channel, Message } from "@/types";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useChatMessages } from "./useChatMessages";
