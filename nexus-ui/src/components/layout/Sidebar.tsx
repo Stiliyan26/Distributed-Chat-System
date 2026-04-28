@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Hash, MessageSquare, FolderOpen, Settings, LogOut, Sun, Moon, Plus } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { Avatar } from '@/components/ui/Avatar';
-import { getUserChannels } from '@/api/channels';
+import { getUserChannels } from "@/api/channels/channels.api";
 import { useAuth } from "@/context/auth/useAuth";
 import { useSocket } from "@/context/socket/useSocket";
 import { useTheme } from "@/context/theme/useTheme";

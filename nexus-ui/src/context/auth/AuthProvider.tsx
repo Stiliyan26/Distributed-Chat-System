@@ -3,7 +3,7 @@ import { AuthContext } from "./auth-context";
 import { createAuthSessionHandlers } from "./auth-handlers";
 import { parseStoredAuthUser } from "./parse-stored-auth-user";
 
-import { authApi } from "@/api/auth";
+import { authApi } from "@/api/auth/auth.api";
 import { STORAGE_KEYS } from "@/shared/constants/storage";
 import type { AuthResponse } from "@/types";
 

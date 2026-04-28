@@ -1,4 +1,4 @@
-import { getMessages } from "@/api/messages";
+import { getMessages } from "@/api/messages/messages.api";
 import { QUERY_KEYS } from "@/shared/constants/queryKeys";
 import { mergeChatMessages } from "@/lib/utils";
 import type { Message } from "@/types";

@@ -4,79 +4,38 @@ import { extractApiErrorMessage } from "@/shared/utils/extractApiErrorMessage";
 import { useReducer } from "react";
 import { useNavigate } from "react-router-dom";
 import { AUTH_MESSAGES } from "../constants/auth";
-
-type LoginFormState = {
-  email: string;
-  password: string;
-  showPassword: boolean;
-  error: string;
-  loading: boolean;
-};
-
-type LoginFormAction =
-  | { type: "setEmail"; payload: string }
-  | { type: "setPassword"; payload: string }
-  | { type: "togglePassword" }
-  | { type: "startSubmit" }
-  | { type: "failSubmit"; payload: string }
-  | { type: "endSubmit" };
-
-const initialState: LoginFormState = {
-  email: "",
-  password: "",
-  showPassword: false,
-  error: "",
-  loading: false,
-};
-
-function reducer(state: LoginFormState, action: LoginFormAction): LoginFormState {
-  switch (action.type) {
-    case "setEmail":
-      return { ...state, email: action.payload };
-    case "setPassword":
-      return { ...state, password: action.payload };
-    case "togglePassword":
-      return { ...state, showPassword: !state.showPassword };
-    case "startSubmit":
-      return { ...state, error: "", loading: true };
-    case "failSubmit":
-      return { ...state, error: action.payload };
-    case "endSubmit":
-      return { ...state, loading: false };
-    default:
-      return state;
-  }
-}
+import { loginFormInitialState, loginFormReducer } from "../state/loginForm.reducer";
+import { LOGIN_ACTIONS } from "../state/loginForm.types";
 
 export function useLoginForm() {
   const { login } = useAuth();
 
   const navigate = useNavigate();
 
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(loginFormReducer, loginFormInitialState);
 
-  const submit = async (event: React.FormEvent) => {
+  const submit = async (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
-    dispatch({ type: "startSubmit" });
+    dispatch({ type: LOGIN_ACTIONS.START_SUBMIT });
 
     try {
       await login(state.email, state.password);
       navigate(ROUTES.home);
     } catch (error) {
       dispatch({
-        type: "failSubmit",
+        type: LOGIN_ACTIONS.FAIL_SUBMIT,
         payload: extractApiErrorMessage(error, AUTH_MESSAGES.loginFailed),
       });
     } finally {
-      dispatch({ type: "endSubmit" });
+      dispatch({ type: LOGIN_ACTIONS.END_SUBMIT });
     }
   };
 
   return {
     state,
-    setEmail: (email: string) => dispatch({ type: "setEmail", payload: email }),
-    setPassword: (password: string) => dispatch({ type: "setPassword", payload: password }),
-    togglePassword: () => dispatch({ type: "togglePassword" }),
+    setEmail: (email: string) => dispatch({ type: LOGIN_ACTIONS.SET_EMAIL, payload: email }),
+    setPassword: (password: string) => dispatch({ type: LOGIN_ACTIONS.SET_PASSWORD, payload: password }),
+    togglePassword: () => dispatch({ type: LOGIN_ACTIONS.TOGGLE_PASSWORD }),
     submit,
   };
 }

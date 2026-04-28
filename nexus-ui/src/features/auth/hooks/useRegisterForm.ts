@@ -4,100 +4,33 @@ import { extractApiErrorMessage } from "@/shared/utils/extractApiErrorMessage";
 import { useMemo, useReducer } from "react";
 import { useNavigate } from "react-router-dom";
 import { AUTH_MESSAGES } from "../constants/auth";
-
-export type Strength = "WEAK" | "FAIR" | "STRONG" | "VERY STRONG";
-
-type RegisterState = {
-  username: string;
-  email: string;
-  password: string;
-  confirm: string;
-  error: string;
-  loading: boolean;
-};
-
-type RegisterAction =
-  | { type: "setUsername"; payload: string }
-  | { type: "setEmail"; payload: string }
-  | { type: "setPassword"; payload: string }
-  | { type: "setConfirm"; payload: string }
-  | { type: "startSubmit" }
-  | { type: "failSubmit"; payload: string }
-  | { type: "endSubmit" };
-
-type StrengthMap = Record<number, { label: Strength; color: string; width: string }>;
-
-const initialState: RegisterState = {
-  username: "",
-  email: "",
-  password: "",
-  confirm: "",
-  error: "",
-  loading: false,
-};
-
-const strengthMap: StrengthMap = {
-  0: { label: "WEAK", color: "bg-red-500", width: "w-1/4" },
-  1: { label: "WEAK", color: "bg-red-500", width: "w-1/4" },
-  2: { label: "FAIR", color: "bg-amber-500", width: "w-2/4" },
-  3: { label: "STRONG", color: "bg-emerald-500", width: "w-3/4" },
-  4: { label: "VERY STRONG", color: "bg-indigo-500", width: "w-full" },
-};
-
-function reducer(state: RegisterState, action: RegisterAction): RegisterState {
-  switch (action.type) {
-    case "setUsername":
-      return { ...state, username: action.payload };
-    case "setEmail":
-      return { ...state, email: action.payload };
-    case "setPassword":
-      return { ...state, password: action.payload };
-    case "setConfirm":
-      return { ...state, confirm: action.payload };
-    case "startSubmit":
-      return { ...state, error: "", loading: true };
-    case "failSubmit":
-      return { ...state, error: action.payload };
-    case "endSubmit":
-      return { ...state, loading: false };
-    default:
-      return state;
-  }
-}
-
-function getStrength(password: string) {
-  const checks = {
-    uppercase: /[A-Z]/.test(password),
-    lowercase: /[a-z]/.test(password),
-    numSymbol: /[\d!@#$%^&*]/.test(password),
-    length: password.length >= 8,
-  };
-
-  const count = Object.values(checks).filter(Boolean).length;
-
-  return {
-    ...strengthMap[count],
-    checks,
-  };
-}
+import {
+  registerFormInitialState,
+  registerFormReducer,
+} from "../state/registerForm.reducer";
+import { REGISTER_ACTIONS } from "../state/registerForm.types";
+import { getStrength } from "../state/registerForm.strength";
 
 export function useRegisterForm() {
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(registerFormReducer, registerFormInitialState);
 
   const strength = useMemo(() => {
-    return getStrength(state.password)
+    return getStrength(state.password);
   }, [state.password]);
 
-  const submit = async (event: React.FormEvent) => {
+  const submit = async (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
-    dispatch({ type: "startSubmit" });
+    dispatch({ type: REGISTER_ACTIONS.START_SUBMIT });
 
     if (state.password !== state.confirm) {
-      dispatch({ type: "failSubmit", payload: AUTH_MESSAGES.passwordMismatch });
-      dispatch({ type: "endSubmit" });
+      dispatch({
+        type: REGISTER_ACTIONS.FAIL_SUBMIT,
+        payload: AUTH_MESSAGES.passwordMismatch,
+      });
+      dispatch({ type: REGISTER_ACTIONS.END_SUBMIT });
       return;
     }
 
@@ -106,21 +39,21 @@ export function useRegisterForm() {
       navigate(ROUTES.home);
     } catch (error) {
       dispatch({
-        type: "failSubmit",
+        type: REGISTER_ACTIONS.FAIL_SUBMIT,
         payload: extractApiErrorMessage(error, AUTH_MESSAGES.registrationFailed),
       });
     } finally {
-      dispatch({ type: "endSubmit" });
+      dispatch({ type: REGISTER_ACTIONS.END_SUBMIT });
     }
   };
 
   return {
     state,
     strength,
-    setUsername: (username: string) => dispatch({ type: "setUsername", payload: username }),
-    setEmail: (email: string) => dispatch({ type: "setEmail", payload: email }),
-    setPassword: (password: string) => dispatch({ type: "setPassword", payload: password }),
-    setConfirm: (confirm: string) => dispatch({ type: "setConfirm", payload: confirm }),
+    setUsername: (username: string) => dispatch({ type: REGISTER_ACTIONS.SET_USERNAME, payload: username }),
+    setEmail: (email: string) => dispatch({ type: REGISTER_ACTIONS.SET_EMAIL, payload: email }),
+    setPassword: (password: string) => dispatch({ type: REGISTER_ACTIONS.SET_PASSWORD, payload: password }),
+    setConfirm: (confirm: string) => dispatch({ type: REGISTER_ACTIONS.SET_CONFIRM, payload: confirm }),
     submit,
   };
 }
