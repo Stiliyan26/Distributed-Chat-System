@@ -1,9 +1,9 @@
-import api from './axios';
-import type { UserListResponse, UserSearchResult } from '@/types';
+import type { UserListResponse, UserSearchResult } from "../models/http-types";
 
-// Response: { data: UserSearchResult[], nextCursor: string | null }
+import api from "../client/axios";
+
 export const searchUsers = async (username: string, cursor?: string): Promise<UserSearchResult[]> => {
-  const res = await api.get<UserListResponse>('/users', {
+  const res = await api.get<UserListResponse>("/users", {
     params: { username, ...(cursor ? { cursor } : {}) },
   });
   return res.data.data ?? [];
@@ -13,7 +13,7 @@ export const searchUsers = async (username: string, cursor?: string): Promise<Us
 export async function resolveUsersByIds(ids: string[]): Promise<UserSearchResult[]> {
   if (ids.length === 0) return [];
   try {
-    const res = await api.post<UserSearchResult[]>('/users/resolve', { ids });
+    const res = await api.post<UserSearchResult[]>("/users/resolve", { ids });
     return res.data;
   } catch (postErr) {
     const rows = await Promise.all(

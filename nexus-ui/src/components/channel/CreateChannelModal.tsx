@@ -2,8 +2,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Search } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Avatar } from '@/components/ui/Avatar';
-import { createChannel } from '@/api/channels';
-import { searchUsers } from '@/api/users';
+import { createChannel } from "@/api/channels/channels.api";
+import { searchUsers } from "@/api/users/users.api";
 import { useSocket } from "@/context/socket/useSocket";
 import type { UserSearchResult } from '@/types';
 
@@ -58,7 +58,7 @@ export function CreateChannelModal({ onClose }: CreateChannelModalProps) {
     setSelected((prev) => prev.filter((u) => u.id !== userId));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!name.trim()) return;
     mutation.mutate();

@@ -1,4 +1,4 @@
-import { authApi } from "@/api/auth";
+import { authApi } from "@/api/auth/auth.api";
 import { ROUTES } from "@/shared/constants/routes";
 import { STORAGE_KEYS } from "@/shared/constants/storage";
 import type { AuthResponse } from "@/types";

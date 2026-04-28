@@ -1,4 +1,4 @@
-import { getUserChannels } from "@/api/channels";
+import { getUserChannels } from "@/api/channels/channels.api";
 import type { ConnectionStatus, SocketMessage } from "@/types";
 import { useAuth } from "@/context/auth/useAuth";
 import React, { useCallback, useEffect, useRef, useState } from "react";

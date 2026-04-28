@@ -1,4 +1,4 @@
-import type { Strength } from "../hooks/useRegisterForm";
+import type { Strength } from "../state/registerForm.types";
 
 type PasswordStrengthProps = {
   strength: {

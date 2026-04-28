@@ -3,8 +3,8 @@ import { X, Search } from 'lucide-react';
 import axios from 'axios';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Avatar } from '@/components/ui/Avatar';
-import { addChannelMember } from '@/api/channels';
-import { searchUsers } from '@/api/users';
+import { addChannelMember } from "@/api/channels/channels.api";
+import { searchUsers } from "@/api/users/users.api";
 import { useSocket } from "@/context/socket/useSocket";
 import type { UserSearchResult } from '@/types';
 

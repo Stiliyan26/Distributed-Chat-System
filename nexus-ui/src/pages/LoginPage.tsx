@@ -6,7 +6,8 @@ import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export function LoginPage() {
-  const { state, setEmail, setPassword, togglePassword, submit } = useLoginForm();
+  const { state, setEmail, setPassword, togglePassword, submit } =
+    useLoginForm();
 
   return (
     <AuthShell
@@ -35,7 +36,9 @@ export function LoginPage() {
               autoFocus
             />
             {state.email && (
-              <p className="text-emerald-400/80 text-[11px] mt-1.5">Encryption verified: AES-256 standard</p>
+              <p className="text-emerald-400/80 text-[11px] mt-1.5">
+                Encryption verified: AES-256 standard
+              </p>
             )}
           </div>
 
@@ -59,7 +62,10 @@ export function LoginPage() {
               </button>
             </div>
             <div className="flex justify-end mt-1.5">
-              <button type="button" className="text-[11px] text-outline-var hover:text-primary transition-colors">
+              <button
+                type="button"
+                className="text-[11px] text-outline-var hover:text-primary transition-colors"
+              >
                 Forgot credentials?
               </button>
             </div>
@@ -84,7 +90,10 @@ export function LoginPage() {
 
         <p className="text-center text-sm text-white/50 mt-6">
           Don't have an account?{" "}
-          <Link to={ROUTES.register} className="text-primary font-medium hover:underline">
+          <Link
+            to={ROUTES.register}
+            className="text-primary font-medium hover:underline"
+          >
             Register
           </Link>
         </p>
