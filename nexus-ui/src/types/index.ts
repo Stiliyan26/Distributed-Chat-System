@@ -10,7 +10,6 @@ export interface AuthResponse {
   email: string;
 }
 
-// Backend returns { channelId, channelName }
 export interface Channel {
   channelId: string;
   channelName: string;
@@ -19,12 +18,10 @@ export interface Channel {
   unreadCount?: number;
 }
 
-// Backend returns { memberIds: string[] } from GET /channels/:id/members
 export interface ChannelMembersResponse {
   memberIds: string[];
 }
 
-// Enriched member (after fetching user details for each id)
 export interface ChannelMember {
   id: string;
   username: string;
@@ -33,7 +30,6 @@ export interface ChannelMember {
   status?: 'online' | 'offline' | 'away';
 }
 
-// Backend message shape from GET /messages and socket new_message
 export interface Message {
   channelId: string;
   senderId: string;
@@ -45,7 +41,6 @@ export interface Message {
   _optimistic?: boolean;
 }
 
-// Socket new_message payload (may or may not include channelId)
 export interface SocketMessage {
   content: string;
   senderId: string;
@@ -54,7 +49,13 @@ export interface SocketMessage {
   channelId?: string;
 }
 
-// User search: backend returns { data: [...], nextCursor }
+export interface SendMessagePayload {
+  channelId: string;
+  senderUsername: string;
+  content: string;
+  sentAt: string;
+}
+
 export interface UserSearchResult {
   id: string;
   username: string;

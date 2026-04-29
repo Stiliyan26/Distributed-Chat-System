@@ -9,11 +9,14 @@ export const searchUsers = async (username: string, cursor?: string): Promise<Us
   return res.data.data ?? [];
 };
 
-/** Batch resolve; falls back to per-id GET if the batch POST fails (e.g. proxy/body issues). */
 export async function resolveUsersByIds(ids: string[]): Promise<UserSearchResult[]> {
-  if (ids.length === 0) return [];
+  if (ids.length === 0) {
+    return [];
+  };
+
   try {
     const res = await api.post<UserSearchResult[]>("/users/resolve", { ids });
+
     return res.data;
   } catch (postErr) {
     const rows = await Promise.all(
@@ -26,10 +29,13 @@ export async function resolveUsersByIds(ids: string[]): Promise<UserSearchResult
         }
       }),
     );
+
     const out = rows.filter((u): u is UserSearchResult => u !== null);
+
     if (out.length === 0) {
       throw postErr;
     }
+
     return out;
   }
 }
