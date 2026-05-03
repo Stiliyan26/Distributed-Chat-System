@@ -30,12 +30,16 @@ export interface ChannelMember {
   status?: 'online' | 'offline' | 'away';
 }
 
-export interface Message {
+/** Fields used to compute stable merge/dedupe keys for chat rows (second-precision `sentAt`). */
+export interface ChatMessageFingerprintFields {
   channelId: string;
   senderId: string;
-  senderUsername: string;
   content: string;
   sentAt: string;
+}
+
+export interface Message extends ChatMessageFingerprintFields {
+  senderUsername: string;
   // local-only fields for UI
   _id?: string;
   _optimistic?: boolean;

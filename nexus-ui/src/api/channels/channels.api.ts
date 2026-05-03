@@ -1,6 +1,5 @@
-import type { Channel, ChannelMembersResponse } from "../models/http-types";
-
 import api from "../client/axios";
+import type { Channel, ChannelMembersResponse } from "../models/http-types";
 
 export const getUserChannels = () =>
   api.get<Channel[]>("/channels/user").then((r) => r.data);

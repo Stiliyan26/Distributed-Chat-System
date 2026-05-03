@@ -1,8 +1,9 @@
+import type { ReactNode, RefObject } from "react";
+
 import { EmptyChat } from "@/components/chat/EmptyChat";
 import { MessageBubble } from "@/components/chat/MessageBubble";
-import { formatDate } from "@/lib/utils";
+import { formatChatDaySeparatorLabel } from "@/lib/chat-datetime";
 import type { Message } from "@/types";
-import type { RefObject, ReactNode } from "react";
 
 type ChatMessagesPanelProps = {
   isLoading: boolean;
@@ -20,7 +21,7 @@ function renderGroupedMessages(
   let lastSenderId = "";
 
   messages.forEach((msg, idx) => {
-    const date = formatDate(msg.sentAt);
+    const date = formatChatDaySeparatorLabel(msg.sentAt);
 
     if (date !== lastDate) {
       result.push(
@@ -73,6 +74,7 @@ export function ChatMessagesPanel({
       ) : (
         <>
           {renderGroupedMessages(messages, ownUserId)}
+
           <div ref={messagesEndRef} />
         </>
       )}

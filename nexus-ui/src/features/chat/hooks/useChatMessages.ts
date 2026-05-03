@@ -1,9 +1,12 @@
-import { getMessages } from "@/api/messages/messages.api";
-import { QUERY_KEYS } from "@/shared/constants/queryKeys";
-import { mergeChatMessages } from "@/lib/utils";
-import type { Message } from "@/types";
-import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
+
+import { useQuery } from "@tanstack/react-query";
+
+import { getMessages } from "@/api/messages/messages.api";
+import { mergeChatMessages } from "@/lib/chat-message-merge";
+import { QUERY_KEYS } from "@/shared/constants/queryKeys";
+import type { Message } from "@/types";
+
 import { CHAT_UI } from "../constants/chat";
 
 type UseChatMessagesParams = {
@@ -17,15 +20,24 @@ export function useChatMessages({
 }: UseChatMessagesParams) {
   const { data: fetchedMessages = [], isLoading } = useQuery({
     queryKey: [QUERY_KEYS.messages, activeChannelId],
-    queryFn: () => getMessages(activeChannelId!),
+    queryFn: () => {
+      if (!activeChannelId) {
+        return Promise.resolve([]);
+      }
+
+      return getMessages(activeChannelId);
+    },
     enabled: !!activeChannelId,
     staleTime: CHAT_UI.messageStaleTimeMs,
   });
 
-  const messages = useMemo(
-    () => mergeChatMessages(fetchedMessages, localMessages),
-    [fetchedMessages, localMessages],
-  );
+  const messages = useMemo(() => {
+    if (localMessages.length === 0) {
+      return fetchedMessages;
+    }
+
+    return mergeChatMessages(fetchedMessages, localMessages);
+  }, [fetchedMessages, localMessages]);
 
   return {
     isLoading,

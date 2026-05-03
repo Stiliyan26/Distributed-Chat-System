@@ -1,6 +1,7 @@
 import type { Socket } from "socket.io-client";
 
 import { getUserChannels } from "@/api/channels/channels.api";
+
 import { emitJoinAllUserChannels } from "./socket-emit-actions";
 
 const WARN_CONNECT = "[Socket] Could not fetch channels on connect:";

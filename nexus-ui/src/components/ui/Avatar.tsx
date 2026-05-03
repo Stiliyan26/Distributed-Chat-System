@@ -1,4 +1,4 @@
-import { getAvatarColor, getInitials } from '@/lib/utils';
+import { getAvatarBackgroundClass, getInitialsFromDisplayName } from '@/lib/avatar-display';
 import { cn } from '@/lib/cn';
 
 interface AvatarProps {
@@ -15,11 +15,11 @@ export function Avatar({ name, size = 'md', className }: AvatarProps) {
       className={cn(
         'avatar',
         sizeMap[size],
-        getAvatarColor(name),
+        getAvatarBackgroundClass(name),
         className,
       )}
     >
-      {getInitials(name)}
+      {getInitialsFromDisplayName(name)}
     </div>
   );
 }

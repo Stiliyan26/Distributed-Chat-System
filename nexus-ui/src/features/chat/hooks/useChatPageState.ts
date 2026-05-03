@@ -1,7 +1,10 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
 import { useAuth } from "@/context/auth/useAuth";
 import { useSocket } from "@/context/socket/useSocket";
 import type { Channel, Message } from "@/types";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+import type { ChatPreviewMap } from "../models/chat-preview-message";
 import { useChatMessages } from "./useChatMessages";
 import { useChatRealtimeUpdates } from "./useChatRealtimeUpdates";
 
@@ -16,9 +19,10 @@ export function useChatPageState() {
   const [localMessages, setLocalMessages] = useState<Message[]>([]);
   const [typingUser, setTypingUser] = useState<string | null>(null);
   const [unreadMap, setUnreadMap] = useState<Record<string, number>>({});
-  const [previewMap, setPreviewMap] = useState<Record<string, { sender: string; content: string }>>({});
+  const [previewMap, setPreviewMap] = useState<ChatPreviewMap>({});
 
   const activeChannelId = activeChannel?.channelId;
+
   const { isLoading, messages } = useChatMessages({
     activeChannelId,
     localMessages,

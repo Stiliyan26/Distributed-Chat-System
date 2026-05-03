@@ -1,14 +1,16 @@
-import type { Message, SocketMessage } from "@/types";
 import { useEffect } from "react";
+
 import type { Dispatch, SetStateAction } from "react";
+
+import type { Message, SocketMessage } from "@/types";
+
+import type { ChatPreviewMap } from "../models/chat-preview-message";
 
 type UseChatRealtimeUpdatesParams = {
   activeChannelId?: string;
   onNewMessage: (handler: (msg: SocketMessage) => void) => () => void;
   setLocalMessages: Dispatch<SetStateAction<Message[]>>;
-  setPreviewMap: Dispatch<
-    SetStateAction<Record<string, { sender: string; content: string }>>
-  >;
+  setPreviewMap: Dispatch<SetStateAction<ChatPreviewMap>>;
   setTypingUser: Dispatch<SetStateAction<string | null>>;
   setUnreadMap: Dispatch<SetStateAction<Record<string, number>>>;
 };

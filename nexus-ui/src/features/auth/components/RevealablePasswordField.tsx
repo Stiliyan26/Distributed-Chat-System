@@ -30,6 +30,7 @@ export function RevealablePasswordField({
       <label htmlFor={id} className="label-sm mb-2 block">
         {label}
       </label>
+
       <div className="relative">
         <input
           id={id}

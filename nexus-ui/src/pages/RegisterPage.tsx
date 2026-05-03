@@ -1,9 +1,10 @@
+import { Link } from "react-router-dom";
+
 import { AuthErrorAlert } from "@/features/auth/components/AuthErrorAlert";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { PasswordStrength } from "@/features/auth/components/PasswordStrength";
 import { useRegisterForm } from "@/features/auth/hooks/useRegisterForm";
 import { ROUTES } from "@/shared/constants/routes";
-import { Link } from "react-router-dom";
 
 export function RegisterPage() {
   const {

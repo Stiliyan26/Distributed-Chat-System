@@ -1,6 +1,5 @@
-import type { AuthResponse } from "../models/http-types";
-
 import api from "../client/axios";
+import type { AuthResponse } from "../models/http-types";
 import { AuthApiPaths } from "./routes";
 
 export const authApi = {

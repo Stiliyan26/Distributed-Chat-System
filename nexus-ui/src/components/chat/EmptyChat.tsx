@@ -11,10 +11,13 @@ export function EmptyChat({ onSendFirst }: EmptyChatProps) {
       <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-200 dark:bg-surface-high">
         <MessageSquare size={28} className="text-slate-500 dark:text-outline-var" />
       </div>
+
       <h3 className="mb-2 text-xl font-semibold text-slate-900 dark:text-white">Silence is absolute</h3>
+
       <p className="max-w-xs text-sm leading-relaxed text-slate-500 dark:text-white/40">
         This channel has no active data streams. Be the first to broadcast a message to the network.
       </p>
+
       {onSendFirst && (
         <button onClick={onSendFirst} className="btn-primary mt-6 px-6">
           Say something!
@@ -30,7 +33,9 @@ export function NoChannelSelected() {
       <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-200 dark:bg-surface-high">
         <MessageSquare size={32} className="text-indigo-500/80 dark:text-indigo-400/60" />
       </div>
+
       <h3 className="mb-2 text-xl font-semibold text-slate-900 dark:text-white">Network Isolated</h3>
+
       <p className="max-w-xs text-sm leading-relaxed text-slate-500 dark:text-white/40">
         No communication nodes found in this cluster. Select a channel or establish a new one to begin distributed processing.
       </p>

@@ -1,5 +1,7 @@
 import { createContext } from "react";
+
 import type { Socket } from "socket.io-client";
+
 import type { ConnectionStatus, SocketMessage } from "@/types";
 
 export interface SocketContextType {

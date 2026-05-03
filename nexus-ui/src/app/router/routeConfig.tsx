@@ -1,9 +1,11 @@
+import type { ReactNode } from "react";
+
 import { SocketProvider } from "@/context/socket/SocketProvider";
 import { ChatPage } from "@/pages/ChatPage";
 import { LoginPage } from "@/pages/LoginPage";
 import { RegisterPage } from "@/pages/RegisterPage";
 import { ROUTES } from "@/shared/constants/routes";
-import type { ReactNode } from "react";
+
 import { ProtectedRoute, PublicAuthRoute } from "./RouteGuards";
 
 export type AppRoute = {

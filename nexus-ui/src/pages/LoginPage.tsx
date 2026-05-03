@@ -1,10 +1,11 @@
+import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
+
 import { AuthErrorAlert } from "@/features/auth/components/AuthErrorAlert";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { RevealablePasswordField } from "@/features/auth/components/RevealablePasswordField";
 import { useLoginForm } from "@/features/auth/hooks/useLoginForm";
 import { ROUTES } from "@/shared/constants/routes";
-import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
 
 const LOGIN_FIELD_IDS = {
   email: "login-email",

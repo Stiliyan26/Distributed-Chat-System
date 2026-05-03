@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+
 import type { Socket } from "socket.io-client";
 
 import type { SocketMessage } from "@/types";
@@ -31,7 +32,11 @@ export function useSocketActions({ socket }: UseSocketActionsParams) {
     await syncJoinedChannelsFromApi(socket, "joinAll");
   }, [socket]);
 
-  const sendMessage = useCallback((channelId: string, senderUsername: string, content: string) => {
+  const sendMessage = useCallback((
+    channelId: string,
+    senderUsername: string,
+    content: string
+  ) => {
     if (!socket) {
       return;
     }

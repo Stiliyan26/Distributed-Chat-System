@@ -1,5 +1,6 @@
 import { Avatar } from '@/components/ui/Avatar';
-import { formatTime, isCodeBlock, parseCodeBlock } from '@/lib/utils';
+import { formatChatMessageTime } from '@/lib/chat-datetime';
+import { isMarkdownFencedCode, parseMarkdownFencedCode } from '@/lib/markdown-fenced-code';
 import type { Message } from '@/types';
 
 interface MessageBubbleProps {
@@ -9,8 +10,8 @@ interface MessageBubbleProps {
 }
 
 export function MessageBubble({ message, isOwn, showHeader }: MessageBubbleProps) {
-  const isCode = isCodeBlock(message.content);
-  const { lang, code } = isCode ? parseCodeBlock(message.content) : { lang: '', code: '' };
+  const isCode = isMarkdownFencedCode(message.content);
+  const { lang, code } = isCode ? parseMarkdownFencedCode(message.content) : { lang: '', code: '' };
 
   return (
     <div className={`flex gap-3 px-4 py-0.5 group animate-fade-in ${isOwn ? 'flex-row-reverse' : ''}`}>
@@ -25,7 +26,7 @@ export function MessageBubble({ message, isOwn, showHeader }: MessageBubbleProps
         {showHeader && (
           <div className={`flex items-baseline gap-2 mb-1 ${isOwn ? 'flex-row-reverse' : ''}`}>
             <span className="text-sm font-semibold text-slate-900 dark:text-white">{message.senderUsername}</span>
-            <span className="label-sm">{formatTime(message.sentAt)}</span>
+            <span className="label-sm">{formatChatMessageTime(message.sentAt)}</span>
           </div>
         )}
 
@@ -54,7 +55,7 @@ export function MessageBubble({ message, isOwn, showHeader }: MessageBubbleProps
 
         {!showHeader && (
           <span className="label-sm opacity-0 group-hover:opacity-100 transition-opacity mt-0.5">
-            {formatTime(message.sentAt)}
+            {formatChatMessageTime(message.sentAt)}
           </span>
         )}
       </div>
