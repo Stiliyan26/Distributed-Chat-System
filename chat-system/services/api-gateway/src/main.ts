@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
+import { json, urlencoded } from 'express';
 
 import { GlobalExceptionFilter } from '@libs/shared/src/filters/global-exception.filter';
 
@@ -9,9 +10,16 @@ import { ApiGatewayModule } from './api-gateway.module';
 import { ChatProxyMiddleware } from './proxy/middleware/chat-proxy.middleware';
 
 async function bootstrap() {
-  const app = await NestFactory.create(ApiGatewayModule);
+  const bodyLimit = process.env.GATEWAY_BODY_LIMIT || '512kb';
+
+  const app = await NestFactory.create(ApiGatewayModule, {
+    bodyParser: false,
+  });
+
   const globalPrefix = 'api';
 
+  app.use(json({ limit: bodyLimit }));
+  app.use(urlencoded({ extended: true, limit: bodyLimit }));
   app.use(cookieParser());
 
   app.useGlobalFilters(new GlobalExceptionFilter());

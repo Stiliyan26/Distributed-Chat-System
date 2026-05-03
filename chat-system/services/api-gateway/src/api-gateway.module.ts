@@ -1,7 +1,9 @@
 import { Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 
 import { JwtModule } from "@nestjs/jwt";
+import { APP_GUARD } from "@nestjs/core";
+import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 
 import configuration from './config/configuration';
 import { ProxyModule } from "./proxy/proxy.module";
@@ -12,10 +14,26 @@ import { ProxyModule } from "./proxy/proxy.module";
             isGlobal: true,
             load: [configuration]
         }),
+        ThrottlerModule.forRootAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: (config: ConfigService) => ({
+                throttlers: [
+                    {
+                        // throttleTtlMs = 60_000 → 1 minute (this is the counting window, in milliseconds).
+                        ttl: config.get<number>('gateway.throttleTtlMs')!,
+                        // throttleLimit = 200 → at most 200 requests in that 1 minute (per tracker, usually IP).
+                        limit: config.get<number>('gateway.throttleLimit')!,
+                    },
+                ],
+            }),
+        }),
         JwtModule.register({}),
         ProxyModule
     ],
     controllers: [],
-    providers: []
+    providers: [
+        { provide: APP_GUARD, useClass: ThrottlerGuard },
+    ]
 })
 export class ApiGatewayModule { };

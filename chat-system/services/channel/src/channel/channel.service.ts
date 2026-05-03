@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 
 import { ChannelError, ChannelRole } from './constants/channel.constants';
+import { AddChannelMemberRequestDto } from './dto/request/add-channel-member.request.dto';
 import { CreateChannelRequestDto } from './dto/request/create-channel.request.dto';
 import { CreateChannelResponseDto } from './dto/response/create-channel.response.dto';
 import { GetChannelMembersResponseDto } from './dto/response/get-channel-members.response.dto';
@@ -39,6 +40,42 @@ export class ChannelService {
       channelName: savedChannel.channelName,
       memberIds: uniqueMemberIds
     };
+  }
+
+  async addMember(
+    channelId: string,
+    addChannelMemberRequestDto: AddChannelMemberRequestDto,
+    requesterId: string
+  ): Promise<void> {
+    const { memberId } = addChannelMemberRequestDto;
+
+    const channelExists = await this.channelRepository.exists({ where: { id: channelId } });
+
+    if (!channelExists) {
+      throw new NotFoundException(ChannelError.NOT_FOUND);
+    }
+
+    const requesterMembership = await this.channelMemberRepository.findOne({
+      where: { channelId, memberId: requesterId }
+    });
+
+    if (!requesterMembership) {
+      throw new ForbiddenException('You are not a member of this channel');
+    }
+
+    const existing = await this.channelMemberRepository.findOne({
+      where: { channelId, memberId }
+    });
+
+    if (existing) {
+      throw new ConflictException('User is already a member of this channel');
+    }
+
+    await this.channelMemberRepository.insert({
+      channelId,
+      memberId,
+      role: ChannelRole.MEMBER
+    });
   }
 
   async getAllMembersByChannelId(channelId: string): Promise<GetChannelMembersResponseDto> {
