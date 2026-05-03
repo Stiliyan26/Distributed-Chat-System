@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 import type { Dispatch, SetStateAction } from "react";
 
-import type { Message, SocketMessage } from "@/types";
+import type { Message, SocketMessage } from "@/shared/types";
 
 import type { ChatPreviewMap } from "../models/chat-preview-message";
 

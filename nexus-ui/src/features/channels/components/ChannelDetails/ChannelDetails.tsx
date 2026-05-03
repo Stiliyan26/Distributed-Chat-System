@@ -2,14 +2,14 @@ import { useMemo, useState } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 
-import { getChannelMembers } from "@/api/channels/channels.api";
-import { getUsersPresenceStatus } from "@/api/presence/presence.api";
-import { resolveUsersByIds } from "@/api/users/users.api";
-import { useAuth } from "@/context/auth/useAuth";
-import { useSocket } from "@/context/socket/useSocket";
-import type { Channel, UserSearchResult } from "@/types";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { getChannelMembers } from "@/features/channels/api/channels.api";
+import { getUsersPresenceStatus } from "@/features/presence/api/presence.api";
+import { useSocket } from "@/realtime/useSocket";
+import { resolveUsersByIds } from "@/shared/api/users.api";
+import type { Channel, UserSearchResult } from "@/shared/types";
 
-import { AddMemberModal } from "./AddMemberModal";
+import { AddMemberModal } from "../AddMemberModal";
 import { ChannelDetailsDescription } from "./ChannelDetailsDescription";
 import { ChannelDetailsHeader } from "./ChannelDetailsHeader";
 import { ChannelDetailsIdSection } from "./ChannelDetailsIdSection";

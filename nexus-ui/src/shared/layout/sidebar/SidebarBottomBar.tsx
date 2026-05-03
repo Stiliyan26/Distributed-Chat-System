@@ -1,8 +1,8 @@
 import { LogOut, Moon, Sun } from "lucide-react";
 
-import { Avatar } from "@/components/ui/Avatar";
 import { Theme } from "@/shared/constants/theme";
-import type { AuthResponse } from "@/types";
+import type { AuthResponse } from "@/shared/types";
+import { Avatar } from "@/shared/ui/Avatar";
 
 interface SidebarBottomBarProps {
   user: AuthResponse | null;

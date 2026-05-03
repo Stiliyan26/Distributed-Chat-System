@@ -2,11 +2,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { createChannel } from "@/api/channels/channels.api";
-import { searchUsers } from "@/api/users/users.api";
-import { useSocket } from "@/context/socket/useSocket";
-import { extractApiErrorMessage } from "@/shared/utils/extractApiErrorMessage";
-import type { UserSearchResult } from "@/types";
+import { createChannel } from "@/features/channels/api/channels.api";
+import { useSocket } from "@/realtime/useSocket";
+import { searchUsers } from "@/shared/api/users.api";
+import { extractApiErrorMessage } from "@/shared/lib/extractApiErrorMessage";
+import type { UserSearchResult } from "@/shared/types";
 
 import {
   createChannelFormElementIds,

@@ -1,5 +1,5 @@
-import { Avatar } from "@/components/ui/Avatar";
-import type { UserSearchResult } from "@/types";
+import type { UserSearchResult } from "@/shared/types";
+import { Avatar } from "@/shared/ui/Avatar";
 
 interface AddMemberSearchHitListProps {
   hits: UserSearchResult[];

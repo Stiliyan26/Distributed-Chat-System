@@ -1,5 +1,6 @@
-import api from "../client/axios";
-import type { UserListResponse, UserSearchResult } from "../models/http-types";
+import type { UserListResponse, UserSearchResult } from "@/shared/types";
+
+import api from "./axios";
 
 export const searchUsers = async (username: string, cursor?: string): Promise<UserSearchResult[]> => {
   const res = await api.get<UserListResponse>("/users", {

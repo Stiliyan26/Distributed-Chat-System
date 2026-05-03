@@ -2,7 +2,7 @@ import { useCallback } from "react";
 
 import type { Socket } from "socket.io-client";
 
-import type { SocketMessage } from "@/types";
+import type { SocketMessage } from "@/shared/types";
 
 import { emitJoinAllUserChannels, emitSendMessage } from "../socket-emit-actions";
 import { syncJoinedChannelsFromApi } from "../sync-joined-channels-from-api";

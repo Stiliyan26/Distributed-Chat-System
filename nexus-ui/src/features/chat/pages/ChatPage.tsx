@@ -1,14 +1,14 @@
-import { ChannelDetails } from "@/components/channel/ChannelDetails";
-import { CreateChannelModal } from "@/components/channel/CreateChannelModal";
-import { NoChannelSelected } from "@/components/chat/EmptyChat";
-import { MessageInput } from "@/components/chat/MessageInput";
-import { TypingIndicator } from "@/components/chat/TypingIndicator";
-import { Sidebar } from "@/components/layout/sidebar";
-import { ConnectionBanner } from "@/components/ui/ConnectionBanner";
-import { useAuth } from "@/context/auth/useAuth";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { ChannelDetails } from "@/features/channels/components/ChannelDetails/ChannelDetails";
+import { CreateChannelModal } from "@/features/channels/components/CreateChannelModal";
 import { ChatHeader } from "@/features/chat/components/ChatHeader";
 import { ChatMessagesPanel } from "@/features/chat/components/ChatMessagesPanel";
+import { NoChannelSelected } from "@/features/chat/components/EmptyChat";
+import { MessageInput } from "@/features/chat/components/MessageInput";
+import { TypingIndicator } from "@/features/chat/components/TypingIndicator";
 import { useChatPageState } from "@/features/chat/hooks/useChatPageState";
+import { Sidebar } from "@/shared/layout/sidebar";
+import { ConnectionBanner } from "@/shared/ui/ConnectionBanner";
 
 export function ChatPage() {
   const { user } = useAuth();

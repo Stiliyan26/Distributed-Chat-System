@@ -1,8 +1,8 @@
 import { Hash } from "lucide-react";
 
 import type { ChatPreviewMessage } from "@/features/chat/models/chat-preview-message";
-import { cn } from "@/lib/cn";
-import type { Channel } from "@/types";
+import { cn } from "@/shared/lib/cn";
+import type { Channel } from "@/shared/types";
 
 interface SidebarChannelRowProps {
   channel: Channel;

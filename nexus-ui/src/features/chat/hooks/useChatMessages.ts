@@ -2,10 +2,10 @@ import { useMemo } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 
-import { getMessages } from "@/api/messages/messages.api";
-import { mergeChatMessages } from "@/lib/chat-message-merge";
+import { getMessages } from "@/features/chat/api/messages.api";
+import { mergeChatMessages } from "@/features/chat/utils/chat-message-merge";
 import { QUERY_KEYS } from "@/shared/constants/queryKeys";
-import type { Message } from "@/types";
+import type { Message } from "@/shared/types";
 
 import { CHAT_UI } from "../constants/chat";
 

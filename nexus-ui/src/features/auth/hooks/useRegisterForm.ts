@@ -2,9 +2,9 @@ import { useMemo, useReducer } from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import { useAuth } from "@/context/auth/useAuth";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { ROUTES } from "@/shared/constants/routes";
-import { extractApiErrorMessage } from "@/shared/utils/extractApiErrorMessage";
+import { extractApiErrorMessage } from "@/shared/lib/extractApiErrorMessage";
 
 import { AUTH_MESSAGES } from "../constants/auth";
 import {

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { useAuth } from "@/context/auth/useAuth";
-import { useSocket } from "@/context/socket/useSocket";
-import type { Channel, Message } from "@/types";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useSocket } from "@/realtime/useSocket";
+import type { Channel, Message } from "@/shared/types";
 
 import type { ChatPreviewMap } from "../models/chat-preview-message";
 import { useChatMessages } from "./useChatMessages";

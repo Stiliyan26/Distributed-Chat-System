@@ -1,6 +1,6 @@
 import type { Socket } from "socket.io-client";
 
-import { getUserChannels } from "@/api/channels/channels.api";
+import { getUserChannels } from "@/features/channels/api/channels.api";
 
 import { emitJoinAllUserChannels } from "./socket-emit-actions";
 

@@ -1,9 +1,9 @@
 import type { Dispatch, SetStateAction } from "react";
 
-import { authApi } from "@/api/auth/auth.api";
+import { authApi } from "@/features/auth/api/auth.api";
 import { ROUTES } from "@/shared/constants/routes";
 import { STORAGE_KEYS } from "@/shared/constants/storage";
-import type { AuthResponse } from "@/types";
+import type { AuthResponse } from "@/shared/types";
 
 export function createAuthSessionHandlers(
   setUser: Dispatch<SetStateAction<AuthResponse | null>>,
