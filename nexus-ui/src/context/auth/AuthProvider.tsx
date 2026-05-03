@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { AuthContext } from "./auth-context";
-import { createAuthSessionHandlers } from "./auth-handlers";
-import { parseStoredAuthUser } from "./parse-stored-auth-user";
 
 import { authApi } from "@/api/auth/auth.api";
 import { STORAGE_KEYS } from "@/shared/constants/storage";
 import type { AuthResponse } from "@/types";
+
+import { AuthContext } from "./auth-context";
+import { createAuthSessionHandlers } from "./auth-handlers";
+import { parseStoredAuthUser } from "./parse-stored-auth-user";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthResponse | null>(() =>

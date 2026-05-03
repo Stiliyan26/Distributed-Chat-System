@@ -1,5 +1,5 @@
 import { STORAGE_KEYS } from "@/shared/constants/storage";
-import { Theme, isTheme } from "@/shared/constants/theme";
+import { isTheme, Theme } from "@/shared/constants/theme";
 
 
 export function persistThemeAndSyncDom(theme: Theme): void {

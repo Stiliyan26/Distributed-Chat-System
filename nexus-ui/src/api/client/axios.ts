@@ -1,6 +1,7 @@
 import axios, { type AxiosError } from "axios";
 
 import { ROUTES } from "@/shared/constants/routes";
+
 import { AuthApiPaths } from "../auth/routes";
 import type { RetriableRequestConfig } from "./axios.types";
 import { SessionRefreshCoordinator } from "./session-refresh-coordinator";

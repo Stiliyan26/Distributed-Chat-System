@@ -1,7 +1,8 @@
-import { useAuth } from "@/context/auth/useAuth";
-import { ROUTES } from "@/shared/constants/routes";
 import type { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
+
+import { useAuth } from "@/context/auth/useAuth";
+import { ROUTES } from "@/shared/constants/routes";
 
 function SessionBootstrapScreen() {
   return (

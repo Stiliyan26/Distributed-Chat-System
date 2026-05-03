@@ -1,5 +1,6 @@
-import { useState, useRef, useCallback } from 'react';
-import { Send, Plus, AtSign, Smile, Terminal } from 'lucide-react';
+import { useCallback, useRef, useState } from "react";
+
+import { AtSign, Plus, Send, Smile, Terminal } from "lucide-react";
 
 interface MessageInputProps {
   channelName: string;
@@ -8,21 +9,26 @@ interface MessageInputProps {
 }
 
 export function MessageInput({ channelName, onSend, disabled }: MessageInputProps) {
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSend = useCallback(() => {
     const trimmed = text.trim();
-    if (!trimmed || disabled) return;
+
+    if (!trimmed || disabled) {
+      return;
+    }
+
     onSend(trimmed);
-    setText('');
+    setText("");
+
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = "auto";
     }
   }, [text, onSend, disabled]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
@@ -30,9 +36,9 @@ export function MessageInput({ channelName, onSend, disabled }: MessageInputProp
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
-    const ta = e.target;
-    ta.style.height = 'auto';
-    ta.style.height = `${Math.min(ta.scrollHeight, 160)}px`;
+    const target = e.target;
+    target.style.height = "auto";
+    target.style.height = `${Math.min(target.scrollHeight, 160)}px`;
   };
 
   return (
@@ -48,19 +54,29 @@ export function MessageInput({ channelName, onSend, disabled }: MessageInputProp
           placeholder={`Message #${channelName}...`}
           className="w-full bg-transparent text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-outline-var px-4 pt-3 pb-2 resize-none outline-none min-h-[44px] max-h-40"
         />
+
         <div className="flex items-center justify-between px-3 pb-2.5">
           <div className="flex items-center gap-1 text-outline-var">
-            <button className="p-1.5 hover:text-slate-900 dark:hover:text-white rounded transition-colors" title="Attach">
+            <button
+              className="p-1.5 hover:text-slate-900 dark:hover:text-white rounded transition-colors"
+              title="Attach"
+            >
               <Plus size={16} />
             </button>
-            <button className="p-1.5 hover:text-slate-900 dark:hover:text-white rounded transition-colors" title="Mention">
+            <button
+              className="p-1.5 hover:text-slate-900 dark:hover:text-white rounded transition-colors"
+              title="Mention"
+            >
               <AtSign size={16} />
             </button>
-            <button className="p-1.5 hover:text-slate-900 dark:hover:text-white rounded transition-colors" title="Emoji">
+            <button
+              className="p-1.5 hover:text-slate-900 dark:hover:text-white rounded transition-colors"
+              title="Emoji"
+            >
               <Smile size={16} />
             </button>
             <button
-              onClick={() => setText((t) => (t ? t + '\n```bash\n\n```' : '```bash\n\n```'))}
+              onClick={() => setText((t) => (t ? t + "\n```bash\n\n```" : "```bash\n\n```"))}
               className="p-1.5 hover:text-slate-900 dark:hover:text-white rounded transition-colors"
               title="Code block"
             >

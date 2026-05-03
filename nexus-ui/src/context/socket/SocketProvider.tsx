@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
-import { SocketContext } from "./socket-context";
 
-import type { ConnectionStatus } from "@/types";
+import { io, Socket } from "socket.io-client";
+
 import { useAuth } from "@/context/auth/useAuth";
+import type { ConnectionStatus } from "@/types";
 
 import { attachSocketLifecycleListeners } from "./attach-socket-lifecycle-listeners";
 import { SOCKET_CLIENT_OPTIONS } from "./constants/socket-client-options";
 import { useSocketActions } from "./hooks/useSocketActions";
+import { SocketContext } from "./socket-context";
 
 export function SocketProvider({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();

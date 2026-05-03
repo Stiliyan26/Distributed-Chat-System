@@ -1,5 +1,7 @@
-import type { Channel } from "@/types";
 import { Hash, Info, Pin, Star, Users } from "lucide-react";
+
+import type { Channel } from "@/types";
+
 import { CHAT_TITLES } from "../constants/chat";
 
 type ChatHeaderProps = {

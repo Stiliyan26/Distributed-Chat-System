@@ -1,6 +1,5 @@
-import type { Message } from "../models/http-types";
-
 import api from "../client/axios";
+import type { Message } from "../models/http-types";
 
 export const getMessages = (channelId: string) =>
   api.get<Message[]>("/messages", { params: { channelId } }).then((r) => r.data);

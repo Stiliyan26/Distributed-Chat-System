@@ -1,9 +1,9 @@
-import { MessageInput } from "@/components/chat/MessageInput";
-import { NoChannelSelected } from "@/components/chat/EmptyChat";
-import { TypingIndicator } from "@/components/chat/TypingIndicator";
 import { ChannelDetails } from "@/components/channel/ChannelDetails";
 import { CreateChannelModal } from "@/components/channel/CreateChannelModal";
-import { Sidebar } from "@/components/layout/Sidebar";
+import { NoChannelSelected } from "@/components/chat/EmptyChat";
+import { MessageInput } from "@/components/chat/MessageInput";
+import { TypingIndicator } from "@/components/chat/TypingIndicator";
+import { Sidebar } from "@/components/layout/sidebar";
 import { ConnectionBanner } from "@/components/ui/ConnectionBanner";
 import { useAuth } from "@/context/auth/useAuth";
 import { ChatHeader } from "@/features/chat/components/ChatHeader";
@@ -47,6 +47,7 @@ export function ChatPage() {
           connectionStatus.type === "error") && (
           <ConnectionBanner status={connectionStatus} />
         )}
+
         {connectionStatus.type === "connected" && (
           <div className="animate-slide-down">
             <ConnectionBanner status={connectionStatus} />

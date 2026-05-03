@@ -17,7 +17,9 @@ export function AuthShell({ title, subtitle, children, footer }: AuthShellProps)
         <div className="w-14 h-14 rounded-xl bg-brand-gradient flex items-center justify-center mb-4 shadow-glow">
           <Terminal size={26} className="text-white" />
         </div>
+
         <h1 className="text-2xl font-semibold text-primary tracking-wide">{title}</h1>
+
         <p className="label-sm mt-1">{subtitle}</p>
       </div>
 

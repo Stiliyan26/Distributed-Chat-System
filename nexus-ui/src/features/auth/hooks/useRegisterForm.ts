@@ -1,15 +1,18 @@
+import { useMemo, useReducer } from "react";
+
+import { useNavigate } from "react-router-dom";
+
 import { useAuth } from "@/context/auth/useAuth";
 import { ROUTES } from "@/shared/constants/routes";
 import { extractApiErrorMessage } from "@/shared/utils/extractApiErrorMessage";
-import { useMemo, useReducer } from "react";
-import { useNavigate } from "react-router-dom";
+
 import { AUTH_MESSAGES } from "../constants/auth";
 import {
   registerFormInitialState,
   registerFormReducer,
 } from "../state/registerForm.reducer";
-import { REGISTER_ACTIONS } from "../state/registerForm.types";
 import { getStrength } from "../state/registerForm.strength";
+import { REGISTER_ACTIONS } from "../state/registerForm.types";
 
 export function useRegisterForm() {
   const { register } = useAuth();
