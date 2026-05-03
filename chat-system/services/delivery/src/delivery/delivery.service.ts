@@ -23,8 +23,11 @@ export class DeliveryService {
         
         this.logger.log(`[DeliveryService] Received delivery request for channel: ${channelId}. Flowing offline emails: ${JSON.stringify(offlineUsersEmails)}`);
         
-        // Real-time broadcast to online users via Redis Pub/Sub
-        await this.redisService.publish(`channel:${channelId}`, JSON.stringify(message));
+        // Real-time broadcast to online users via Redis Pub/Sub (include channelId for chat UI consumers)
+        await this.redisService.publish(
+            `channel:${channelId}`,
+            JSON.stringify({ ...message, channelId }),
+        );
 
         // Background email delivery for offline users
         if (offlineUsersEmails.length > 0) {

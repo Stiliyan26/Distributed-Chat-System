@@ -3,6 +3,7 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Post
 import { ChannelRoutes } from '@libs/shared/src/constants/routes.constants';
 import { ChannelService } from './channel.service';
 
+import { AddChannelMemberRequestDto } from './dto/request/add-channel-member.request.dto';
 import { CreateChannelRequestDto } from './dto/request/create-channel.request.dto';
 import { GetChannelMembersResponseDto } from './dto/response/get-channel-members.response.dto';
 import { CreateChannelResponseDto } from './dto/response/create-channel.response.dto';
@@ -21,6 +22,16 @@ export class ChannelController {
     @Param('channelId', ParseUUIDPipe) channelId: string
   ): Promise<GetChannelMembersResponseDto> {
     return this.channelService.getAllMembersByChannelId(channelId);
+  }
+
+  @Post(ChannelRoutes.MEMBERS)
+  @HttpCode(HttpStatus.CREATED)
+  addMember(
+    @Param('channelId', ParseUUIDPipe) channelId: string,
+    @Body() addChannelMemberRequestDto: AddChannelMemberRequestDto,
+    @CurrentUserId() requesterId: string
+  ): Promise<void> {
+    return this.channelService.addMember(channelId, addChannelMemberRequestDto, requesterId);
   }
 
   @Get(ChannelRoutes.USER_CHANNELS)
