@@ -1,6 +1,6 @@
 import { Calendar } from "lucide-react";
 
-import type { Channel } from "@/types";
+import type { Channel } from "@/shared/types";
 
 interface ChannelDetailsDescriptionProps {
   channel: Channel;

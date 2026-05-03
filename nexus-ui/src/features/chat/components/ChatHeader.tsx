@@ -1,6 +1,6 @@
 import { Hash, Info, Pin, Star, Users } from "lucide-react";
 
-import type { Channel } from "@/types";
+import type { Channel } from "@/shared/types";
 
 import { CHAT_TITLES } from "../constants/chat";
 

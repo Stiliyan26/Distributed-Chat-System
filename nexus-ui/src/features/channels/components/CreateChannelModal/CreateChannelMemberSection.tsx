@@ -1,4 +1,4 @@
-import type { UserSearchResult } from "@/types";
+import type { UserSearchResult } from "@/shared/types";
 
 import { MemberSearchHitList } from "./MemberSearchHitList";
 import { MemberSearchTextField } from "./MemberSearchTextField";

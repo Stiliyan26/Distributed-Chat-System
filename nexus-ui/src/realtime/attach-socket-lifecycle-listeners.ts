@@ -1,7 +1,7 @@
 import type { Dispatch, SetStateAction } from "react";
 import type { Socket } from "socket.io-client";
 
-import type { ConnectionStatus } from "@/types";
+import type { ConnectionStatus } from "@/shared/types";
 
 import { syncJoinedChannelsFromApi } from "./sync-joined-channels-from-api";
 

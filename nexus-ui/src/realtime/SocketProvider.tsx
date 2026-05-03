@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 
 import { io, Socket } from "socket.io-client";
 
-import { useAuth } from "@/context/auth/useAuth";
-import type { ConnectionStatus } from "@/types";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import type { ConnectionStatus } from "@/shared/types";
 
 import { attachSocketLifecycleListeners } from "./attach-socket-lifecycle-listeners";
 import { SOCKET_CLIENT_OPTIONS } from "./constants/socket-client-options";

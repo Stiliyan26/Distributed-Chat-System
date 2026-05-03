@@ -1,7 +1,7 @@
-import { Avatar } from '@/components/ui/Avatar';
-import { formatChatMessageTime } from '@/lib/chat-datetime';
-import { isMarkdownFencedCode, parseMarkdownFencedCode } from '@/lib/markdown-fenced-code';
-import type { Message } from '@/types';
+import { formatChatMessageTime } from '@/features/chat/utils/chat-datetime';
+import { isMarkdownFencedCode, parseMarkdownFencedCode } from '@/features/chat/utils/markdown-fenced-code';
+import type { Message } from '@/shared/types';
+import { Avatar } from '@/shared/ui/Avatar';
 
 interface MessageBubbleProps {
   message: Message;

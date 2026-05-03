@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
 
 import type { ChatPreviewMap } from "@/features/chat/models/chat-preview-message";
-import type { Channel } from "@/types";
+import type { Channel } from "@/shared/types";
 
 import { SidebarChannelRow } from "./SidebarChannelRow";
 

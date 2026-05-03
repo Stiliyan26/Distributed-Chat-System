@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 
-import { authApi } from "@/api/auth/auth.api";
+import { authApi } from "@/features/auth/api/auth.api";
 import { STORAGE_KEYS } from "@/shared/constants/storage";
-import type { AuthResponse } from "@/types";
+import type { AuthResponse } from "@/shared/types";
 
 import { AuthContext } from "./auth-context";
 import { createAuthSessionHandlers } from "./auth-handlers";

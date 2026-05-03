@@ -1,7 +1,7 @@
 import { FolderOpen, Hash, MessageSquare, Settings } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { cn } from "@/lib/cn";
+import { cn } from "@/shared/lib/cn";
 
 import { SIDEBAR_VIEW_ID, type SidebarView } from "./sidebar-view-ids";
 

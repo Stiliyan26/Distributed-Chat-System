@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 
-import { SocketProvider } from "@/context/socket/SocketProvider";
-import { ChatPage } from "@/pages/ChatPage";
-import { LoginPage } from "@/pages/LoginPage";
-import { RegisterPage } from "@/pages/RegisterPage";
+import { LoginPage } from "@/features/auth/pages/LoginPage";
+import { RegisterPage } from "@/features/auth/pages/RegisterPage";
+import { ChatPage } from "@/features/chat/pages/ChatPage";
+import { SocketProvider } from "@/realtime/SocketProvider";
 import { ROUTES } from "@/shared/constants/routes";
 
 import { ProtectedRoute, PublicAuthRoute } from "./RouteGuards";

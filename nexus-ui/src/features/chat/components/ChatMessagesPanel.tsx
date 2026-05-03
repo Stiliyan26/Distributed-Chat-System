@@ -1,9 +1,9 @@
 import type { ReactNode, RefObject } from "react";
 
-import { EmptyChat } from "@/components/chat/EmptyChat";
-import { MessageBubble } from "@/components/chat/MessageBubble";
-import { formatChatDaySeparatorLabel } from "@/lib/chat-datetime";
-import type { Message } from "@/types";
+import { EmptyChat } from "@/features/chat/components/EmptyChat";
+import { MessageBubble } from "@/features/chat/components/MessageBubble";
+import { formatChatDaySeparatorLabel } from "@/features/chat/utils/chat-datetime";
+import type { Message } from "@/shared/types";
 
 type ChatMessagesPanelProps = {
   isLoading: boolean;

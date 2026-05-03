@@ -1,6 +1,6 @@
 import { AlertCircle, CheckCircle, RefreshCw, WifiOff } from "lucide-react";
 
-import type { ConnectionStatus } from "@/types";
+import type { ConnectionStatus } from "@/shared/types";
 
 interface ConnectionBannerProps {
   status: ConnectionStatus;

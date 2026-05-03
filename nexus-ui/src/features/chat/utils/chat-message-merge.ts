@@ -1,4 +1,4 @@
-import type { ChatMessageFingerprintFields, Message } from '@/types';
+import type { ChatMessageFingerprintFields, Message } from '@/shared/types';
 
 /** Groups the same logical message from optimistic UI, socket echo, and REST refetch (second precision). */
 export function chatMessageFingerprint(message: ChatMessageFingerprintFields): string {

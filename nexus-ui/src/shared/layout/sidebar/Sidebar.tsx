@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 
-import { getUserChannels } from "@/api/channels/channels.api";
-import { useAuth } from "@/context/auth/useAuth";
-import { useSocket } from "@/context/socket/useSocket";
-import { useTheme } from "@/context/theme/useTheme";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { getUserChannels } from "@/features/channels/api/channels.api";
+import { useSocket } from "@/realtime/useSocket";
+import { useTheme } from "@/shared/theme/useTheme";
 
 import { SIDEBAR_VIEW_ID } from "./sidebar-view-ids";
 import { SidebarBottomBar } from "./SidebarBottomBar";

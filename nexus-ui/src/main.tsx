@@ -1,11 +1,11 @@
-import "./index.css";
+import "./styles/index.css";
 
 import { StrictMode } from "react";
 
 import { createRoot } from "react-dom/client";
 
-import App from "./App";
-import { applyStoredThemeToDocument } from "./shared/theme/theme.bootstrap";
+import { AppRoot } from "@/app/AppRoot";
+import { applyStoredThemeToDocument } from "@/shared/theme/theme.bootstrap";
 
 applyStoredThemeToDocument();
 
@@ -17,6 +17,6 @@ if (!root) {
 
 createRoot(root).render(
   <StrictMode>
-    <App />
+    <AppRoot />
   </StrictMode>,
 );

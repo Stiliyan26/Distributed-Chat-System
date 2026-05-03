@@ -1,6 +1,6 @@
 import type { Socket } from "socket.io-client";
 
-import type { SendMessagePayload } from "@/types";
+import type { SendMessagePayload } from "@/shared/types";
 
 import { SOCKET_EMIT_EVENTS } from "./constants/socket-events";
 

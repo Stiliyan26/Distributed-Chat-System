@@ -1,6 +1,6 @@
-import { Avatar } from "@/components/ui/Avatar";
-import { cn } from "@/lib/cn";
-import type { UserSearchResult } from "@/types";
+import { cn } from "@/shared/lib/cn";
+import type { UserSearchResult } from "@/shared/types";
+import { Avatar } from "@/shared/ui/Avatar";
 
 interface ChannelMemberRowProps {
   member: UserSearchResult;

@@ -1,5 +1,5 @@
-import { getAvatarBackgroundClass, getInitialsFromDisplayName } from '@/lib/avatar-display';
-import { cn } from '@/lib/cn';
+import { getAvatarBackgroundClass, getInitialsFromDisplayName } from '@/shared/lib/avatar-display';
+import { cn } from '@/shared/lib/cn';
 
 interface AvatarProps {
   name: string;

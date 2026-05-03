@@ -1,6 +1,6 @@
-import api from "../client/axios";
-import type { AuthResponse } from "../models/http-types";
-import { AuthApiPaths } from "./routes";
+import { AuthApiPaths } from "@/shared/api/auth-paths";
+import api from "@/shared/api/axios";
+import type { AuthResponse } from "@/shared/types";
 
 export const authApi = {
   login: (email: string, password: string): Promise<AuthResponse> =>
