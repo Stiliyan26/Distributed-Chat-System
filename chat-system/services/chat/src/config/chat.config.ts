@@ -6,6 +6,7 @@ const chatConfigSchema = z.object({
     messagingUrl: z.url(),
     presenceUrl: z.url(),
   }),
+  jwtSecret: z.string().min(1),
 });
 
 export type ChatConfig = z.infer<typeof chatConfigSchema>;
@@ -18,6 +19,7 @@ const chatConfig = registerAs(CHAT_CONFIG_KEY, () => {
       messagingUrl: process.env.MESSAGING_SERVICE_URL,
       presenceUrl: process.env.PRESENCE_SERVICE_URL,
     },
+    jwtSecret: process.env.JWT_SECRET,
   });
 });
 

@@ -34,7 +34,16 @@
     "docker:all:up": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml -f ../docker-compose.chat.yml -f ../docker-compose.presence.yml -f ../docker-compose.delivery.yml up -d",
     "docker:all:up:build": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml -f ../docker-compose.chat.yml -f ../docker-compose.presence.yml -f ../docker-compose.delivery.yml up -d --build",
     "docker:all:down": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml -f ../docker-compose.chat.yml -f ../docker-compose.presence.yml -f ../docker-compose.delivery.yml down",
-    "docker:all:logs": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml -f ../docker-compose.chat.yml -f ../docker-compose.presence.yml -f ../docker-compose.delivery.yml logs -f"
+    "docker:all:logs": "docker-compose -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml -f ../docker-compose.chat.yml -f ../docker-compose.presence.yml -f ../docker-compose.delivery.yml logs -f",
+    "docker:k8s:build:all": "docker build -f services/auth/Dockerfile -t chat-system/auth:dev . && docker build -f services/channel/Dockerfile -t chat-system/channel:dev . && docker build -f services/chat/Dockerfile -t chat-system/chat:dev . && docker build -f services/presence/Dockerfile -t chat-system/presence:dev . && docker build -f services/delivery/Dockerfile -t chat-system/delivery:dev . && docker build -f services/api-gateway/Dockerfile -t chat-system/api-gateway:dev . && docker build -f services/messaging/Dockerfile.api -t chat-system/messaging-api:dev . && docker build -f services/messaging/Dockerfile.worker -t chat-system/messaging-worker:dev .",
+    "k8s:secrets:sync": "node tools/k8s-sync-secrets.js",
+    "k8s:infra:up": "kubectl apply -f ../k8s/namespaces/infra.yaml -f ../k8s/infra/postgres/ -f ../k8s/infra/redis/ -f ../k8s/infra/kafka/",
+    "k8s:apps:up": "kubectl apply -f ../k8s/namespaces/apps.yaml -f ../k8s/apps/auth/ -f ../k8s/apps/channel/ -f ../k8s/apps/presence/ -f ../k8s/apps/delivery/configmap.yaml -f ../k8s/apps/delivery/service.yaml -f ../k8s/apps/delivery/deployment.yaml -f ../k8s/apps/messaging/ -f ../k8s/apps/chat/ -f ../k8s/apps/api-gateway/",
+    "k8s:ingress:install": "helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx 2>/dev/null; helm repo update && helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx --namespace ingress-nginx --create-namespace --set controller.service.type=LoadBalancer",
+    "k8s:ingress:apply": "kubectl apply -f ../k8s/ingress/",
+    "k8s:all:up": "npm run k8s:infra:up && npm run k8s:secrets:sync && npm run k8s:apps:up",
+    "k8s:apps:restart": "kubectl rollout restart deployment/auth deployment/channel deployment/presence deployment/delivery deployment/messaging-api deployment/messaging-worker deployment/chat deployment/api-gateway -n apps",
+    "k8s:status": "kubectl get pods -n infra && kubectl get pods -n apps"
   },
   "private": true,
   "devDependencies": {

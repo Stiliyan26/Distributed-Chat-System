@@ -7,6 +7,7 @@ import presenceConfig from "../config/presence.config";
 
 import { PresenceController } from "./presence.controller";
 import { PresenceService } from "./presence.service";
+import { HealthController } from "../health.controller";
 
 @Module({
     imports: [
@@ -16,7 +17,7 @@ import { PresenceService } from "./presence.service";
         }),
         RedisModule
     ],
-    controllers: [PresenceController],
+    controllers: [PresenceController, HealthController],
     providers: [PresenceService]
 })
 export class PresenceModule { };

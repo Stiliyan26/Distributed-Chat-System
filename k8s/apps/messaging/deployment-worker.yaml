@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: messaging-worker
+  namespace: apps
+  labels:
+    app: messaging-worker
+    app.kubernetes.io/part-of: chat-system
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: messaging-worker
+  template:
+    metadata:
+      labels:
+        app: messaging-worker
+    spec:
+      containers:
+        - name: messaging-worker
+          image: chat-system/messaging-worker:dev
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: messaging-worker-config
+            - secretRef:
+                name: messaging-secret
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            exec:
+              command: ["sh", "-c", "test -d /proc/1"]
+            initialDelaySeconds: 30
+            periodSeconds: 20

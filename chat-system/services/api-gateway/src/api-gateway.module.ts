@@ -5,6 +5,7 @@ import { JwtModule } from "@nestjs/jwt";
 
 import configuration from './config/configuration';
 import { ProxyModule } from "./proxy/proxy.module";
+import { HealthController } from "./health.controller";
 
 @Module({
     imports: [
@@ -15,7 +16,7 @@ import { ProxyModule } from "./proxy/proxy.module";
         JwtModule.register({}),
         ProxyModule
     ],
-    controllers: [],
+    controllers: [HealthController],
     providers: []
 })
 export class ApiGatewayModule { };

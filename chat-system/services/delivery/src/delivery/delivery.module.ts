@@ -10,6 +10,7 @@ import { RedisModule } from "@libs/shared/src/database/redis.module";
 import deliveryConfig, { DELIVERY_CONFIG_KEY } from "../config/delivery.config";
 import { DeliveryController } from "./delivery.controller";
 import { DeliveryService } from "./delivery.service";
+import { HealthController } from "../health.controller";
 
 @Module({
     imports: [
@@ -43,7 +44,7 @@ import { DeliveryService } from "./delivery.service";
             inject: [ConfigService]
         })
     ],
-    controllers: [DeliveryController],
+    controllers: [DeliveryController, HealthController],
     providers: [DeliveryService]
 })
 export class DeliveryModule { };

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: messaging-api
+  namespace: apps
+  labels:
+    app: messaging-api
+    app.kubernetes.io/part-of: chat-system
+spec:
+  type: ClusterIP
+  selector:
+    app: messaging-api
+  ports:
+    - name: http
+      port: 3004
+      targetPort: http

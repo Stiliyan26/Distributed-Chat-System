@@ -11,6 +11,10 @@ export class UserHeaderGuard implements CanActivate {
         const request = context.switchToHttp()
             .getRequest<Request>();
 
+        if (request.path.endsWith('/health')) {
+            return true;
+        }
+
         const userId = request.headers[AuthHeader.USER_ID];
 
         if (!userId) {

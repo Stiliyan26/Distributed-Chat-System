@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-sql
+  namespace: infra
+  labels:
+    app.kubernetes.io/part-of: chat-system
+data:
+  init.sql: |
+    -- Runs only on first PVC init (empty data dir). Matches docker-compose DB names.
+    CREATE DATABASE users_db;
+    CREATE DATABASE channels_db;
+    CREATE DATABASE messages_db;

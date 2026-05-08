@@ -1,5 +1,6 @@
 import { Inject, Logger, OnModuleInit, UsePipes, ValidationPipe } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
 import {
     ConnectedSocket,
     MessageBody,
@@ -15,7 +16,7 @@ import axios from "axios";
 import Redis from "ioredis";
 import { Server, Socket } from 'socket.io';
 
-import { AuthHeader } from '@libs/shared/src/constants/auth.constants';
+import { AuthCookie, AuthHeader } from '@libs/shared/src/constants/auth.constants';
 import { CommonConstants } from '@libs/shared/src/constants/common.constants';
 import { MessageRoutes, PresenceRoutes } from '@libs/shared/src/constants/routes.constants';
 
@@ -77,7 +78,8 @@ export class ChatGateway implements OnModuleInit, OnGatewayConnection, OnGateway
     constructor(
         @Inject(REDIS_CLIENT)
         private readonly redisClient: Redis,
-        private readonly configService: ConfigService<{ [CHAT_CONFIG_KEY]: ChatConfig }>
+        private readonly configService: ConfigService<{ [CHAT_CONFIG_KEY]: ChatConfig }>,
+        private readonly jwtService: JwtService,
     ) { }
 
     onModuleInit() {
@@ -119,6 +121,16 @@ export class ChatGateway implements OnModuleInit, OnGatewayConnection, OnGateway
     }
 
     async handleConnection(socket: Socket) {
+        const userId = this.resolveSocketUserId(socket);
+
+        if (!userId) {
+            this.logger.warn(`[ChatGateway] Missing user identity — disconnecting socket ${socket.id}`);
+            socket.disconnect();
+            return;
+        }
+
+        socket.data.userId = userId;
+
         const isPresenceTracked = await this.updatePresenceStatus(this.presenceOnlineUrl, socket);
 
         if (!isPresenceTracked) {
@@ -210,7 +222,7 @@ export class ChatGateway implements OnModuleInit, OnGatewayConnection, OnGateway
         @MessageBody() sendMessageRequestDto: SendMessageRequestDto,
         @ConnectedSocket() socket: Socket
     ) {
-        const userId = socket.handshake.headers[AuthHeader.USER_ID] as string;
+        const userId = socket.data.userId as string;
 
         await this.ensureSocketSubscribedToChannels(socket, [sendMessageRequestDto.channelId]);
 
@@ -243,8 +255,47 @@ export class ChatGateway implements OnModuleInit, OnGatewayConnection, OnGateway
         await this.redisClient.subscribe(...redisChannels);
     }
 
+    private resolveSocketUserId(socket: Socket): string | undefined {
+        const headerVal = socket.handshake.headers[AuthHeader.USER_ID];
+        if (typeof headerVal === 'string' && headerVal.length > 0) {
+            return headerVal;
+        }
+
+        const cookieHeader = socket.handshake.headers.cookie;
+        if (!cookieHeader) {
+            return undefined;
+        }
+
+        const token = this.parseCookies(cookieHeader)[AuthCookie.ACCESS_TOKEN];
+        if (!token) {
+            return undefined;
+        }
+
+        try {
+            const secret = this.chatConfig.jwtSecret;
+            const payload = this.jwtService.verify<{ sub?: string }>(token, { secret });
+
+            return payload.sub;
+        } catch {
+            return undefined;
+        }
+    }
+
+    private parseCookies(cookieHeader: string): Record<string, string> {
+        return cookieHeader.split(';').reduce((acc, part) => {
+            const idx = part.trim().indexOf('=');
+            if (idx <= 0) {
+                return acc;
+            }
+            const key = part.substring(0, idx).trim();
+            const value = part.substring(idx + 1).trim();
+            acc[key] = value;
+            return acc;
+        }, {} as Record<string, string>);
+    }
+
     private async updatePresenceStatus(endpointUrl: string, socket: Socket): Promise<boolean> {
-        const userId = socket.handshake.headers[AuthHeader.USER_ID] as string;
+        const userId = socket.data.userId as string;
 
         try {
             await axios.post(

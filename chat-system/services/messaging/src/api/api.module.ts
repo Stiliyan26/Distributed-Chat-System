@@ -8,6 +8,7 @@ import { SharedDatabaseModule } from '@libs/shared/src/database/database.module'
 import { UserHeaderGuard } from '@libs/shared/src/guards/user-header.guard';
 
 import { MessagingApiModule } from '../messaging/messaging.module';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -24,5 +25,6 @@ import { MessagingApiModule } from '../messaging/messaging.module';
       useClass: UserHeaderGuard
     },
   ],
+  controllers: [HealthController],
 })
 export class ApiModule { }

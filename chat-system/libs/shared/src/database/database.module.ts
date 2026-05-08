@@ -2,7 +2,11 @@ import { Global, Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
-import { addTransactionalDataSource } from "typeorm-transactional";
+import {
+  addTransactionalDataSource,
+  deleteDataSourceByName,
+  getDataSourceByName,
+} from "typeorm-transactional";
 
 import { DATABASE_CONFIG_KEY } from "./database.config";
 
@@ -31,7 +35,17 @@ import { DATABASE_CONFIG_KEY } from "./database.config";
         if (!options) {
           throw new Error('DataSource options are not defined');
         }
-        
+
+        const existingDataSource = getDataSourceByName('default');
+
+        if (existingDataSource?.isInitialized) {
+          return existingDataSource;
+        }
+
+        if (existingDataSource) {
+          deleteDataSourceByName('default');
+        }
+
         return addTransactionalDataSource(new DataSource(options));
       }
     }),

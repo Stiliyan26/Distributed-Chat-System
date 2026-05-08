@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: messaging-worker-config
+  namespace: apps
+  labels:
+    app: messaging-worker
+    app.kubernetes.io/part-of: chat-system
+data:
+  NODE_ENV: production
+  DB_TYPE: postgres
+  DB_HOST: postgres.infra.svc.cluster.local
+  DB_PORT: "5432"
+  DB_NAME: messages_db
+  DB_SYNC: "true"
+  KAFKA_CLIENT_ID: messaging-worker
+  KAFKA_BROKER: kafka.infra.svc.cluster.local:9092
+  KAFKA_TOPIC: messages
+  KAFKA_CONSUMER_GROUP: messaging-workers
+  KAFKAJS_NO_PARTITIONER_WARNING: "1"
+  CHANNEL_SERVICE_URL: http://channel.apps.svc.cluster.local:3000
+  PRESENCE_SERVICE_URL: http://presence.apps.svc.cluster.local:3004
+  DELIVERY_SERVICE_URL: http://delivery.apps.svc.cluster.local:3005
+  AUTH_SERVICE_URL: http://auth.apps.svc.cluster.local:3001

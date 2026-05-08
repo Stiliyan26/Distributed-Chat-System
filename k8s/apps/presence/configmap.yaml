@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: presence-config
+  namespace: apps
+  labels:
+    app: presence
+    app.kubernetes.io/part-of: chat-system
+data:
+  NODE_ENV: production
+  PORT: "3004"
+  REDIS_DATABASE_URL: redis://redis.infra.svc.cluster.local:6379

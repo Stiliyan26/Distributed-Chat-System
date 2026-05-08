@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-gateway-config
+  namespace: apps
+  labels:
+    app: api-gateway
+    app.kubernetes.io/part-of: chat-system
+data:
+  NODE_ENV: production
+  PORT: "3000"
+  AUTH_SERVICE_URL: http://auth.apps.svc.cluster.local:3001
+  CHANNEL_SERVICE_URL: http://channel.apps.svc.cluster.local:3000
+  MESSAGING_SERVICE_URL: http://messaging-api.apps.svc.cluster.local:3004
+  CHAT_SERVICE_URL: http://chat.apps.svc.cluster.local:3003
