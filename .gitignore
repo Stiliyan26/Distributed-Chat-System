@@ -43,7 +43,8 @@ Thumbs.db
 
 .nx/cache
 .nx/workspace-data
-.cursor/rules/nx-rules.mdc
+.cursor/rules/
+.cursor
 .github/instructions/nx.instructions.md
 
 test-output
