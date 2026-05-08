@@ -1,0 +1,105 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    background-color: #131318;
+  }
+
+  html[data-theme="light"] {
+    background-color: #f1f5f9;
+  }
+
+  body {
+    background-color: #131318;
+    color: #e4e4f0;
+    font-family: "Inter", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    transition:
+      background-color 0.25s ease,
+      color 0.25s ease;
+  }
+
+  html[data-theme="light"] body {
+    background-color: #f1f5f9;
+    color: #0f172a;
+  }
+
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #35343a;
+    border-radius: 2px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #464554;
+  }
+
+  html[data-theme="light"] ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+  }
+
+  html[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-brand-gradient text-white font-medium px-5 py-2.5 rounded-md transition-all duration-150 hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-slate-200 dark:bg-surface-high text-slate-900 dark:text-white font-medium px-5 py-2.5 rounded-md transition-all duration-150 hover:bg-slate-300 dark:hover:bg-surface-highest active:scale-[0.98];
+  }
+
+  .input-field {
+    @apply w-full bg-slate-100 dark:bg-surface-low text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-outline-var rounded-md px-3.5 py-2.5 text-sm outline-none border border-slate-200 dark:border-transparent focus:border-indigo-500/60 transition-all duration-150;
+  }
+
+  .label-sm {
+    @apply text-[11px] font-medium uppercase tracking-[0.05em] text-slate-500 dark:text-outline-var;
+  }
+
+  .nav-item {
+    @apply flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-surface-high/60 transition-all duration-150 cursor-pointer;
+  }
+
+  .nav-item-active {
+    @apply bg-slate-200 dark:bg-surface-high text-slate-900 dark:text-white;
+  }
+
+  .avatar {
+    @apply flex items-center justify-center rounded-md text-white font-semibold text-sm select-none flex-shrink-0;
+  }
+
+  .status-dot {
+    @apply w-2 h-2 rounded-full;
+  }
+
+  .code-block {
+    @apply font-mono text-xs bg-surface p-3 rounded-md border border-outline-var/20 text-green-400/90 overflow-x-auto;
+  }
+}
