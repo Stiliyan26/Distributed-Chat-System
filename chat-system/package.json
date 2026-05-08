@@ -41,6 +41,7 @@
     "k8s:apps:up": "kubectl apply -f ../k8s/namespaces/apps.yaml -f ../k8s/apps/auth/ -f ../k8s/apps/channel/ -f ../k8s/apps/presence/ -f ../k8s/apps/delivery/configmap.yaml -f ../k8s/apps/delivery/service.yaml -f ../k8s/apps/delivery/deployment.yaml -f ../k8s/apps/messaging/ -f ../k8s/apps/chat/ -f ../k8s/apps/api-gateway/",
     "k8s:ingress:install": "helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx 2>/dev/null; helm repo update && helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx --namespace ingress-nginx --create-namespace --set controller.service.type=LoadBalancer",
     "k8s:ingress:apply": "kubectl apply -f ../k8s/ingress/",
+    "k8s:step6:up": "npm run k8s:ingress:install && npm run k8s:ingress:apply",
     "k8s:all:up": "npm run k8s:infra:up && npm run k8s:secrets:sync && npm run k8s:apps:up",
     "k8s:apps:restart": "kubectl rollout restart deployment/auth deployment/channel deployment/presence deployment/delivery deployment/messaging-api deployment/messaging-worker deployment/chat deployment/api-gateway -n apps",
     "k8s:status": "kubectl get pods -n infra && kubectl get pods -n apps"
