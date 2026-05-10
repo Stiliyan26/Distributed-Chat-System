@@ -28,7 +28,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: "3004"
-      REDIS_DATABASE_URL: redis://redis-presence:6379
+      REDIS_DATABASE_URL: ${PRESENCE_REDIS_URL:-redis://redis-presence:6379}
     ports:
       - "3004:3004"
       - "9233:9233"

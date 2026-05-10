@@ -1,5 +1,9 @@
 FROM node:20-alpine AS build 
 WORKDIR /app
+# Nx plugin workers often time out under Docker BuildKit / parallel builds
+ENV NX_DAEMON=false
+ENV NX_PLUGIN_NO_TIMEOUTS=true
+ENV CI=true
 COPY package.json package-lock.json ./
 RUN npm install
 COPY . .
