@@ -4,7 +4,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
 import { addTransactionalDataSource } from "typeorm-transactional";
 
-import { DATABASE_CONFIG_KEY } from "./database.config";
+import { DATABASE_CONFIG_KEY, DatabaseConfig } from "./database.config";
 
 
 @Global()
@@ -12,8 +12,21 @@ import { DATABASE_CONFIG_KEY } from "./database.config";
   imports: [
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => {
-        const dbConfig = configService.get(DATABASE_CONFIG_KEY);
+        const dbConfig = configService.get<DatabaseConfig>(DATABASE_CONFIG_KEY)!;
 
+        // Neon / cloud: single DATABASE_URL with SSL
+        if ('url' in dbConfig) {
+          return {
+            type: 'postgres',
+            url: dbConfig.url,
+            ssl: { rejectUnauthorized: false },
+            synchronize: dbConfig.synchronize,
+            autoLoadEntities: true,
+            logging: true,
+          };
+        }
+
+        // Local docker-compose: individual host/port/user/pass vars
         return {
           type: dbConfig.type,
           host: dbConfig.host,
@@ -21,6 +34,7 @@ import { DATABASE_CONFIG_KEY } from "./database.config";
           username: dbConfig.username,
           password: dbConfig.password,
           database: dbConfig.database,
+          ssl: false,
           synchronize: dbConfig.synchronize,
           autoLoadEntities: true,
           logging: true,
@@ -31,7 +45,7 @@ import { DATABASE_CONFIG_KEY } from "./database.config";
         if (!options) {
           throw new Error('DataSource options are not defined');
         }
-        
+
         return addTransactionalDataSource(new DataSource(options));
       }
     }),

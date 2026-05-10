@@ -2,6 +2,8 @@ name: chat-system-channel
 
 services:
   channels-db:
+    profiles:
+      - local-postgres
     image: postgres:16-alpine
     container_name: channels-db
     environment:
@@ -26,6 +28,7 @@ services:
       dockerfile: services/channel/Dockerfile
     container_name: channel-service
     environment:
+      DATABASE_URL: ${CHANNEL_DATABASE_URL:-}
       DB_TYPE: postgres
       DB_HOST: channels-db
       DB_PORT: "5432"

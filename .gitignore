@@ -51,3 +51,7 @@ test-output
 
 # Local secrets (Azure Service Bus scripts)
 service-bus/.env
+
+# Docker Compose / local Neon — never commit connection strings
+.env
+.env.local
