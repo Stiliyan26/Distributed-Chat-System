@@ -30,7 +30,7 @@ import { DeliveryService } from "./delivery.service";
                     },
                 },
                 defaults: {
-                    from: '"Chat System" <noreply@chat-system.com>',
+                    from: `"Chat System" <${configService.get(`${DELIVERY_CONFIG_KEY}.smtpFrom`)}>`,
                 },
                 template: {
                     dir: join(__dirname, 'assets/templates'),

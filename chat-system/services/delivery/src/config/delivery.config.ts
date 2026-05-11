@@ -6,6 +6,7 @@ const deliveryConfigSchema = z.object({
   smtpPort: z.coerce.number().default(587),
   smtpUser: z.string(),
   smtpPass: z.string(),
+  smtpFrom: z.string().default('stiliyan.nikolov02@gmail.com'),
 });
 
 export type DeliveryConfig = z.infer<typeof deliveryConfigSchema>;
@@ -18,6 +19,7 @@ const deliveryConfig = registerAs(DELIVERY_CONFIG_KEY, () => {
     smtpPort: process.env.SMTP_PORT,
     smtpUser: process.env.SMTP_USER,
     smtpPass: process.env.SMTP_PASS,
+    smtpFrom: process.env.SMTP_FROM,
   });
 });
 
