@@ -1,25 +1,6 @@
 name: chat-system-presence
 
 services:
-  redis-presence:
-    image: redis:7-alpine
-    container_name: presence-redis
-    ports:
-      - "6379:6379"
-    restart: always
-    networks:
-      - chat-network
-
-  redis-insight:
-    image: redis/redisinsight:latest
-    container_name: presence-redis-insight
-    ports:
-      - "8001:5540"
-    depends_on:
-      - redis-presence
-    networks:
-      - chat-network
-
   presence-service:
     build:
       context: ./chat-system
@@ -28,12 +9,10 @@ services:
     environment:
       NODE_ENV: production
       PORT: "3004"
-      REDIS_DATABASE_URL: ${PRESENCE_REDIS_URL:-redis://redis-presence:6379}
+      REDIS_DATABASE_URL: "${PRESENCE_REDIS_URL:-}"
     ports:
       - "3004:3004"
       - "9233:9233"
-    depends_on:
-      - redis-presence
     networks:
       - chat-network
 

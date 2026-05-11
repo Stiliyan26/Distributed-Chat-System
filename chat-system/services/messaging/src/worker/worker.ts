@@ -6,10 +6,13 @@ import { MessageWorkerModule } from "./worker.module";
 async function bootstrap() {
   initializeTransactionalContext();
 
-  const app = await NestFactory.createApplicationContext(MessageWorkerModule);
+  const app = await NestFactory.create(MessageWorkerModule);
   app.enableShutdownHooks();
+  const port = Number(process.env.PORT ?? 3000);
 
-  Logger.log('messaging-worker started, consuming from Kafka...');
+  await app.listen(port);
+
+  Logger.log(`messaging-worker started, consuming from Kafka and serving health checks on port ${port}`);
 }
 
 bootstrap().catch((err: unknown) => {

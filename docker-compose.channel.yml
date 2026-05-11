@@ -1,56 +1,21 @@
 name: chat-system-channel
 
 services:
-  channels-db:
-    profiles:
-      - local-postgres
-    image: postgres:16-alpine
-    container_name: channels-db
-    environment:
-      POSTGRES_USER: chat
-      POSTGRES_PASSWORD: chat-secret
-      POSTGRES_DB: channels_db
-    ports:
-      - "5435:5432"
-    volumes:
-      - channels-db-data:/var/lib/postgresql/data
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U chat -d channels_db" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - chat-network
-
   channel-service:
     build:
       context: ./chat-system
       dockerfile: services/channel/Dockerfile
     container_name: channel-service
     environment:
-      DATABASE_URL: ${CHANNEL_DATABASE_URL:-}
-      DB_TYPE: postgres
-      DB_HOST: channels-db
-      DB_PORT: "5432"
-      DB_USERNAME: chat
-      DB_PASSWORD: chat-secret
-      DB_NAME: channels_db
+      DATABASE_URL: "${CHANNEL_DATABASE_URL:-}"
       DB_SYNC: "true"
       NODE_ENV: production
       PORT: "3000"
     ports:
       - "3020:3000"
       - "9235:9235"
-    depends_on:
-      channels-db:
-        condition: service_healthy
-        required: false
     networks:
       - chat-network
-
-volumes:
-  channels-db-data:
-
 
 networks:
   chat-network:

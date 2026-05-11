@@ -1,19 +1,6 @@
 name: chat-system-delivery
 
 services:
-  redis-pubsub:
-    image: redis:7-alpine
-    container_name: redis-pubsub
-    ports:
-      - "6380:6379"
-    networks:
-      - chat-network
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   delivery-service:
     build:
       context: ./chat-system
@@ -22,7 +9,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: "3005"
-      REDIS_PUBSUB_URL: ${REDIS_PUBSUB_URL:-redis://redis-pubsub:6379}
+      REDIS_PUBSUB_URL: "${REDIS_PUBSUB_URL:-}"
       SMTP_HOST: smtp.gmail.com
       SMTP_PORT: 465
       SMTP_USER: stiliyan.nikolov02@gmail.com
@@ -32,9 +19,6 @@ services:
       - "9234:9234"
     networks:
       - chat-network
-    depends_on:
-      redis-pubsub:
-        condition: service_healthy
 
 networks:
   chat-network:

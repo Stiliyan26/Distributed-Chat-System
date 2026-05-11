@@ -7,6 +7,7 @@ import messagingConfig from '../config/messaging.config';
 import { SharedDatabaseModule } from '@libs/shared/src/database/database.module';
 
 import { MessagingWorkerDomainModule } from "../messaging/messaging.module";
+import { WorkerHealthController } from "./worker.health.controller";
 
 @Module({
   imports: [
@@ -17,5 +18,6 @@ import { MessagingWorkerDomainModule } from "../messaging/messaging.module";
     SharedDatabaseModule,
     MessagingWorkerDomainModule,
   ],
+  controllers: [WorkerHealthController],
 })
 export class MessageWorkerModule { }

@@ -7,17 +7,14 @@
     "docker:auth:down": "docker compose --env-file ../.env -f ../docker-compose.auth.yml down",
     "docker:auth:logs": "docker compose --env-file ../.env -f ../docker-compose.auth.yml logs -f",
     "docker:auth:up:build": "docker compose --env-file ../.env -f ../docker-compose.auth.yml up -d --build",
-    "docker:auth:up:local-db": "COMPOSE_PROFILES=local-postgres docker compose --env-file ../.env -f ../docker-compose.auth.yml up -d",
     "docker:messaging:up": "docker compose --env-file ../.env -f ../docker-compose.messaging.yml up -d",
     "docker:messaging:down": "docker compose --env-file ../.env -f ../docker-compose.messaging.yml down",
     "docker:messaging:logs": "docker compose --env-file ../.env -f ../docker-compose.messaging.yml logs -f",
     "docker:messaging:up:build": "docker compose --env-file ../.env -f ../docker-compose.messaging.yml up -d --build",
-    "docker:messaging:up:local-stack": "COMPOSE_PROFILES=local-postgres,local-kafka docker compose --env-file ../.env -f ../docker-compose.messaging.yml up -d",
     "docker:channel:up": "docker compose --env-file ../.env -f ../docker-compose.channel.yml up -d",
     "docker:channel:down": "docker compose --env-file ../.env -f ../docker-compose.channel.yml down",
     "docker:channel:logs": "docker compose --env-file ../.env -f ../docker-compose.channel.yml logs -f",
     "docker:channel:up:build": "docker compose --env-file ../.env -f ../docker-compose.channel.yml up -d --build",
-    "docker:channel:up:local-db": "COMPOSE_PROFILES=local-postgres docker compose --env-file ../.env -f ../docker-compose.channel.yml up -d",
     "docker:api-gateway:up": "docker compose --env-file ../.env -f ../docker-compose.api-gateway.yml up -d",
     "docker:api-gateway:up:build": "docker compose --env-file ../.env -f ../docker-compose.api-gateway.yml up -d --build",
     "docker:api-gateway:down": "docker compose --env-file ../.env -f ../docker-compose.api-gateway.yml down",
@@ -38,9 +35,7 @@
     "docker:all:up:build": "docker compose --env-file ../.env -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml -f ../docker-compose.chat.yml -f ../docker-compose.presence.yml -f ../docker-compose.delivery.yml up -d --build",
     "docker:all:build": "docker compose --env-file ../.env -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml -f ../docker-compose.chat.yml -f ../docker-compose.presence.yml -f ../docker-compose.delivery.yml up -d --build",
     "docker:all:down": "docker compose --env-file ../.env -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml -f ../docker-compose.chat.yml -f ../docker-compose.presence.yml -f ../docker-compose.delivery.yml down",
-    "docker:all:logs": "docker compose --env-file ../.env -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml -f ../docker-compose.chat.yml -f ../docker-compose.presence.yml -f ../docker-compose.delivery.yml logs -f",
-    "docker:all:up:local-db": "COMPOSE_PROFILES=local-postgres,local-kafka docker compose --env-file ../.env -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml -f ../docker-compose.chat.yml -f ../docker-compose.presence.yml -f ../docker-compose.delivery.yml up -d",
-    "docker:all:up:build:local-db": "COMPOSE_PROFILES=local-postgres,local-kafka docker compose --env-file ../.env -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml -f ../docker-compose.chat.yml -f ../docker-compose.presence.yml -f ../docker-compose.delivery.yml up -d --build"
+    "docker:all:logs": "docker compose --env-file ../.env -f ../docker-compose.auth.yml -f ../docker-compose.messaging.yml -f ../docker-compose.channel.yml -f ../docker-compose.api-gateway.yml -f ../docker-compose.chat.yml -f ../docker-compose.presence.yml -f ../docker-compose.delivery.yml logs -f"
   },
   "private": true,
   "devDependencies": {
