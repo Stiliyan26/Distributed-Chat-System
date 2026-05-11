@@ -20,18 +20,22 @@ export class DeliveryService {
 
     async deliverMessage(deliverMessageRequestDto: DeliverMessageRequestDto) {
         const { channelId, message, offlineUsersEmails } = deliverMessageRequestDto;
-        
+
         this.logger.log(`[DeliveryService] Received delivery request for channel: ${channelId}. Flowing offline emails: ${JSON.stringify(offlineUsersEmails)}`);
-        
+
         // Real-time broadcast to online users via Redis Pub/Sub (include channelId for chat UI consumers)
         await this.redisService.publish(
             `channel:${channelId}`,
             JSON.stringify({ ...message, channelId }),
         );
 
-        // Background email delivery for offline users
+        // Background email delivery for offline users (non-blocking)
         if (offlineUsersEmails.length > 0) {
-            await this.sendEmails(offlineUsersEmails, message, channelId);
+            setImmediate(() => {
+                this.sendEmails(offlineUsersEmails, message, channelId).catch((err) => {
+                    this.logger.error(`sendEmails error: ${err}`);
+                });
+            });
         }
     }
 
@@ -63,4 +67,4 @@ export class DeliveryService {
             }
         });
     }
-}   
+}
