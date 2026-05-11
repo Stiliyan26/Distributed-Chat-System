@@ -44,6 +44,7 @@ services:
     depends_on:
       channels-db:
         condition: service_healthy
+        required: false
     networks:
       - chat-network
 

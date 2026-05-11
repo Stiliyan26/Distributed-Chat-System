@@ -11,8 +11,8 @@ import { ChannelRoutes, DeliveryRoutes, PresenceRoutes, UserRoutes } from "@libs
 import { ChannelMembersResponse } from '@libs/shared/src/interfaces/channel.interface';
 import { UserStatusResponse } from '@libs/shared/src/interfaces/presence.interface';
 import { ConfigService } from "@nestjs/config";
-import { MESSAGING_CONFIG_KEY, MessagingConfig } from "../../../config/messaging.config";
-import { KafkaLog } from "../../constants/messaging.constants";
+import { kafkaJsClientConfig, MESSAGING_CONFIG_KEY, MessagingConfig } from "../../../config/messaging.config";
+import { KafkaLog, formatKafkaBootstrapLine } from "../../constants/messaging.constants";
 import { KafkaMessagePayloadDto } from "../../dto/kafka/kafka-message-payload.dto";
 import { PublishMessageRequestDto } from "../../dto/request/publish-message.request.dto";
 import { DeliveryRequest, PublishMessageResponse } from '../../interfaces/message.interface';
@@ -60,16 +60,19 @@ export class MessageProducerService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleInit() {
+    this.logger.log(
+      formatKafkaBootstrapLine('producer', this.messagingConfig.kafka),
+    );
+
     this.kafka = new Kafka({
-      clientId: this.messagingConfig.kafka.clientId,
-      brokers: [this.messagingConfig.kafka.broker],
+      ...kafkaJsClientConfig(this.messagingConfig.kafka),
       retry: {
         initialRetryTime: 300,
         retries: 10,
         maxRetryTime: 30_000,
         multiplier: 2,
-        factor: 0.2
-      }
+        factor: 0.2,
+      },
     });
 
     this.producer = this.kafka.producer();

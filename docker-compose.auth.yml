@@ -46,6 +46,7 @@ services:
     depends_on:
       users-db:
         condition: service_healthy
+        required: false
     networks:
       - chat-network
 

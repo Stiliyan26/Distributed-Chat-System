@@ -4,8 +4,8 @@ import { plainToInstance } from "class-transformer";
 import { validate, ValidationError } from "class-validator";
 import { Consumer, EachMessagePayload, Kafka } from "kafkajs";
 
-import { MESSAGING_CONFIG_KEY, MessagingConfig } from "../../../config/messaging.config";
-import { KafkaLog } from "../../constants/messaging.constants";
+import { kafkaJsClientConfig, MESSAGING_CONFIG_KEY, MessagingConfig } from "../../../config/messaging.config";
+import { KafkaLog, formatKafkaBootstrapLine } from "../../constants/messaging.constants";
 import { KafkaMessagePayloadDto } from "../../dto/kafka/kafka-message-payload.dto";
 import { MessagePersistenceService } from "../../message.persistence.service";
 
@@ -26,13 +26,23 @@ export class MessageConsumerService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleInit() {
-    this.kafka = new Kafka({
-      clientId: this.messagingConfig.kafka.clientId,
-      brokers: [this.messagingConfig.kafka.broker]
-    });
+    const k = this.messagingConfig.kafka;
+    this.logger.log(
+      formatKafkaBootstrapLine('consumer', {
+        ...k,
+        consumerGroup: k.consumerGroup,
+        sessionTimeoutMs: k.sessionTimeoutMs ?? 45_000,
+      }),
+    );
+
+    this.kafka = new Kafka(kafkaJsClientConfig(this.messagingConfig.kafka));
+
+    const sessionTimeout =
+      this.messagingConfig.kafka.sessionTimeoutMs ?? 45_000;
 
     this.consumer = this.kafka.consumer({
-      groupId: this.messagingConfig.kafka.consumerGroup
+      groupId: this.messagingConfig.kafka.consumerGroup,
+      sessionTimeout,
     });
 
     this.logger.log(KafkaLog.CONNECTING);

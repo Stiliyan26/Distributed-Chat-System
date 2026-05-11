@@ -23,6 +23,8 @@ services:
       - chat-network
 
   zookeeper:
+    profiles:
+      - local-kafka
     image: confluentinc/cp-zookeeper:7.6.0
     container_name: zookeeper
     environment:
@@ -44,6 +46,8 @@ services:
       - chat-network
 
   kafka:
+    profiles:
+      - local-kafka
     image: confluentinc/cp-kafka:7.6.0
     container_name: kafka
     depends_on:
@@ -69,6 +73,8 @@ services:
       - chat-network
 
   kafka-ui:
+    profiles:
+      - local-kafka
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
     ports:
@@ -88,31 +94,37 @@ services:
       dockerfile: services/messaging/Dockerfile.api
     container_name: messaging-service
     environment:
-      PORT: 3000
-      KAFKA_BROKER: kafka:29092
-      KAFKA_TOPIC: messages
-      DATABASE_URL: ${MESSAGES_DATABASE_URL:-}
+      PORT: '3000'
+      KAFKA_BROKER: '${KAFKA_BROKER:-kafka:29092}'
+      KAFKA_TOPIC: '${KAFKA_TOPIC:-messages_topic}'
+      KAFKA_CLIENT_ID: '${KAFKA_CLIENT_ID:-messaging-service-docker}'
+      KAFKA_SASL_USERNAME: '${KAFKA_SASL_USERNAME:-${KAFKA_API_KEY:-}}'
+      KAFKA_SASL_PASSWORD: '${KAFKA_SASL_PASSWORD:-${KAFKA_API_SECRET:-}}'
+      KAFKA_SESSION_TIMEOUT_MS: '${KAFKA_SESSION_TIMEOUT_MS:-45000}'
+      DATABASE_URL: '${MESSAGES_DATABASE_URL:-}'
       DB_HOST: messages-db
-      DB_PORT: "5432"
+      DB_PORT: '5432'
       DB_USERNAME: chat
       DB_PASSWORD: chat-secret
       DB_NAME: messages_db
       DB_TYPE: postgres
-      DB_SYNC: "true"
-      CHANNEL_SERVICE_URL: http://channel-service:3000
-      PRESENCE_SERVICE_URL: http://presence-service:3004
-      DELIVERY_SERVICE_URL: http://delivery-service:3005
-      AUTH_SERVICE_URL: http://auth-service:3001
-      KAFKA_CONSUMER_GROUP: "messaging-service-group"
-      KAFKAJS_NO_PARTITIONER_WARNING: "1"
+      DB_SYNC: 'true'
+      CHANNEL_SERVICE_URL: 'http://channel-service:3000'
+      PRESENCE_SERVICE_URL: 'http://presence-service:3004'
+      DELIVERY_SERVICE_URL: 'http://delivery-service:3005'
+      AUTH_SERVICE_URL: 'http://auth-service:3001'
+      KAFKA_CONSUMER_GROUP: messaging-service-group
+      KAFKAJS_NO_PARTITIONER_WARNING: '1'
     ports:
       - "3003:3000"
       - "9231:9231"
     depends_on:
       kafka:
         condition: service_healthy
+        required: false
       messages-db:
         condition: service_healthy
+        required: false
     networks:
       - chat-network
 
@@ -122,26 +134,32 @@ services:
       dockerfile: services/messaging/Dockerfile.worker
     container_name: messaging-worker
     environment:
-      KAFKA_BROKER: kafka:29092
-      KAFKA_TOPIC: messages
-      KAFKA_CONSUMER_GROUP: "messaging-workers"
-      DATABASE_URL: ${MESSAGES_DATABASE_URL:-}
+      KAFKA_BROKER: '${KAFKA_BROKER:-kafka:29092}'
+      KAFKA_TOPIC: '${KAFKA_TOPIC:-messages_topic}'
+      KAFKA_CLIENT_ID: '${KAFKA_CLIENT_ID:-messaging-worker-docker}'
+      KAFKA_SASL_USERNAME: '${KAFKA_SASL_USERNAME:-${KAFKA_API_KEY:-}}'
+      KAFKA_SASL_PASSWORD: '${KAFKA_SASL_PASSWORD:-${KAFKA_API_SECRET:-}}'
+      KAFKA_SESSION_TIMEOUT_MS: '${KAFKA_SESSION_TIMEOUT_MS:-45000}'
+      KAFKA_CONSUMER_GROUP: messaging-workers
+      DATABASE_URL: '${MESSAGES_DATABASE_URL:-}'
       DB_HOST: messages-db
-      DB_PORT: "5432"
+      DB_PORT: '5432'
       DB_USERNAME: chat
       DB_PASSWORD: chat-secret
       DB_NAME: messages_db
       DB_TYPE: postgres
-      DB_SYNC: "true"
-      CHANNEL_SERVICE_URL: http://channel-service:3000
-      PRESENCE_SERVICE_URL: http://presence-service:3004
-      DELIVERY_SERVICE_URL: http://delivery-service:3005
-      AUTH_SERVICE_URL: http://auth-service:3001
+      DB_SYNC: 'true'
+      CHANNEL_SERVICE_URL: 'http://channel-service:3000'
+      PRESENCE_SERVICE_URL: 'http://presence-service:3004'
+      DELIVERY_SERVICE_URL: 'http://delivery-service:3005'
+      AUTH_SERVICE_URL: 'http://auth-service:3001'
     depends_on:
       kafka:
         condition: service_healthy
+        required: false
       messages-db:
         condition: service_healthy
+        required: false
     ports:
       - "9229:9229"
     networks:
