@@ -10,6 +10,7 @@ import { RedisModule } from "@libs/shared/src/database/redis.module";
 import deliveryConfig, { DELIVERY_CONFIG_KEY } from "../config/delivery.config";
 import { DeliveryController } from "./delivery.controller";
 import { DeliveryService } from "./delivery.service";
+import { DeliveryHealthController } from "./delivery.health.controller";
 
 @Module({
     imports: [
@@ -24,6 +25,10 @@ import { DeliveryService } from "./delivery.service";
                     host: configService.get(`${DELIVERY_CONFIG_KEY}.smtpHost`),
                     port: configService.get(`${DELIVERY_CONFIG_KEY}.smtpPort`),
                     secure: configService.get(`${DELIVERY_CONFIG_KEY}.smtpPort`) === 465,
+                    requireTLS: configService.get(`${DELIVERY_CONFIG_KEY}.smtpPort`) === 587,
+                    connectionTimeout: 10000,
+                    greetingTimeout: 10000,
+                    socketTimeout: 15000,
                     auth: {
                         user: configService.get(`${DELIVERY_CONFIG_KEY}.smtpUser`),
                         pass: configService.get(`${DELIVERY_CONFIG_KEY}.smtpPass`)
@@ -43,7 +48,7 @@ import { DeliveryService } from "./delivery.service";
             inject: [ConfigService]
         })
     ],
-    controllers: [DeliveryController],
+    controllers: [DeliveryController, DeliveryHealthController],
     providers: [DeliveryService]
 })
 export class DeliveryModule { };

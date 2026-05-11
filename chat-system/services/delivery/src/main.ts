@@ -1,5 +1,6 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { RequestMethod } from '@nestjs/common';
 
 import { GlobalExceptionFilter } from '@libs/shared/src/filters/global-exception.filter';
 
@@ -19,7 +20,13 @@ async function bootstrap() {
     }));
 
   const globalPrefix = CommonConstants.GLOBAL_PREFIX;
-  app.setGlobalPrefix(globalPrefix);
+  app.setGlobalPrefix(globalPrefix, {
+    exclude: [
+      { path: '', method: RequestMethod.GET },
+      { path: '', method: RequestMethod.HEAD },
+      { path: 'health', method: RequestMethod.GET },
+    ],
+  });
 
   app.enableShutdownHooks();
 
