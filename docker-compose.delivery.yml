@@ -10,8 +10,7 @@ services:
       NODE_ENV: production
       PORT: "3005"
       REDIS_PUBSUB_URL: "${REDIS_PUBSUB_URL:-}"
-      SENDGRID_API_KEY: "${SENDGRID_API_KEY:-}"
-      SMTP_FROM: "${SMTP_FROM:-stiliyan.nikolov02@gmail.com}"
+      BREVO_API_KEY: "${BREVO_API_KEY:-}"
     ports:
       - "3005:3005"
       - "9234:9234"

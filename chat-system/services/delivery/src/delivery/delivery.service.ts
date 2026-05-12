@@ -1,7 +1,11 @@
 import { Inject, Injectable, Logger, OnModuleInit } from "@nestjs/common";
 
 import { ConfigService } from "@nestjs/config";
-import sgMail from "@sendgrid/mail";
+import {
+    SendSmtpEmail,
+    TransactionalEmailsApi,
+    TransactionalEmailsApiApiKeys,
+} from "@getbrevo/brevo";
 import Handlebars from "handlebars";
 import Redis from "ioredis";
 import { readFile } from "node:fs/promises";
@@ -22,6 +26,7 @@ type OfflineEmailTemplateContext = {
 export class DeliveryService implements OnModuleInit {
 
     private readonly logger = new Logger(DeliveryService.name);
+    private readonly brevoApi = new TransactionalEmailsApi();
     private offlineEmailTemplate?: (context: OfflineEmailTemplateContext) => string;
 
     constructor(
@@ -35,26 +40,20 @@ export class DeliveryService implements OnModuleInit {
     }
 
     async onModuleInit() {
-        const { sendgridApiKey, smtpFrom } = this.deliveryConfig;
+        const { brevoApiKey } = this.deliveryConfig;
 
-        if (!sendgridApiKey) {
+        if (!brevoApiKey) {
             this.logger.warn(
-                'SENDGRID_API_KEY is not configured. Delivery service will stay up, but offline email delivery is disabled until the key is added.'
+                'BREVO_API_KEY is not configured. Delivery service will stay up, but offline email delivery is disabled until the key is added.'
             );
             return;
         }
 
-        sgMail.setApiKey(sendgridApiKey);
+        this.brevoApi.setApiKey(TransactionalEmailsApiApiKeys.apiKey, brevoApiKey);
 
         this.logger.log(
-            `SendGrid configured from=${smtpFrom}`
+            'Brevo configured for transactional delivery from stiliyan.nikolov02@gmail.com'
         );
-
-        if (smtpFrom === 'stiliyan.nikolov02@gmail.com') {
-            this.logger.warn(
-                'SMTP_FROM is using the fallback sender. With SendGrid, set SMTP_FROM to a verified sender/domain or emails may be accepted by the app but never delivered.'
-            );
-        }
 
         try {
             await this.getOfflineEmailTemplate();
@@ -92,19 +91,18 @@ export class DeliveryService implements OnModuleInit {
         message: DeliveryPayloadDto,
         channelId: string
     ): Promise<void> {
-        if (!this.deliveryConfig.sendgridApiKey) {
+        if (!this.deliveryConfig.brevoApiKey) {
             this.logger.warn(
-                `Skipping offline email delivery for channel ${channelId} because SENDGRID_API_KEY is missing.`
+                `Skipping offline email delivery for channel ${channelId} because BREVO_API_KEY is missing.`
             );
             return;
         }
 
         const htmlTemplate = await this.getOfflineEmailTemplate();
-        const fromEmail = this.deliveryConfig.smtpFrom;
 
         const results = await Promise.allSettled(
             offlineUsersEmails.map(async (email) => {
-                this.logger.log(`SendGrid attempt: sending offline email to ${email}`);
+                this.logger.log(`Brevo attempt: sending offline email to ${email}`);
 
                 const html = htmlTemplate({
                     senderUsername: message.senderUsername,
@@ -112,19 +110,20 @@ export class DeliveryService implements OnModuleInit {
                     channelId
                 });
 
-                const [response] = await sgMail.send({
-                    to: email,
-                    from: {
-                        email: fromEmail,
-                        name: "Chat System",
-                    },
-                    subject: `New message from ${message.senderUsername}`,
-                    text: `${message.senderUsername} sent a new message while you were offline: ${message.content}`,
-                    html,
-                });
+                const brevoEmail = new SendSmtpEmail();
+                brevoEmail.to = [{ email }];
+                brevoEmail.sender = {
+                    email: "stiliyan.nikolov02@gmail.com",
+                    name: "Chat System",
+                };
+                brevoEmail.subject = `New message from ${message.senderUsername}`;
+                brevoEmail.textContent = `${message.senderUsername} sent a new message while you were offline: ${message.content}`;
+                brevoEmail.htmlContent = html;
+
+                const { body } = await this.brevoApi.sendTransacEmail(brevoEmail);
 
                 this.logger.log(
-                    `SendGrid success: sent email to ${email} statusCode=${response.statusCode}`
+                    `Brevo success: sent email to ${email} messageId=${body.messageId ?? 'n/a'}`
                 );
             })
         );
@@ -135,7 +134,7 @@ export class DeliveryService implements OnModuleInit {
                     result.reason instanceof Error
                         ? `${result.reason.message}\n${result.reason.stack ?? ''}`.trim()
                         : String(result.reason);
-                this.logger.error(`SendGrid failed for ${offlineUsersEmails[index]}: ${reason}`);
+                this.logger.error(`Brevo failed for ${offlineUsersEmails[index]}: ${reason}`);
             }
         });
     }
