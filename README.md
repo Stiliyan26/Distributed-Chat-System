@@ -1,5 +1,7 @@
 # Distributed Chat System
 
+https://distributed-chat-system-five.vercel.app
+
 A production-grade real-time distributed chat system built with microservices architecture. 7 services, event-driven message pipeline, dynamic Pub/Sub fan-out, multi-device presence tracking with crash recovery, and polyglot persistence — all containerized with Docker.
 
 ## Tech Stack
@@ -9,7 +11,7 @@ A production-grade real-time distributed chat system built with microservices ar
 **Databases:** PostgreSQL (Auth, Channel, Messages, Notification)
 **Cache:** Redis (Presence, Pub/Sub)
 **Message Broker:** Apache Kafka  
-**Real-time:** Socket.IO (WebSocket)   
+**Real-time:** Socket.IO (WebSocket)  
 **Infrastructure:** Docker · Docker Compose
 
 ---
@@ -25,15 +27,15 @@ A production-grade real-time distributed chat system built with microservices ar
 
 ## Services
 
-| Service | Port | Database | Role |
-|---------|------|----------|------|
-| API Gateway | 3000 | — | JWT validation, REST routing, header injection (x-user-id, x-username) |
-| Auth Service | 3001 | PostgreSQL | Registration, login, JWT generation (shared secret, 1-year expiry) |
-| Channel Service | 3002 | PostgreSQL | Channel CRUD, member management, provides member lists to other services |
-| Chat Service | 3003 | Redis Pub/Sub | WebSocket connections (Socket.IO), dynamic topic subscription, in-memory connection maps |
-| Messaging Service | 3004 | PostgreSQL + Kafka | Two entry points: messaging-api (HTTP) + messaging-worker (Kafka consumer) |
-| Presence Service | 3004 | Redis | Online/offline tracking, atomic Lua-based multi-device connection tracking, TTL heartbeats |
-| Delivery Service | 3006 | — | Receives constructed payloads, publishes to Redis Pub/Sub + sends email for offline users |
+| Service           | Port | Database           | Role                                                                                       |
+| ----------------- | ---- | ------------------ | ------------------------------------------------------------------------------------------ |
+| API Gateway       | 3000 | —                  | JWT validation, REST routing, header injection (x-user-id, x-username)                     |
+| Auth Service      | 3001 | PostgreSQL         | Registration, login, JWT generation (shared secret, 1-year expiry)                         |
+| Channel Service   | 3002 | PostgreSQL         | Channel CRUD, member management, provides member lists to other services                   |
+| Chat Service      | 3003 | Redis Pub/Sub      | WebSocket connections (Socket.IO), dynamic topic subscription, in-memory connection maps   |
+| Messaging Service | 3004 | PostgreSQL + Kafka | Two entry points: messaging-api (HTTP) + messaging-worker (Kafka consumer)                 |
+| Presence Service  | 3004 | Redis              | Online/offline tracking, atomic Lua-based multi-device connection tracking, TTL heartbeats |
+| Delivery Service  | 3006 | —                  | Receives constructed payloads, publishes to Redis Pub/Sub + sends email for offline users  |
 
 ---
 
@@ -50,7 +52,7 @@ A production-grade real-time distributed chat system built with microservices ar
 ```
 User joins "investments" on Chat Service 1
   → Chat Service 1 subscribes to topic "channel:investments"
-  
+
 User leaves, no one else on this instance in that channel
   → Chat Service 1 unsubscribes from "channel:investments"
 
@@ -127,13 +129,13 @@ Each Chat Service instance maintains three data structures that serve as reverse
 
 ```typescript
 // Who is this connection? (for switch/disconnect cleanup)
-connections: Map<connectionId, { userId, username, activeChannel }>
+connections: Map<connectionId, { userId; username; activeChannel }>;
 
 // Which connections should receive messages for this channel?
-channelConnections: Map<channelId, Set<connectionId>>
+channelConnections: Map<channelId, Set<connectionId>>;
 
 // Which Pub/Sub topics is this instance subscribed to?
-subscribedTopics: Set<string>
+subscribedTopics: Set<string>;
 ```
 
 **Why all three?** When a message arrives from Pub/Sub → `channelConnections` finds the right WebSocket connections. When a user disconnects → `connections` identifies who they were and which channel to clean up. When the last user leaves a channel → `subscribedTopics` knows to unsubscribe.
@@ -144,14 +146,14 @@ subscribedTopics: Set<string>
 // Chat Service — Socket.IO middleware
 io.use((socket, next) => {
   const token = socket.handshake.auth.token;
-  if (!token) return next(new Error('No token'));
+  if (!token) return next(new Error("No token"));
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     socket.data.userId = decoded.userId;
     socket.data.username = decoded.username;
     next();
   } catch (err) {
-    next(new Error('Invalid token'));
+    next(new Error("Invalid token"));
   }
 });
 ```
@@ -162,12 +164,12 @@ Both API Gateway and Chat Service share the same `JWT_SECRET` environment variab
 
 Each service uses the database that fits its data model:
 
-| Service | Database | Why |
-|---------|----------|-----|
-| Auth | PostgreSQL | Relational: users with unique constraints |
-| Channel | PostgreSQL | Relational: many-to-many channels ↔ members via join table |
-| Messaging | PostgreSQL | Structured messages with composite index on `(channelId, createdAt DESC)` for cursor-based pagination |
-| Presence | Redis | In-memory: sub-millisecond SET/GET, native TTL for heartbeat expiry, SET data type for online user tracking |
+| Service   | Database   | Why                                                                                                         |
+| --------- | ---------- | ----------------------------------------------------------------------------------------------------------- |
+| Auth      | PostgreSQL | Relational: users with unique constraints                                                                   |
+| Channel   | PostgreSQL | Relational: many-to-many channels ↔ members via join table                                                  |
+| Messaging | PostgreSQL | Structured messages with composite index on `(channelId, createdAt DESC)` for cursor-based pagination       |
+| Presence  | Redis      | In-memory: sub-millisecond SET/GET, native TTL for heartbeat expiry, SET data type for online user tracking |
 
 **Redis Pub/Sub** is used for real-time fan-out (ephemeral, no persistence — messages are already stored in PostgreSQL). **Kafka** is used for the message pipeline (persistent, ordered, replayable).
 
@@ -204,13 +206,13 @@ Uses `before` timestamp instead of offset-based pagination. Why: when new messag
 
 ## Crash Recovery
 
-| Component | Failure Mode | Recovery |
-|-----------|-------------|----------|
-| Chat Service | Instance crashes | Client auto-reconnects (exponential backoff). Load balancer routes to healthy instance. Stale presence expires via TTL in ≤30s. Redis Pub/Sub auto-detects subscriber gone. |
-| Messaging Service | Crashes mid-processing | Kafka redelivers unprocessed messages (offset not committed). Idempotent DB writes prevent duplicates. |
-| Redis (Presence) | Crashes | Chat Service continues working (Pub/Sub still delivers). Presence rebuilds as connections send heartbeats and join/leave events. |
-| Kafka | Broker crashes | Messages already persisted to disk survive restarts. messaging-api returns 500 until Kafka recovers. |
-| PostgreSQL | Crashes | Services return 500. On recovery, all data intact (WAL guarantees). |
+| Component         | Failure Mode           | Recovery                                                                                                                                                                    |
+| ----------------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Chat Service      | Instance crashes       | Client auto-reconnects (exponential backoff). Load balancer routes to healthy instance. Stale presence expires via TTL in ≤30s. Redis Pub/Sub auto-detects subscriber gone. |
+| Messaging Service | Crashes mid-processing | Kafka redelivers unprocessed messages (offset not committed). Idempotent DB writes prevent duplicates.                                                                      |
+| Redis (Presence)  | Crashes                | Chat Service continues working (Pub/Sub still delivers). Presence rebuilds as connections send heartbeats and join/leave events.                                            |
+| Kafka             | Broker crashes         | Messages already persisted to disk survive restarts. messaging-api returns 500 until Kafka recovers.                                                                        |
+| PostgreSQL        | Crashes                | Services return 500. On recovery, all data intact (WAL guarantees).                                                                                                         |
 
 ---
 
