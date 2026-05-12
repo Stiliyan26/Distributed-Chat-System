@@ -3,9 +3,10 @@ import { ConfigModule } from "@nestjs/config";
 
 import redisPubSubConfig from "@libs/shared/src/database/redis-pubsub.config";
 import { RedisModule } from "@libs/shared/src/database/redis.module";
+import { HealthController } from "@libs/shared/src/health/health.controller";
 
 import deliveryConfig from "../config/delivery.config";
-import { DeliveryController, DeliveryHealthController } from "./delivery.controller";
+import { DeliveryController } from "./delivery.controller";
 import { DeliveryService } from "./delivery.service";
 
 @Module({
@@ -16,7 +17,7 @@ import { DeliveryService } from "./delivery.service";
         }),
         RedisModule,
     ],
-    controllers: [DeliveryController, DeliveryHealthController],
+    controllers: [DeliveryController, HealthController],
     providers: [DeliveryService]
 })
 export class DeliveryModule { };
