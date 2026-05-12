@@ -1,4 +1,4 @@
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe, RequestMethod } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { initializeTransactionalContext } from 'typeorm-transactional';
 import axios from 'axios';
@@ -30,7 +30,9 @@ async function bootstrap() {
 
   const globalPrefix = CommonConstants.GLOBAL_PREFIX;
 
-  app.setGlobalPrefix(globalPrefix);
+  app.setGlobalPrefix(globalPrefix, {
+    exclude: [{ path: 'health', method: RequestMethod.GET }],
+  });
 
   app.enableShutdownHooks();
 

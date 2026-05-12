@@ -1,4 +1,4 @@
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { Logger, RequestMethod, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { initializeTransactionalContext } from 'typeorm-transactional';
 
@@ -15,7 +15,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AuthModule);
   const globalPrefix = CommonConstants.GLOBAL_PREFIX;
 
-  app.setGlobalPrefix(globalPrefix);
+  app.setGlobalPrefix(globalPrefix, {
+    exclude: [{ path: 'health', method: RequestMethod.GET }],
+  });
   app.enableCors({
     origin: true,
     credentials: true // Allows cookies to be sent

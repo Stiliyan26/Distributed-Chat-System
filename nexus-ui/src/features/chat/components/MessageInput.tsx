@@ -5,17 +5,17 @@ import { AtSign, Plus, Send, Smile, Terminal } from "lucide-react";
 interface MessageInputProps {
   channelName: string;
   onSend: (content: string) => void;
-  disabled?: boolean;
+  sendDisabled?: boolean;
 }
 
-export function MessageInput({ channelName, onSend, disabled }: MessageInputProps) {
+export function MessageInput({ channelName, onSend, sendDisabled }: MessageInputProps) {
   const [text, setText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSend = useCallback(() => {
     const trimmed = text.trim();
 
-    if (!trimmed || disabled) {
+    if (!trimmed || sendDisabled) {
       return;
     }
 
@@ -25,7 +25,7 @@ export function MessageInput({ channelName, onSend, disabled }: MessageInputProp
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
     }
-  }, [text, onSend, disabled]);
+  }, [text, onSend, sendDisabled]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -50,7 +50,6 @@ export function MessageInput({ channelName, onSend, disabled }: MessageInputProp
           value={text}
           onChange={handleInput}
           onKeyDown={handleKeyDown}
-          disabled={disabled}
           placeholder={`Message #${channelName}...`}
           className="w-full bg-transparent text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-outline-var px-4 pt-3 pb-2 resize-none outline-none min-h-[44px] max-h-40"
         />
@@ -85,7 +84,7 @@ export function MessageInput({ channelName, onSend, disabled }: MessageInputProp
           </div>
           <button
             onClick={handleSend}
-            disabled={!text.trim() || disabled}
+            disabled={!text.trim() || sendDisabled}
             className="w-8 h-8 rounded-md bg-brand-gradient flex items-center justify-center transition-all hover:opacity-90 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <Send size={14} className="text-white" />

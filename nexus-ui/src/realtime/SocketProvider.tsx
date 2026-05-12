@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { API_GATEWAY_ORIGIN } from "@/shared/api/api-gateway";
 import type { ConnectionStatus } from "@/shared/types";
 
 import { attachSocketLifecycleListeners } from "./attach-socket-lifecycle-listeners";
@@ -27,7 +28,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional connecting state when opening socket
     setConnectionStatus({ type: "connecting", message: "Connecting..." });
 
-    const socketClient = io("/", SOCKET_CLIENT_OPTIONS);
+    const socketClient = io(API_GATEWAY_ORIGIN, SOCKET_CLIENT_OPTIONS);
 
     setSocket(socketClient);
 

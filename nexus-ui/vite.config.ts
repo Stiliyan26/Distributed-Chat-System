@@ -1,9 +1,12 @@
+import basicSsl from '@vitejs/plugin-basic-ssl';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { defineConfig } from 'vite';
 
+const API_GATEWAY_ORIGIN = 'https://api-gateway-chat-service.onrender.com';
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), basicSsl()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -13,7 +16,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: API_GATEWAY_ORIGIN,
         changeOrigin: true,
         ws: true,
       },

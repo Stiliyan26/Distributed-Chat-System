@@ -1,4 +1,4 @@
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { Logger, RequestMethod, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import axios from 'axios';
@@ -29,7 +29,9 @@ async function bootstrap() {
   app.useWebSocketAdapter(new IoAdapter(app));
 
   const globalPrefix = CommonConstants.GLOBAL_PREFIX;
-  app.setGlobalPrefix(globalPrefix);
+  app.setGlobalPrefix(globalPrefix, {
+    exclude: [{ path: 'health', method: RequestMethod.GET }],
+  });
 
   app.enableShutdownHooks();
 

@@ -12,6 +12,7 @@ import { SharedDatabaseModule } from '@libs/shared/src/database/database.module'
 import { UserHeaderGuard } from '@libs/shared/src/guards/user-header.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { ChannelMemberEntity } from './entities/channel-member.entity';
+import { HealthController } from '@libs/shared/src/health/health.controller';
 
 
 @Module({
@@ -26,7 +27,7 @@ import { ChannelMemberEntity } from './entities/channel-member.entity';
       ChannelMemberEntity
     ])
   ],
-  controllers: [ChannelController],
+  controllers: [ChannelController, HealthController],
   providers: [
     {
       provide: APP_GUARD,

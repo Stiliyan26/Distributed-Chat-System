@@ -79,7 +79,7 @@ export function ChatPage() {
               <MessageInput
                 channelName={activeChannel.channelName}
                 onSend={sendChatMessage}
-                disabled={
+                sendDisabled={
                   connectionStatus.type === "disconnected" ||
                   connectionStatus.type === "error"
                 }

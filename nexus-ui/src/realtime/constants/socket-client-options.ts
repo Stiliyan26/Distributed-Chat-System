@@ -4,6 +4,7 @@ export const SOCKET_CLIENT_OPTIONS: Partial<ManagerOptions> = {
   path: "/api/socket.io",
   withCredentials: true,
   transports: ["websocket"],
-  reconnectionAttempts: 10,
+  reconnection: false,
+  reconnectionAttempts: 0,
   reconnectionDelay: 1500,
 };

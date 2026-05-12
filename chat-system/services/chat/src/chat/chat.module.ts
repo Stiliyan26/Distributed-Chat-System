@@ -6,6 +6,7 @@ import redisPubSubConfig from "@libs/shared/src/database/redis-pubsub.config";
 
 import chatConfig from "../config/chat.config";
 import { ChatGateway } from "./chat.gateway";
+import { HealthController } from "@libs/shared/src/health/health.controller";
 
 @Module({
     imports: [
@@ -15,6 +16,7 @@ import { ChatGateway } from "./chat.gateway";
         }),
         RedisModule
     ],
+    controllers: [HealthController],
     providers: [ChatGateway]
 })
 export class ChatModule { }

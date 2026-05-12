@@ -11,6 +11,7 @@ import { AuthService } from './auth.service';
 import { UsersModule } from '../user/users.module';
 import { UserEntity } from '../user/entities/user.entity';
 import authConfig from '../config/auth.config';
+import { HealthController } from '@libs/shared/src/health/health.controller';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import authConfig from '../config/auth.config';
     JwtModule.register({}),
     UsersModule,
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, HealthController],
   providers: [AuthService],
 })
 export class AuthModule { }

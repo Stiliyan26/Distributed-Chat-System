@@ -3,11 +3,12 @@ import axios, { type AxiosError } from "axios";
 import { ROUTES } from "@/shared/constants/routes";
 
 import { AuthApiPaths } from "./auth-paths";
+import { API_BASE_URL } from "./api-gateway";
 import type { RetriableRequestConfig } from "./axios.types";
 import { SessionRefreshCoordinator } from "./session-refresh-coordinator";
 
 const axiosClient = axios.create({
-  baseURL: "/api",
+  baseURL: API_BASE_URL,
   withCredentials: true,
   headers: { "Content-Type": "application/json" },
 });

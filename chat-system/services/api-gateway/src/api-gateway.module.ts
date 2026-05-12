@@ -6,6 +6,7 @@ import { APP_GUARD } from "@nestjs/core";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 
 import configuration from './config/configuration';
+import { GatewayHealthController } from './health/gateway-health.controller';
 import { ProxyModule } from "./proxy/proxy.module";
 
 @Module({
@@ -31,7 +32,7 @@ import { ProxyModule } from "./proxy/proxy.module";
         JwtModule.register({}),
         ProxyModule
     ],
-    controllers: [],
+    controllers: [GatewayHealthController],
     providers: [
         { provide: APP_GUARD, useClass: ThrottlerGuard },
     ]
