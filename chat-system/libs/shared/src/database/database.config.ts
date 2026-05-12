@@ -31,7 +31,11 @@ const databaseConfig = registerAs(DATABASE_CONFIG_KEY, (): DatabaseConfig => {
     const synchronize = process.env.DB_SYNC === 'true' || process.env.NODE_ENV !== 'production';
 
     if (process.env.DATABASE_URL) {
-        return { url: process.env.DATABASE_URL, ssl: true, synchronize };
+        return databaseConfigSchema.parse({
+            url: process.env.DATABASE_URL,
+            ssl: true,
+            synchronize,
+        });
     }
 
     return databaseConfigSchema.parse({
