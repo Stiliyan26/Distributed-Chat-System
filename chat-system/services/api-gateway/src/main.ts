@@ -22,6 +22,11 @@ async function bootstrap() {
   app.use(urlencoded({ extended: true, limit: bodyLimit }));
   app.use(cookieParser());
 
+  app.enableCors({
+    origin: process.env.FRONTEND_URL || true,
+    credentials: true,
+  });
+
   app.useGlobalFilters(new GlobalExceptionFilter());
 
   app.setGlobalPrefix(globalPrefix, {
