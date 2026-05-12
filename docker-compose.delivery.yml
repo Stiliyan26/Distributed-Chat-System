@@ -10,10 +10,8 @@ services:
       NODE_ENV: production
       PORT: "3005"
       REDIS_PUBSUB_URL: "${REDIS_PUBSUB_URL:-}"
-      SMTP_HOST: smtp.gmail.com
-      SMTP_PORT: 465
-      SMTP_USER: stiliyan.nikolov02@gmail.com
-      SMTP_PASS: ybja zbfg warc xizo
+      SENDGRID_API_KEY: "${SENDGRID_API_KEY:-}"
+      SMTP_FROM: "${SMTP_FROM:-stiliyan.nikolov02@gmail.com}"
     ports:
       - "3005:3005"
       - "9234:9234"

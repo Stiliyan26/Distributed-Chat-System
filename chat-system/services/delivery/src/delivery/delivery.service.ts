@@ -1,23 +1,32 @@
 import { Inject, Injectable, Logger, OnModuleInit } from "@nestjs/common";
 
-import { MailerService } from "@nestjs-modules/mailer";
 import { ConfigService } from "@nestjs/config";
+import sgMail from "@sendgrid/mail";
+import Handlebars from "handlebars";
 import Redis from "ioredis";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 
 import { REDIS_CLIENT } from "@libs/shared/src/constants/redis.constants";
 import { DELIVERY_CONFIG_KEY, DeliveryConfig } from "../config/delivery.config";
 import { DeliverMessageRequestDto } from "./dto/deliver-message.request.dto";
 import { DeliveryPayloadDto } from "./dto/delivery-payload.dto";
 
+type OfflineEmailTemplateContext = {
+    senderUsername: string;
+    messageContent: string;
+    channelId: string;
+};
+
 @Injectable()
 export class DeliveryService implements OnModuleInit {
 
     private readonly logger = new Logger(DeliveryService.name);
+    private offlineEmailTemplate?: (context: OfflineEmailTemplateContext) => string;
 
     constructor(
         @Inject(REDIS_CLIENT)
         private readonly redisService: Redis,
-        private readonly mailerService: MailerService,
         private readonly configService: ConfigService<{ [DELIVERY_CONFIG_KEY]: DeliveryConfig }>
     ) { }
 
@@ -26,10 +35,19 @@ export class DeliveryService implements OnModuleInit {
     }
 
     async onModuleInit() {
-        const { smtpHost, smtpPort, smtpFrom } = this.deliveryConfig;
+        const { sendgridApiKey, smtpFrom } = this.deliveryConfig;
+
+        if (!sendgridApiKey) {
+            this.logger.warn(
+                'SENDGRID_API_KEY is not configured. Delivery service will stay up, but offline email delivery is disabled until the key is added.'
+            );
+            return;
+        }
+
+        sgMail.setApiKey(sendgridApiKey);
 
         this.logger.log(
-            `SMTP configured host=${smtpHost} port=${smtpPort} from=${smtpFrom}`
+            `SendGrid configured from=${smtpFrom}`
         );
 
         if (smtpFrom === 'stiliyan.nikolov02@gmail.com') {
@@ -38,22 +56,13 @@ export class DeliveryService implements OnModuleInit {
             );
         }
 
-        const transporter = (this.mailerService as unknown as {
-            transporter?: { verify: () => Promise<void> };
-        }).transporter;
-
-        if (!transporter) {
-            this.logger.warn('Mailer transporter instance is not exposed; skipping SMTP verify at startup.');
-            return;
-        }
-
         try {
-            await transporter.verify();
-            this.logger.log('SMTP transporter verification succeeded.');
+            await this.getOfflineEmailTemplate();
+            this.logger.log('Offline email template loaded successfully.');
         } catch (err: unknown) {
             const message = err instanceof Error ? err.message : String(err);
             const stack = err instanceof Error ? err.stack : undefined;
-            this.logger.error(`SMTP transporter verification failed: ${message}`, stack);
+            this.logger.error(`Failed to load offline email template: ${message}`, stack);
         }
     }
 
@@ -83,23 +92,39 @@ export class DeliveryService implements OnModuleInit {
         message: DeliveryPayloadDto,
         channelId: string
     ): Promise<void> {
+        if (!this.deliveryConfig.sendgridApiKey) {
+            this.logger.warn(
+                `Skipping offline email delivery for channel ${channelId} because SENDGRID_API_KEY is missing.`
+            );
+            return;
+        }
+
+        const htmlTemplate = await this.getOfflineEmailTemplate();
+        const fromEmail = this.deliveryConfig.smtpFrom;
+
         const results = await Promise.allSettled(
             offlineUsersEmails.map(async (email) => {
-                this.logger.log(`SMTP Attempt: Sending offline email to ${email}`);
+                this.logger.log(`SendGrid attempt: sending offline email to ${email}`);
 
-                const info = await this.mailerService.sendMail({
+                const html = htmlTemplate({
+                    senderUsername: message.senderUsername,
+                    messageContent: message.content,
+                    channelId
+                });
+
+                const [response] = await sgMail.send({
                     to: email,
+                    from: {
+                        email: fromEmail,
+                        name: "Chat System",
+                    },
                     subject: `New message from ${message.senderUsername}`,
-                    template: 'offline-email',
-                    context: {
-                        senderUsername: message.senderUsername,
-                        messageContent: message.content,
-                        channelId
-                    }
+                    text: `${message.senderUsername} sent a new message while you were offline: ${message.content}`,
+                    html,
                 });
 
                 this.logger.log(
-                    `SMTP Success: Sent email to ${email} messageId=${info.messageId ?? 'n/a'} response=${info.response ?? 'n/a'}`
+                    `SendGrid success: sent email to ${email} statusCode=${response.statusCode}`
                 );
             })
         );
@@ -110,8 +135,20 @@ export class DeliveryService implements OnModuleInit {
                     result.reason instanceof Error
                         ? `${result.reason.message}\n${result.reason.stack ?? ''}`.trim()
                         : String(result.reason);
-                this.logger.error(`SMTP Failed for ${offlineUsersEmails[index]}: ${reason}`);
+                this.logger.error(`SendGrid failed for ${offlineUsersEmails[index]}: ${reason}`);
             }
         });
+    }
+
+    private async getOfflineEmailTemplate() {
+        if (this.offlineEmailTemplate) {
+            return this.offlineEmailTemplate;
+        }
+
+        const templatePath = join(__dirname, "assets/templates/offline-email.hbs");
+        const templateSource = await readFile(templatePath, "utf8");
+        this.offlineEmailTemplate = Handlebars.compile<OfflineEmailTemplateContext>(templateSource);
+
+        return this.offlineEmailTemplate;
     }
 }
