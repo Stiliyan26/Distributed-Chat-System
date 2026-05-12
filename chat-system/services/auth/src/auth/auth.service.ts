@@ -152,7 +152,7 @@ export class AuthService {
         res.cookie(AuthCookie.ACCESS_TOKEN, accessToken, {
             httpOnly: true,
             secure: this.authConfig.nodeEnv === 'production',
-            sameSite: AuthCookie.SAME_SITE_STRICT,
+            sameSite: AuthCookie.SAME_SITE_NONE,
             maxAge: 15 * 60 * 1000, // 15 minutes
             path: '/'
         });
@@ -160,7 +160,7 @@ export class AuthService {
         res.cookie(AuthCookie.REFRESH_TOKEN, refreshToken, {
             httpOnly: true,
             secure: this.authConfig.nodeEnv === 'production',
-            sameSite: AuthCookie.SAME_SITE_STRICT,
+            sameSite: AuthCookie.SAME_SITE_NONE,
             maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
             path: CookiePath.REFRESH
         });
