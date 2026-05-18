@@ -1,0 +1,10 @@
+# Optional override: relax API gateway rate limits for local k6 / soak tests.
+# Example:
+#   docker compose -f docker-compose.api-gateway.yml -f docker-compose.loadtest.yml up -d
+#
+# Default GATEWAY_THROTTLE_LIMIT=200 blocks sustained >~3 RPS per client IP.
+
+services:
+  api-gateway:
+    environment:
+      GATEWAY_THROTTLE_LIMIT: "100000"

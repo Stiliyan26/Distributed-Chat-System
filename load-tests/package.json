@@ -1,0 +1,27 @@
+{
+  "name": "chat-system-load-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "HTTP load tests (k6) and Socket.IO soak (Node). Raise api-gateway GATEWAY_THROTTLE_LIMIT before high RPS runs.",
+  "type": "module",
+  "scripts": {
+    "bootstrap": "npm install && node scripts/ensure-env.mjs",
+    "prepare:fixture": "node scripts/prepare-fixture.mjs",
+    "k6:auth": "node scripts/k6-with-env.mjs run k6/auth.js",
+    "k6:messages": "node scripts/k6-with-env.mjs run k6/messages.js",
+    "k6:channels": "node scripts/k6-with-env.mjs run k6/channels.js",
+    "k6:smoke": "node scripts/k6-with-env.mjs run --vus 1 --duration 5s k6/auth.js",
+    "socket:load": "node socketio/load-socket.mjs",
+    "socket:broadcast": "node socketio/group-broadcast.mjs",
+    "docker:stack:up": "bash scripts/docker-stack.sh up -d --build",
+    "docker:stack:down": "bash scripts/docker-stack.sh down",
+    "docker:all:up": "npm run docker:stack:up",
+    "docker:all:down": "npm run docker:stack:down",
+    "postinstall": "node scripts/ensure-env.mjs"
+  },
+  "dependencies": {
+    "axios": "^1.13.6",
+    "dotenv": "^16.4.5",
+    "socket.io-client": "^4.8.3"
+  }
+}

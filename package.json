@@ -1,0 +1,19 @@
+{
+  "name": "chat-system",
+  "private": true,
+  "description": "Root convenience scripts; load tests live in load-tests/",
+  "scripts": {
+    "bootstrap": "npm run bootstrap --prefix ./load-tests",
+    "prepare:fixture": "npm run prepare:fixture --prefix ./load-tests",
+    "k6:auth": "npm run k6:auth --prefix ./load-tests",
+    "k6:channels": "npm run k6:channels --prefix ./load-tests",
+    "k6:messages": "npm run k6:messages --prefix ./load-tests",
+    "k6:smoke": "npm run k6:smoke --prefix ./load-tests",
+    "socket:load": "npm run socket:load --prefix ./load-tests",
+    "socket:broadcast": "npm run socket:broadcast --prefix ./load-tests",
+    "docker:stack:up": "bash load-tests/scripts/docker-stack.sh up -d --build",
+    "docker:stack:down": "bash load-tests/scripts/docker-stack.sh down",
+    "docker:all:up": "npm run docker:stack:up",
+    "docker:all:down": "npm run docker:stack:down"
+  }
+}
