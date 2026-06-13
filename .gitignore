@@ -51,3 +51,6 @@ test-output
 
 # Local secrets (Azure Service Bus scripts)
 service-bus/.env
+
+# Local secrets
+.env
