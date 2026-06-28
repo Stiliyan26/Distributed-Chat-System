@@ -1,5 +1,7 @@
 # Distributed Chat System - https://distributed-chat-system-five.vercel.app/
 
+### Presentation link - https://docs.google.com/presentation/d/1olc3AiLWQG7WR66OBm8kXQMtrY73zIOA/edit?slide=id.p1#slide=id.p1
+
 > A production-grade, real-time distributed chat platform built on a microservices architecture — event-driven messaging, dynamic Pub/Sub fan-out, multi-device presence with crash recovery, and polyglot persistence, fully containerized with Docker.
 
 <p>
